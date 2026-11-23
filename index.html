@@ -3,161 +3,638 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>ガンバレ！江藤くん 最強ナース烈伝</title>
+<title>ときめき江藤くん</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{height:100%;overflow:hidden;background:#0d1b2a;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;color:#1b2a3a}
+html,body{height:100%;overflow:hidden;background:#2a1a2e;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;color:#2a1a2e}
 #app{height:100vh;height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:#fff}
-/* ===== 上段 6 ===== */
-#top{flex:5;min-height:0;position:relative;overflow:hidden;background:#7ccf6b}
-#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-#hud{position:absolute;top:0;left:0;right:0;padding:6px 10px;font-size:12px;font-weight:800;color:#fff;background:rgba(13,27,42,.6);display:flex;justify-content:space-between;z-index:3}
-#note{position:absolute;inset:34px 6px 6px 6px;z-index:7;display:none;overflow:auto;background:#fffbe6;border:5px solid #a8682f;border-radius:10px;padding:12px 14px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
-#note h2{font-size:18px;color:#d7263d;border-bottom:3px double #a8682f;padding-bottom:4px}
-#note .by{font-size:12px;font-weight:700;color:#7a4a21;margin-top:4px}
-#note ul{margin:8px 0 0 1.1em;font-size:14.5px;line-height:1.6;font-weight:600}
-#note li{margin-bottom:6px}
-#note li small{display:block;font-size:12px;font-weight:500;color:#55708a}
-#note .ans{color:#d7263d}
-#note .dexg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.dx{background:#fff;border:2px solid #0d1b2a;border-radius:8px;padding:3px;text-align:center;line-height:1.25}
-.dx img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:5px;display:block}
-.dx.un img{filter:brightness(0)}
-.dx.seen img{filter:grayscale(1) brightness(.75)}
-.dx b{display:block;font-size:10px}
-.dx i{display:block;font-style:normal;color:#55708a;font-size:9px}
-.dx span{color:#d7263d;font-weight:900;font-size:11px}
-#note .pg{font-size:11px;font-weight:800;color:#7a4a21;text-align:right}
-#note .say{display:flex;gap:8px;align-items:center;background:#fff;border:2px solid #e08a00;border-radius:10px;padding:6px;margin:4px 0 8px;font-size:13px;font-weight:700}
-#note .say img{width:60px;height:45px;object-fit:cover;border-radius:6px;border:2px solid #0d1b2a;flex:none}
-button:disabled{opacity:.45}
+#top{flex:5;min-height:0;position:relative;overflow:hidden}
+#bg{position:absolute;inset:0;background:linear-gradient(#ffd1e3,#fff3f8);transition:background .4s}
+#pic{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);height:82%;max-width:88%;aspect-ratio:2/3.2;display:none}
+#pic img{width:100%;height:100%;object-fit:contain;object-position:center bottom;border:4px solid #2a1a2e;border-radius:16px;background:linear-gradient(#fafafb,#d9dbe0 55%,#a9adb6);box-shadow:0 0 0 3px #fff,0 6px 0 rgba(42,26,46,.25)}
+#pic.in{animation:pin .35s}
+@keyframes pin{from{opacity:0;transform:translate(-50%,20px)}}
+/* ホーム画面:左半分に江藤くん、右半分にステータス */
+#pic.left{left:3%;top:40px;bottom:auto;transform:none;height:calc(96% - 40px - 54px);width:auto;max-width:46%}
+/* 江藤くんの独り言(ホーム画面で、立ち絵の下を右から左へ流れる) */
+#mono{position:absolute;left:3%;width:46%;bottom:4%;height:44px;overflow:hidden;background:#fff;border:3px solid #2a1a2e;border-radius:10px;display:none;z-index:2;box-shadow:0 4px 0 rgba(42,26,46,.25)}
+#mono::before{content:"💭";position:absolute;left:4px;top:50%;transform:translateY(-50%);z-index:1;font-size:16px;background:#fff;padding-right:2px}
+#mono span{position:absolute;top:50%;left:100%;white-space:nowrap;font-size:14px;font-weight:800;color:#2a1a2e;transform:translate(0,-50%);animation:mono 10s linear infinite}
+@keyframes mono{from{left:100%;transform:translate(0,-50%)}to{left:0;transform:translate(-100%,-50%)}}
+#pic.left.in{animation:pinL .35s}
+@keyframes pinL{from{opacity:0;transform:translateY(20px)}}
+#side{position:absolute;right:3%;top:40px;bottom:4%;width:47%;z-index:2;display:none;overflow:auto;background:rgba(255,255,255,.92);border:3px solid #2a1a2e;border-radius:12px;padding:7px 8px;font-size:12px;font-weight:800;color:#2a1a2e;box-shadow:0 4px 0 rgba(42,26,46,.25)}
+#side h3{font-size:12.5px;color:#c2255c;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dotted #ff8fb8;padding-bottom:3px;margin-bottom:3px}
+#side h3 small{font-size:10px;color:#7a3a5a}
+#side .r{display:grid;grid-template-columns:5em 1fr 1.8em;align-items:center;gap:4px;margin-top:2px}
+#side .r b{text-align:right;font-size:11px}
+#side .bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;border:1.5px solid #2a1a2e}
+#side .bar i{display:block;height:100%}
+#side .her{display:flex;gap:6px;align-items:center;margin-top:5px}
+#side .fc,#note .fc{border-radius:8px;border:2px solid #2a1a2e;background-color:#e9ecef;background-image:none;background-repeat:no-repeat;background-size:140% auto;flex:none}
+#side .fc{width:62px;height:62px}
+#side .her .bars{flex:1}
+#side .her .bars .bar{margin-top:2px}
+#side .money{margin-top:4px;font-size:11.5px;display:flex;justify-content:space-between}
+#side .lover{color:#c2255c}
+#hud{position:absolute;top:0;left:0;right:0;padding:6px 46px 6px 10px;font-size:12px;font-weight:800;color:#fff;background:rgba(42,26,46,.65);display:flex;justify-content:space-between;z-index:3}
 #snd{position:absolute;top:3px;right:4px;z-index:9;width:36px;height:26px;font-size:14px;padding:0;border-radius:8px;box-shadow:none;background:rgba(255,255,255,.9)}
-#hud{padding-right:46px !important}
-#msg{flex:none;background:#fff;border:3px solid #ffe14d;border-radius:10px;padding:8px 10px;font-size:17px;font-weight:700;line-height:1.5;max-height:42%;overflow:auto;display:none}
-#msg .who{display:inline-block;font-size:13px;color:#fff;background:#0d1b2a;border-radius:8px;padding:1px 8px;margin-bottom:3px}
-#msg .who.eto{background:#e08a00}
-#msg .who.foe{background:#d7263d}
-#msg .pf{float:left;width:64px;height:48px;object-fit:cover;border:3px solid #0d1b2a;border-radius:8px;margin:0 8px 2px 0}
-#msg small{clear:both;display:block;margin-top:6px;padding-top:5px;border-top:1px dashed #9ab;font-size:14.5px;font-weight:500;color:#33506b}
-/* タイトル */
-#title{position:absolute;inset:0;z-index:8;background:linear-gradient(#ffb347,#ffe14d 55%,#7ccf6b);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px}
-#title h1{font-size:32px;line-height:1.15;color:#fff;text-shadow:3px 3px 0 #e0457b,-2px -2px 0 #0d1b2a,2px -2px 0 #0d1b2a,-2px 2px 0 #0d1b2a}
-#title h1 em{font-style:normal;color:#ffe14d;font-size:42px}
-#title .sub{margin-top:6px;font-size:20px;font-weight:900;color:#d7263d;letter-spacing:.12em;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff}
-#title .credit{position:absolute;bottom:4px;left:0;right:0;font-size:10px;font-weight:700;color:#0d1b2a;opacity:.7}
-#title .ver{margin-top:4px;font-size:14px;font-weight:900;color:#0d1b2a;background:#fff;border:3px solid #0d1b2a;border-radius:10px;padding:0 10px;letter-spacing:.05em}
-#title p{margin-top:6px;font-size:13px;font-weight:800;background:#0d1b2a;color:#ffe14d;border-radius:12px;padding:3px 14px}
-#title img{height:42%;max-width:90%;object-fit:contain;margin-top:10px;filter:drop-shadow(0 4px 0 rgba(13,27,42,.3))}
-/* バトル */
-#battle{position:absolute;inset:0;z-index:5;display:none;background:linear-gradient(#bfe9ff 0 52%,#9bd67f 52% 100%)}
-#battle.flash{animation:flash .5s 2}
-@keyframes flash{50%{filter:invert(1)}}
-.plat{position:absolute;border-radius:50%;background:rgba(40,90,40,.3)}
-#platE{display:none}
-#platP{display:none}
-#foe{position:absolute;right:5%;top:9%;height:54%;aspect-ratio:2/3}
-#foe img{height:100%;width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 4px 0 rgba(13,27,42,.3))}
-#me{position:absolute;left:4%;top:42%;height:33%;aspect-ratio:4/3}
-#me img{height:100%;width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 4px 0 rgba(13,27,42,.3))}
-.stat{position:absolute;background:#fffbe6;border:3px solid #0d1b2a;border-radius:10px 2px 10px 2px;padding:5px 9px;width:48%;font-size:13px;font-weight:900;z-index:2}
-#statE{left:3%;top:9%}
-#statP{right:3%;bottom:5%}
-.stat .lv{float:right;font-size:11px;font-weight:700}
-.bar{margin-top:4px;height:9px;background:#3a4a5a;border-radius:5px;overflow:hidden;border:2px solid #0d1b2a}
-.bar i{display:block;height:100%;background:#35d07f;transition:width .5s,background .5s}
-.bar i.mid{background:#f5c518}.bar i.low{background:#ef4444}
-.hpn{font-size:11px;text-align:right;font-weight:700;margin-top:1px}
-.hit{animation:hit .45s}
-@keyframes hit{0%,100%{transform:none;opacity:1}20%{transform:translateX(10px);opacity:.2}40%{opacity:1}60%{transform:translateX(-10px);opacity:.2}}
-.atk{animation:atk .35s}
-@keyframes atk{50%{transform:translate(26px,-16px)}}
-.atk2{animation:atk2 .35s}
-@keyframes atk2{50%{transform:translate(-26px,16px)}}
-.faint{animation:faint .6s forwards}
-@keyframes faint{to{transform:translateY(60%);opacity:0}}
-/* ===== 下段 4 ===== */
-#bottom{flex:5;min-height:0;background:#0d1b2a;padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;border-top:4px solid #ffe14d}
-#lbl{color:#ffe14d;font-size:12px;font-weight:800;display:flex;justify-content:space-between}
-#pane{flex:1;min-height:0;display:grid;gap:7px;overflow-y:auto}
-#pane.c4{grid-template-columns:1fr 1fr}
-#pane.c1{grid-template-columns:1fr}
-#pane.scroll{overflow-y:auto;grid-auto-rows:46px;align-content:start;padding-bottom:6px}
-#pane.scroll button{font-size:13px}
-#note .card{background:#fff;border:3px solid #0d1b2a;border-radius:12px;padding:12px;margin-top:8px;font-size:16px;font-weight:700;line-height:1.5}
-#note .card.back{border-color:#d7263d}
-#note .card small{display:block;margin-top:6px;font-size:12.5px;font-weight:500;color:#33506b}
-button{font-family:inherit;border:none;border-radius:12px;font-weight:800;font-size:15px;color:#0d1b2a;background:#fff;box-shadow:0 4px 0 #6b7f95;padding:6px;line-height:1.3;touch-action:manipulation}
-button:active{transform:translateY(3px);box-shadow:0 1px 0 #6b7f95}
-button.main{background:#ffe14d;box-shadow:0 4px 0 #b99a00;font-size:18px}
-button.right{background:#4ade80;box-shadow:0 4px 0 #1f8a48}
-button.wrong{background:#f87171;box-shadow:0 4px 0 #a53030}
-#side{display:flex;flex-direction:column;gap:8px;flex:none}
-.sideBtn{width:78px;height:60px;font-size:13px;line-height:1.2;background:#ffe14d;box-shadow:0 4px 0 #b99a00}
-button{white-space:pre-line}
-#battle.room{background:linear-gradient(#2f5d50 0 26%,#7a4a21 26% 29%,#e8dcc0 29% 100%)}
-/* 医療器具ならべ:上段=名前つきの枠4つ、下段=絵4枚 */
+#msg{flex:none;background:#fff;border:3px solid #ff8fb8;border-radius:12px;padding:8px 10px;font-size:17px;font-weight:700;line-height:1.5;max-height:42%;overflow:auto;display:none}
+#msg .who{display:inline-block;font-size:13px;color:#fff;background:#2a1a2e;border-radius:8px;padding:1px 8px;margin-bottom:3px}
+#msg .who.eto{background:#e08a00}#msg .who.saki{background:#3b5bdb}#msg .who.yui{background:#d9480f}#msg .who.karui{background:#2b8a3e}#msg .who.etc{background:#6b7f95}
+#msg .pf{float:left;width:64px;height:48px;object-fit:cover;border:3px solid #2a1a2e;border-radius:8px;margin:0 8px 2px 0}
+#msg small{clear:both;display:block;margin-top:6px;padding-top:5px;border-top:1px dashed #c9a;font-size:14.5px;font-weight:500;color:#5c3d5e}
+#note{position:absolute;inset:34px 6px 6px 6px;z-index:7;display:none;overflow:auto;background:#fff8fb;border:5px solid #c2255c;border-radius:12px;padding:12px 14px}
+#note h2{font-size:18px;color:#c2255c;border-bottom:3px double #c2255c;padding-bottom:4px}
+#note .by{font-size:12px;font-weight:700;color:#7a3a5a;margin-top:6px}
+#note .row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;font-weight:700}
+#note .fc{width:72px;height:72px;border-width:3px}
+#note .bar{flex:1;height:12px;background:#eee;border-radius:6px;overflow:hidden;border:2px solid #2a1a2e}
+#note .bar i{display:block;height:100%}
+#note ul{margin:8px 0 0 1.1em;font-size:14px;line-height:1.6;font-weight:600}
+#title{position:absolute;inset:0;z-index:8;background:linear-gradient(#ff8fb8,#ffd1e3 55%,#fff);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px}
+#title h1{font-size:30px;line-height:1.2;color:#fff;text-shadow:3px 3px 0 #c2255c,-2px -2px 0 #2a1a2e,2px -2px 0 #2a1a2e,-2px 2px 0 #2a1a2e}
+#title h1 em{font-style:normal;font-size:40px;color:#fff3a8}
+#title p{margin-top:8px;font-size:13px;font-weight:800;background:#2a1a2e;color:#ffd1e3;border-radius:12px;padding:3px 14px}
+#title .duo{display:flex;gap:8px;margin-top:12px;height:44%}
+#title .duo img{height:100%;aspect-ratio:2/3;object-fit:contain;object-position:center bottom;border:4px solid #2a1a2e;border-radius:14px;background:linear-gradient(#fafafb,#d9dbe0 55%,#a9adb6)}
+#title .credit{position:absolute;bottom:4px;left:0;right:0;font-size:10px;font-weight:700;opacity:.7}
+#title .sel{display:flex;gap:10px;margin-top:8px;height:62%;width:100%;justify-content:center}
+#title .sel>div{flex:1;max-width:46%;display:flex;flex-direction:column;align-items:center;gap:4px}
+#title .sel img{width:100%;flex:1;min-height:0;object-fit:contain;object-position:center bottom;border:4px solid #2a1a2e;border-radius:14px;background:linear-gradient(#fafafb,#d9dbe0 55%,#a9adb6)}
+#title .sel b{font-size:15px;color:#2a1a2e}
+#title .sel span{font-size:11px;font-weight:700;color:#5c3d5e;line-height:1.35}
+.pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);z-index:5;font-size:24px;font-weight:900;color:#fff;-webkit-text-stroke:1.5px #2a1a2e;text-shadow:0 3px 0 #2a1a2e;animation:pop 1.1s forwards;pointer-events:none;white-space:nowrap}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-40px)}}
+#bottom{flex:5;min-height:0;background:#2a1a2e;padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;border-top:4px solid #ff8fb8}
+#lbl{color:#ffd1e3;font-size:12px;font-weight:800;display:flex;justify-content:space-between}
+#pane{flex:1;min-height:0;display:grid;gap:7px;grid-template-columns:1fr;overflow-y:auto}
+#pane.c2{grid-template-columns:1fr 1fr}
+#pane.scroll{overflow-y:auto;grid-auto-rows:50px;align-content:start}
+button{font-family:inherit;border:none;border-radius:12px;font-weight:800;font-size:15px;color:#2a1a2e;background:#fff;box-shadow:0 4px 0 #8a6a8e;padding:6px;line-height:1.3;white-space:pre-line;touch-action:manipulation}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #8a6a8e}
+button.main{background:#ffd43b;box-shadow:0 4px 0 #b08900}
+button.pink{background:#ff8fb8;box-shadow:0 4px 0 #a61e4d}
+button.right{background:#69db7c;box-shadow:0 4px 0 #2b8a3e}
+button.wrong{background:#ff8787;box-shadow:0 4px 0 #a61e1e}
+button:disabled{opacity:.45}
+#pane.menu button{font-size:14px;padding:4px}
+/* 器具ならべ:上段=名前つきの枠4つ、下段=絵4枚 */
 #pane.ord{grid-template-columns:repeat(4,1fr);grid-template-rows:1.25fr 1fr;gap:6px;overflow:hidden}
-button.ordslot{min-height:0;padding:3px;display:flex;flex-direction:column;align-items:stretch;gap:3px;overflow:hidden;background:#33506b;box-shadow:0 3px 0 #1a2a3a;color:#fff}
+button.ordslot{min-height:0;padding:3px;display:flex;flex-direction:column;align-items:stretch;gap:3px;overflow:hidden;background:#5c3d5e;box-shadow:0 3px 0 #2a1a2e;color:#fff}
 button.ordslot:active,button.ordpic:active{transform:none}
 .ord-n{font-size:12px;line-height:1.15;min-height:2.3em;display:flex;align-items:center;justify-content:center;word-break:keep-all;overflow-wrap:anywhere}
-.ord-box{flex:1;min-height:0;border:2px dashed #9fb3c8;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;overflow:hidden}
-button.ordslot.put .ord-box{border-style:solid;border-color:#ffe14d;background:#fff}
-button.ordslot.ok{background:#1f8a48}button.ordslot.ok .ord-box{border-color:#4ade80}
-button.ordslot.ng{background:#a53030}button.ordslot.ng .ord-box{border-color:#f87171}
-button.ordpic{min-height:0;padding:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #ffe14d}
+.ord-box{flex:1;min-height:0;border:2px dashed #e9b8cf;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;overflow:hidden}
+button.ordslot.put .ord-box{border-style:solid;border-color:#ffd43b;background:#fff}
+button.ordslot.ok{background:#2b8a3e}button.ordslot.ok .ord-box{border-color:#69db7c}
+button.ordslot.ng{background:#a61e1e}button.ordslot.ng .ord-box{border-color:#ff8787}
+button.ordpic{min-height:0;padding:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #ff8fb8}
 button.ordpic.used{opacity:.25}
 button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:contain}
 .ord-e{font-size:32px}
-.dmg.weak{color:#cbd5e1;font-size:22px}
-button.main.ep{font-size:15px;line-height:1.25;padding:4px}
-.dmg{position:absolute;right:8%;top:20%;z-index:4;font-size:26px;font-weight:900;color:#fff;-webkit-text-stroke:1.5px #0d1b2a;text-shadow:0 3px 0 #0d1b2a;animation:dmg 1s forwards;pointer-events:none}
-.dmg.crit{color:#ffe14d;font-size:30px}
-.dmg.miss{left:6%;right:auto;top:32%;color:#60a5fa}
-@keyframes dmg{0%{transform:scale(.4);opacity:0}20%{transform:scale(1.15);opacity:1}100%{transform:translateY(-40px);opacity:0}}
-#battle.field{background:linear-gradient(#bfe9ff 0 44%,#d9774a 44% 50%,#7ccf6b 50% 100%)}
-#note .mkc{display:flex;gap:10px;background:#fff;border:2px solid #0d1b2a;border-radius:10px;padding:8px;margin-top:8px;font-size:13px;font-weight:600;line-height:1.5}
-#note .mkc img{width:64px;height:96px;object-fit:cover;border-radius:6px;border:2px solid #0d1b2a;flex:none}
-#note .mkc.un img{filter:brightness(0)}
-#note .mkc b{font-size:16px}#note .mkc i{font-style:normal;color:#55708a;font-size:12px}#note .mkc .st{color:#e08a00}
-#note .mkc p{margin-top:4px}
-#battle.shop{background:linear-gradient(#f6d7a7 0 30%,#a8682f 30% 34%,#e9eef2 34% 100%)}
-.bar i.love{background:#ff5c8a}
-#mapui{display:flex;height:100%;min-height:0;align-items:center;justify-content:center;gap:16px}
-#bagBtn{width:78px;height:78px;font-size:14px;line-height:1.25;background:#ffe14d;box-shadow:0 4px 0 #b99a00;flex:none}
-#pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;height:100%;max-height:250px;aspect-ratio:1;max-width:calc(100% - 110px);margin:0;flex:none}
-#pad button{font-size:24px;background:#e8eef5;touch-action:none}
-#pad .u{grid-area:1/2}#pad .l{grid-area:2/1}#pad .r{grid-area:2/3}#pad .d{grid-area:3/2}
-#pad .c{grid-area:2/2;background:#ffe14d;box-shadow:0 3px 0 #b99a00;border-radius:50%;margin:2%;padding:0;font-size:11px;line-height:1.15;touch-action:manipulation}
+/* 記録(名鑑・図鑑・友達) */
+#note .mkc{display:flex;gap:10px;margin-top:10px;padding:8px;background:#fff;border:3px solid #2a1a2e;border-radius:12px;font-size:13px;line-height:1.45}
+#note .mkc img{width:64px;height:84px;object-fit:contain;object-position:center bottom;border:2px solid #2a1a2e;border-radius:8px;background:linear-gradient(#fafafb,#d9dbe0 55%,#a9adb6);flex:none}
+#note .mkc b{font-size:15px}
+#note .mkc i{font-style:normal;color:#7a3a5a;font-weight:700}
+#note .mkc p{margin-top:3px}
+#note .mkc .st{color:#e8590c}
+#note .mkc.un img{filter:brightness(0) opacity(.35)}
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="top">
-    <canvas id="cv"></canvas>
-    <div id="hud"><span id="hudL">🏫 通学路</span><span id="hudR"></span></div>
-    <div id="battle">
-      <div class="plat" id="platE"></div><div class="plat" id="platP"></div>
-      <div class="stat" id="statE"><span id="eName"></span><span class="lv" id="eLv"></span><div class="bar"><i id="eBar"></i></div></div>
-      <div id="foe"></div>
-      <div id="me"></div>
-      <div class="stat" id="statP">江藤くん<span class="lv">Lv.18</span><div class="bar"><i id="pBar"></i></div><div class="hpn" id="pNum"></div></div>
-    </div>
-    <div id="note"></div>
-    <button id="snd" onclick="sndToggle()">🔊</button>
-    <div id="title"></div>
-  </div>
-  <div id="bottom">
-    <div id="lbl"><span id="lblL"></span><span id="lblR"></span></div>
-    <div id="msg"></div>
-    <div id="pane" class="c1"></div>
-  </div>
+ <div id="top">
+  <div id="bg"></div><div id="pic"><img alt=""></div><div id="side"></div><div id="mono"><span id="monoT"></span></div>
+  <div id="hud"><span id="hudL"></span><span id="hudR"></span></div>
+  <div id="note"></div>
+  <button id="snd" onclick="sndToggle()">🔊</button>
+  <div id="title"></div>
+ </div>
+ <div id="bottom"><div id="lbl"><span id="lblL"></span><span id="lblR"></span></div><div id="msg"></div><div id="pane"></div></div>
 </div>
 <script>
-/* バージョン:更新のたびに上げる(決まりは CLAUDE.md の「バージョン」)。タブの題名にも自動で入る */
-const VERSION='1.4.8';
-/* ================================================================
-   キャラデータ(デザインが届いたら img に画像を入れると差し替わります)
-   ================================================================ */
+/* =====================================================================
+   ときめき江藤くん(1年版) 設計書:docs/tokimeki_design.md
+   ・最初にヒロインをえらぶ。4月第1週〜3月第4週の48週を前半・後半に分けた96ターン
+   ・毎ターン1つ行動をえらぶ。行事・試験・告白チャンスは決まったターンに起こる(FIX)
+   ・ほかのキャラのイベントが確率で起こる(OEV)。ヒロインの物語は全5章(CH)
+   ・告白チャンスは年5回。💗・🤝・大事にする能力・章の達成で「告白される確率」が上がる(confessRate)
+   ・恋人になっても進級試験に受からないと最高のエンドにならない
+   ・旧『ガンバレ！江藤くん』の4話は、この1年の中の行動・行事・イベントとして入っている(下の「旧『ガンバレ！江藤くん』の物語」)
+   ・人物は切り取らない元の構図で、黒枠つきのカードに出す
+   ===================================================================== */
+const VERSION='1.0';
+const $=id=>document.getElementById(id);
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ---------- 登場人物 ---------- */
+const HER={
+ saki:{name:'一ノ瀬サキ',short:'サキ',fy:'35%',need:'body',needName:'からだの知識',theme:'完ぺきじゃなくていい',prof:'クラス委員長。成績トップのがんばり屋で、少しツンとしている(20歳)'},
+ yui:{name:'春日ユイ',short:'ユイ',fy:'31%',need:'care',needName:'思いやり',theme:'遅すぎる夢なんてない',prof:'元保育士の社会人入学。小児看護師をめざす、おだやかなお姉さん(26歳)'}
+};
+const himg=(k,e)=>`heroines/${k}_${e||1}.jpg`; // 1ふつう 2笑顔 3照れ 4心配
+const WHO={eto:'江藤くん',saki:'サキ',yui:'ユイ',karui:'カルイ',gai:'ガイコツ先輩',anki:'アンキ',kibishi:'キビシ主任',donaru:'ドナル先生',yae:'ヤエさん',kizawa:'キザワ',mizuki:'ミズキ',honehara:'ホネハラ教授',sys:null};
+const WHOIMG={karui:'chars/karui.jpg',gai:'chars/gai.jpg',anki:'chars/anki.jpg',kibishi:'chars/kibishi.jpg',donaru:'chars/donaru.jpg',yae:'chars/yae.jpg',kizawa:'chars/kizawa.jpg',mizuki:'chars/mizuki.jpg',honehara:'chars/honehara.jpg'};
+const ST_NAME={body:'からだの知識',med:'病気とくすり',skill:'看護技術',care:'思いやり',hp:'体力'};
+
+/* ---------- 1年のこよみ:t=0〜95(週w=t/2、前半・後半) ---------- */
+const TURNS=96;
+const wOf=t=>Math.floor(t/2), halfOf=t=>t%2, mIdx=t=>Math.floor(wOf(t)/4); // mIdx 0=4月 … 11=3月
+const monthNum=t=>((mIdx(t)+3)%12)+1;
+const when=t=>`${monthNum(t)}月 第${wOf(t)%4+1}週 ${halfOf(t)?'後半':'前半'}`;
+const tOf=(w,h)=>w*2+h;
+/* 月ごとの授業の単元(null の月は、それまでの単元のまとめ) */
+const UNIT_ORDER=['cell','bone','heart',null,null,'resp','dig','kid','imm','nerve','drug',null];
+const UNIT_NAME={cell:'細胞と生物の特徴',bone:'骨と筋肉',heart:'心臓と循環',resp:'呼吸とガス交換',dig:'消化と吸収',kid:'腎臓と体液・体温',imm:'免疫と感染',nerve:'神経とホルモン',drug:'くすりの基本'};
+const UNIT_ST={imm:'med',drug:'med'}; // それ以外は body
+function learnedUnits(t){ return UNIT_ORDER.slice(0,mIdx(t)+1).filter(Boolean); }
+function unitNow(t){ return UNIT_ORDER[mIdx(t)]; }
+
+/* ---------- 状態 ---------- */
+let G=null, state='title';
+function newGame(k){ return {her:k,t:0,st:{body:0,med:0,skill:0,care:0,hp:0},stress:0,money:3000,friend:0,gai:0,
+ h:{saki:{love:0,trust:0,ch:0,last:-9},yui:{love:0,trust:0,ch:0,last:-9}},lover:false,declined:false,exam1:null,exam2:null,
+ miss:[],cool:{},once:{},sick:false,actDone:false,fixDone:{}}; }
+let ENDS={}, ALBUM={};
+try{ ENDS=JSON.parse(localStorage.getItem('tk_ends2')||'{}'); ALBUM=JSON.parse(localStorage.getItem('tk_album')||'{}'); }catch(e){}
+function saveG(){ try{ localStorage.setItem('tk_save2',JSON.stringify(G)); }catch(e){} }
+function loadG(){ try{ return JSON.parse(localStorage.getItem('tk_save2')||'null'); }catch(e){ return null; } }
+function album(id){ if(!ALBUM[id]){ ALBUM[id]=1; try{ localStorage.setItem('tk_album',JSON.stringify(ALBUM)); }catch(e){} } }
+const H=()=>G.h[G.her], HN=()=>HER[G.her].short;
+
+/* ---------- 画面の部品 ---------- */
+function label(l,r){ $('lblL').textContent=l; $('lblR').textContent=r||''; }
+function bg(kind){ $('bg').style.background={school:'linear-gradient(#cfe8ff,#f4f9ff)',lib:'linear-gradient(#e9d8c4,#fbf3e8)',park:'linear-gradient(#bfe9ff 0 55%,#9bd67f 55%)',night:'linear-gradient(#2b1b4e,#a35d9e)',pink:'linear-gradient(#ffd1e3,#fff3f8)',hall:'linear-gradient(#ffe8a3,#fff8e0)',room:'linear-gradient(#d3f9d8,#f4fff6)',winter:'linear-gradient(#dbe4ff,#f8f9ff)',summer:'linear-gradient(#ffd8a8 0 50%,#ffe066 50%)',hosp:'linear-gradient(#e3fafc,#f8f9fa)'}[kind]||'linear-gradient(#ffd1e3,#fff3f8)'; }
+let curPic='';
+const cutSrc=s=>s.replace(/\.jpg$/,'.webp');
+function pic(src){ const p=$('pic'); if(!src){ p.style.display='none'; curPic=''; return; } if(src!==curPic){ const im=p.querySelector('img'); im.onerror=()=>{ im.onerror=null; im.src=src; }; im.src=cutSrc(src); p.classList.remove('in'); void p.offsetWidth; p.classList.add('in'); curPic=src; } p.style.display='block'; }
+/* 江藤くんの立ち絵(1ふつう 2笑顔 3照れ 4困り)。セリフの顔番号から近いものをえらぶ。'c1'〜'c4' で直接指定 */
+const etoCard=e=>`chars/eto_${e}.jpg`;
+const FACE2CARD={'02':2,'06':2,'11':2,'15':2,'20':2,'07':3,'04':4,'08':4,'09':4,'13':4,'16':4,'17':4};
+const cardOf=f=>/^c[1-4]$/.test(f||'')?+f[1]:(FACE2CARD[f]||1);
+const avatarOf=f=>/^c[1-4]$/.test(f||'')?{c1:'01',c2:'02',c3:'07',c4:'13'}[f]:(f||'01');
+function say(who,text,face,extra){
+ const m=$('msg'); m.style.display='block'; const name=who==='foe'?(foe&&foe.name):(WHO[who]||null);
+ m.innerHTML=(who==='eto'?`<img class="pf" src="faces/${avatarOf(face)}.jpg" alt="">`:'')+(name?`<span class="who ${['eto','saki','yui','karui'].includes(who)?who:'etc'}">${name}</span><br>`:'')+text.replace(/\n/g,'<br>')+(extra?`<small>${extra}</small>`:'');
+ m.scrollTop=0;
+ if(who==='foe'&&foe&&foe.img){ home(false); pic(foe.img); return; } // 旧作の人物(いま話している相手)
+ if(who==='saki'||who==='yui'||WHOIMG[who]) home(false);
+ if(who==='saki'||who==='yui') pic(himg(who,face)); else if(WHOIMG[who]) pic(WHOIMG[who]);
+ else if(who==='eto'&&(!curPic||curPic.includes('chars/eto_'))) pic(etoCard(cardOf(face)));
+}
+function buttons(list,cols,cls){ const p=$('pane'); p.className=(cols===2?'c2':'')+(cls?' '+cls:''); p.innerHTML=''; p.scrollTop=0;
+ list.forEach(o=>{ const b=document.createElement('button'); b.textContent=o.t; if(o.cls) b.className=o.cls; if(o.wide) b.style.gridColumn='1 / -1'; if(o.dis) b.disabled=true; b.onclick=()=>{ sfx('click'); o.f(b); }; p.appendChild(b); }); }
+function next(f,t){ buttons([{t:t||'つぎへ ▶',cls:'main',f:b=>{ if(b.disabled) return; b.disabled=true; f(); }}]); }
+function talk(lines,done){ let i=0; (function step(){ if(i>=lines.length) return done(); const [w,t,fc]=lines[i++]; say(w,t,fc); next(step); })(); }
+function disableAll(){ [...$('pane').children].forEach(b=>b.disabled=true); }
+function nextBtn(f){ setTimeout(()=>{ [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶'; b.onclick=()=>{ if(b.disabled) return; b.disabled=true; sfx('click'); f(); }; $('pane').appendChild(b); },300); }
+function clearPane(){ [...$('pane').children].filter(x=>!/\b(right|wrong)\b/.test(x.className||'')).forEach(x=>{ try{ x.remove(); }catch(e){} }); }
+function popTxt(t){ const d=document.createElement('div'); d.className='pop'; d.textContent=t; $('top').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1200); }
+function hud(){ if(!G) return; $('hudL').textContent=`📅 ${when(G.t)}`; $('hudR').textContent=`のこり ${TURNS-G.t}`; if($('side').style.display==='block') renderSide(); }
+
+/* ---------- 音(BGMは本編の魔王魂の曲、効果音は合成) ---------- */
+const AU={ctx:null,on:true,el:null,name:null};
+try{ AU.on=localStorage.getItem('tk_snd')!=='off'; }catch(e){}
+const BGM={title:'bgm/title.mp3',school:'bgm/class.mp3',event:'bgm/battle.mp3',test:'bgm/boss.mp3',date:'bgm/ride.mp3'};
+/* 曲のファイル(../bgm)が無いとき(GitHub Pages の公開版など)は、合成音の曲で代わりに鳴らす */
+const BGM_NG={};
+const SYN={title:{bpm:112,n:[72,76,79,84,83,79,76,79,77,81,84,81,79,76,74,72]},school:{bpm:100,n:[67,72,76,72,74,77,76,72,69,72,76,74,72,71,72,0]},
+ event:{bpm:140,n:[69,72,76,81,79,76,77,74,69,72,76,81,83,84,83,81]},test:{bpm:160,n:[57,60,64,69,68,64,65,62,57,60,64,69,71,72,71,69]},date:{bpm:120,n:[76,79,84,83,81,79,76,77,79,81,79,77,76,74,72,0]}};
+let SYN_T=null, SYN_G=null;
+function synthStop(){ clearTimeout(SYN_T); SYN_T=null; if(SYN_G){ try{ SYN_G.disconnect(); }catch(e){} SYN_G=null; } }
+function synTone(dest,m,at,d,type,vol){ const c=AU.ctx,o=c.createOscillator(),g=c.createGain(); o.type=type; o.frequency.value=440*Math.pow(2,(m-69)/12); g.gain.setValueAtTime(vol,at); g.gain.exponentialRampToValueAtTime(0.0008,at+d); o.connect(g); g.connect(dest); o.start(at); o.stop(at+d+0.03); }
+function synthPlay(name){ synthStop(); const c=AU.ctx, s=SYN[name]; if(!c||!s) return; const g=c.createGain(); g.gain.value=AU.on?0.5:0; g.connect(c.destination); SYN_G=g; const spb=60/s.bpm/2; let t=c.currentTime+0.05;
+ (function loop(){ if(SYN_G!==g) return; if(c.state!=='running'){ SYN_T=setTimeout(loop,500); return; }
+   try{ s.n.forEach((m,i)=>{ if(m) synTone(g,m,t+i*spb,spb*0.9,'square',0.035); if(i%4===0) synTone(g,(m||60)-24,t+i*spb,spb*3.6,'triangle',0.07); }); }catch(e){}
+   t+=s.n.length*spb; SYN_T=setTimeout(loop,Math.max(50,(t-c.currentTime-0.3)*1000)); })(); }
+function auInit(){ try{ if(!AU.ctx){ const C=window.AudioContext||window.webkitAudioContext; if(C) AU.ctx=new C(); } if(AU.ctx&&AU.ctx.state==='suspended') AU.ctx.resume();
+ if(AU.name&&BGM_NG[AU.name]&&!SYN_G&&AU.ctx) synthPlay(AU.name);
+ else if(AU.el&&AU.el.paused&&!document.hidden){ const p=AU.el.play(); if(p&&p.catch) p.catch(()=>{}); } else if(!AU.name&&state==='title') bgm('title'); }catch(e){} }
+['click','touchend','keydown'].forEach(n=>document.addEventListener(n,auInit,true));
+function bgm(name){ if(AU.name===name) return; if(AU.el){ try{ AU.el.pause(); }catch(e){} AU.el=null; } synthStop(); AU.name=name;
+ if(BGM[name]&&!BGM_NG[name]&&typeof Audio!=='undefined'){ try{ const el=new Audio(BGM[name]); el.loop=true; el.volume=0.4; el.muted=!AU.on;
+   el.onerror=()=>{ BGM_NG[name]=1; if(AU.el===el){ AU.el=null; synthPlay(name); } }; AU.el=el; const p=el.play(); if(p&&p.catch) p.catch(()=>{}); return; }catch(e){} }
+ synthPlay(name); }
+function sfx(k){ if(!AU.ctx||!AU.on) return; try{ const c=AU.ctx, t=c.currentTime+0.01, seq={click:[[1000,.04]],ok:[[784,.08],[1047,.12]],ng:[[300,.12],[200,.2]],love:[[880,.08],[1175,.08],[1568,.18]],up:[[660,.06],[880,.1]],bell:[[1319,.15],[1047,.15],[1175,.15],[784,.3]]}[k]||[[800,.05]]; let tt=t;
+ seq.forEach(([f,d])=>{ const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=f; g.gain.setValueAtTime(0.12,tt); g.gain.exponentialRampToValueAtTime(0.001,tt+d); o.connect(g); g.connect(c.destination); o.start(tt); o.stop(tt+d+0.02); tt+=d; }); }catch(e){} }
+function sndToggle(){ AU.on=!AU.on; if(AU.el) AU.el.muted=!AU.on; if(SYN_G) SYN_G.gain.value=AU.on?0.5:0; $('snd').textContent=AU.on?'🔊':'🔇'; try{ localStorage.setItem('tk_snd',AU.on?'on':'off'); }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ try{ if(AU.el){ if(document.hidden) AU.el.pause(); else { const p=AU.el.play(); if(p&&p.catch) p.catch(()=>{}); } } if(AU.ctx){ if(document.hidden) AU.ctx.suspend(); else AU.ctx.resume(); } }catch(e){} });
+
+/* ---------- 問題(単元 u ごと。生物・看護の問題は順次ふやす) ---------- */
+const Q=(u,q,a,w,ex)=>({u,q,a,w,ex});
+const QB=[
+ Q('cell','遺伝情報をもつDNAが、おもに含まれている細胞の構造は?','核',['液胞','細胞膜','細胞壁'],'真核細胞では、DNAは核の中で染色体をつくっている。'),
+ Q('cell','細胞内で呼吸の場となる細胞小器官は?','ミトコンドリア',['葉緑体','ゴルジ体','リボソーム'],'ミトコンドリアは酸素を使って有機物を分解し、ATPをつくる。'),
+ Q('cell','生物のからだで「エネルギーの通貨」とよばれる物質は?','ATP',['DNA','グリコーゲン','インスリン'],'ATPのリン酸どうしの結合が切れるとき、エネルギーが出る。'),
+ Q('cell','酵素の主成分は?','タンパク質',['脂肪','炭水化物','ビタミン'],'だから高温では形がこわれ、はたらきを失う(失活)。'),
+ Q('cell','すべての細胞がもっている、物質の出入りを調節する膜は?','細胞膜',['細胞壁','核膜','葉緑体の膜'],'細胞膜は動物・植物・細菌すべての細胞にある。'),
+ Q('bone','成人の骨の数は、およそいくつ?','約200個',['約50個','約500個','約1000個'],'成人の骨は約200個。体を支え、内臓を守る。'),
+ Q('bone','骨の中で血球をつくっている組織は?','骨髄',['軟骨','じん帯','けん'],'骨髄の造血幹細胞から赤血球・白血球・血小板がつくられる。'),
+ Q('bone','筋肉を骨につないでいる組織は?','けん(腱)',['じん帯','軟骨','骨髄'],'けんは筋肉と骨、じん帯は骨と骨をつなぐ。'),
+ Q('bone','自分の意思で動かせる筋肉は?','骨格筋',['心筋','胃の平滑筋','血管の平滑筋'],'骨格筋は随意筋。心筋と平滑筋は不随意筋。'),
+ Q('heart','全身に血液を送り出す、壁がもっとも厚い心臓の部屋は?','左心室',['右心室','左心房','右心房'],'左心室は全身へ血液を送るため、筋肉の壁がいちばん厚い。'),
+ Q('heart','肺から心臓へもどる血液が流れる血管は?','肺静脈',['肺動脈','大静脈','大動脈'],'肺静脈には酸素の多い動脈血が流れる。名前にだまされないこと。'),
+ Q('heart','心臓の拍動のリズムをつくる、右心房にある部分は?','洞房結節',['房室弁','冠動脈','大動脈弁'],'洞房結節はペースメーカー。'),
+ Q('heart','赤血球に含まれ、酸素を運ぶタンパク質は?','ヘモグロビン',['フィブリン','インスリン','アルブミン'],'ヘモグロビンは鉄を含み、酸素の多い肺で酸素と結合する。'),
+ Q('heart','成人の安静時の脈拍の目安は、1分間に何回?','60〜100回',['20〜40回','120〜160回','200回以上'],'成人の安静時はおよそ60〜100回/分。'),
+ Q('heart','胸骨圧迫のテンポとして正しいのは?','1分間に100〜120回',['1分間に30〜50回','1分間に60回','1分間に200回'],'深さ約5cm、1分間に100〜120回。中断はできるだけ短く。'),
+ Q('resp','肺の中で、血液とガス交換をする小さなふくろは?','肺胞',['気管支','糸球体','柔毛'],'肺胞と毛細血管のあいだで、酸素と二酸化炭素が入れかわる。'),
+ Q('resp','呼吸の中枢がある脳の部分は?','延髄',['小脳','大脳','中脳'],'延髄は呼吸と拍動の中枢。'),
+ Q('resp','息を吸うとき、横隔膜はどうなる?','縮んで下がる',['ゆるんで上がる','変わらない','左右に広がる'],'横隔膜が縮んで下がり、胸の中が広がって空気が入る。'),
+ Q('resp','成人の安静時の呼吸数の目安は、1分間に何回?','12〜20回',['3〜5回','40〜60回','80回以上'],'成人の安静時はおよそ12〜20回/分。'),
+ Q('dig','だ液に含まれ、デンプンを分解する酵素は?','アミラーゼ',['ペプシン','トリプシン','リパーゼ'],'アミラーゼはデンプンをマルトース(麦芽糖)に分解する。'),
+ Q('dig','胃液に含まれ、タンパク質を分解する酵素は?','ペプシン',['アミラーゼ','リパーゼ','マルターゼ'],'胃液は塩酸を含む強い酸性。ペプシンは酸性でよくはたらく。'),
+ Q('dig','胆汁をつくる器官は?','肝臓',['胆のう','すい臓','胃'],'肝臓でつくられ、胆のうにためられて十二指腸に出る。'),
+ Q('dig','栄養分をおもに吸収する、小腸の内側の小さな突起は?','柔毛',['肺胞','糸球体','気管支'],'柔毛で表面積が大きくなり、吸収の効率が上がる。'),
+ Q('kid','腎臓で、血液をろ過する毛細血管のかたまりは?','糸球体',['細尿管','ボーマンのう','集合管'],'糸球体でろ過された液が原尿。'),
+ Q('kid','原尿に含まれるグルコースは、ふつうどれくらい再吸収される?','ほぼ100%',['約50%','約10%','まったくされない'],'健康な人では、グルコースはほぼすべて再吸収される。'),
+ Q('kid','体温調節など、恒常性の中枢がある脳の部分は?','間脳の視床下部',['延髄','小脳','大脳皮質'],'視床下部は自律神経と内分泌の中枢。'),
+ Q('kid','暑いとき、からだが熱を逃がすしくみは?','汗をかき、皮膚の血管が広がる',['ふるえる','皮膚の血管が縮む','鳥はだが立つ'],'汗の蒸発と、皮膚の血流がふえることで熱を逃がす。'),
+ Q('imm','抗体をつくって放出する細胞は?','形質細胞',['キラーT細胞','赤血球','血小板'],'B細胞が分化した形質細胞が抗体をつくる(体液性免疫)。'),
+ Q('imm','ワクチン(予防接種)が利用している反応は?','二次応答',['一次応答','拒絶反応','免疫不全'],'2度目の侵入で速く強く反応するしくみを利用して、発症を防ぐ。'),
+ Q('imm','食作用で細菌を取りこんで分解する細胞は?','好中球やマクロファージ',['赤血球','血小板','形質細胞'],'生まれつきそなわった自然免疫の中心。'),
+ Q('imm','感染予防の基本として、もっとも大切なのは?','手洗い・手指消毒',['大声で話す','タオルを共用する','マスクを一日中さわる'],'接触感染を防ぐ基本は手洗いと手指消毒。看護の現場でも最重要。'),
+ Q('nerve','休息時にはたらき、心拍数を下げる神経は?','副交感神経',['交感神経','運動神経','感覚神経'],'副交感神経は休むモード。交感神経は戦うモード。'),
+ Q('nerve','血糖値を下げるホルモンは?','インスリン',['グルカゴン','アドレナリン','チロキシン'],'すい臓のランゲルハンス島B細胞から出る、血糖値を下げる唯一のホルモン。'),
+ Q('nerve','神経細胞のつなぎめを何という?','シナプス',['ネフロン','ニューロン','柔毛'],'シナプスでは神経伝達物質で情報がわたされる。'),
+ Q('nerve','血糖値を上げるホルモンは?','グルカゴン',['インスリン','バソプレシン','パラトルモン'],'すい臓のA細胞から出る。アドレナリンや糖質コルチコイドも血糖値を上げる。'),
+ Q('drug','飲み薬は、ふつう何で飲むのがよい?','水かぬるま湯',['お茶','ジュース','牛乳'],'飲み物によっては薬の効き方が変わる。基本は水かぬるま湯。'),
+ Q('drug','「食間に飲む」薬は、いつ飲む?','食事と食事のあいだ(食後約2時間)',['食事の最中','食事の直前','寝る直前'],'食間は「食事中」ではない。よくある勘ちがい。'),
+ Q('drug','多くの薬を分解(代謝)するおもな器官は?','肝臓',['肺','心臓','胃'],'肝臓で代謝され、腎臓などから排出される。'),
+ Q('drug','薬を飲んで、じんましんや息苦しさが出た。考えられることは?','薬のアレルギー(副作用)',['薬がよく効いている','ただの疲れ','もっと飲む合図'],'すぐに飲むのをやめて医療者に伝える。急な息苦しさは救急要請も。')
+];
+let QNOW=null, CHOICE=null, VOLNOW=null;
+const qKey=q=>q.q;
+/* units の中から n 問。review=true なら「まちがいノート」を優先 */
+function quiz(n,title,cb,asker,units,review){
+ let pool=QB.filter(q=>!units||units.includes(q.u));
+ let list=[]; if(review){ const m=pool.filter(q=>G.miss.includes(qKey(q))); list=shuffle(m).slice(0,n); }
+ list=list.concat(shuffle(pool.filter(q=>!list.includes(q)))).slice(0,n);
+ let i=0, ok=0, got=[];
+ (function ask(){ if(i>=n||i>=list.length){ QNOW=null; return cb(ok,got); } const q=list[i++]; QNOW=q;
+   say(asker||'sys',`【${i}/${Math.min(n,list.length)}】${q.q}`,asker==='saki'||asker==='yui'?1:null); label(title,`正解 ${ok}`);
+   buttons(shuffle([q.a,...q.w]).map(t=>({t,f:b=>{ disableAll(); const good=t===q.a; [...$('pane').children].forEach(x=>{ if(x.textContent===q.a) x.classList.add('right'); });
+     if(good){ ok++; got.push(q); sfx('ok'); G.miss=G.miss.filter(k=>k!==qKey(q)); say('sys','⭕ 正解!',null,q.ex); }
+     else { b.classList.add('wrong'); sfx('ng'); if(!G.miss.includes(qKey(q))) G.miss.push(qKey(q)); say('sys',`❌ 正解は「${q.a}」`,null,q.ex); }
+     nextBtn(ask); }})),2); })();
+}
+function choose(opts,cb,title){ CHOICE=opts; label(title||'どうする?'); buttons(shuffle(opts).map(o=>({t:o[0],f:b=>{ CHOICE=null; disableAll(); b.classList.add(o[1]?'right':'wrong'); sfx(o[1]?'ok':'ng'); say('sys',(o[1]?'⭕ ':'❌ ')+o[2]); nextBtn(()=>cb(o[1])); }})),1); }
+/* 3択の会話。opts=[[セリフ, 💗, 返事[who,text,face], 必要な思いやり]] */
+function chat3(k,opts,cb){ label(`${HER[k].short}と話す`);
+ buttons(opts.map(o=>{ const need=o[3]||0, lock=G.st.care<need; return {t:(lock?`🔒(思いやり${need}) `:'')+o[0],dis:lock,f:()=>{ addLove(k,o[1],o[4]||0); say(...o[2]); label(o[1]>=10?'💗 いい感じ!':o[1]<0?'💔 …':'○'); cb(o[1]); }}; }),1); }
+function addSt(k,v){ const eff=G.stress>=80&&v>0?Math.ceil(v/2):v; G.st[k]=clamp(G.st[k]+eff,0,99); if(eff>0) popTxt(`${ST_NAME[k]} +${eff}`); hud(); return eff; }
+function addLove(k,v,tr){ const h=G.h[k]; h.love=clamp(h.love+v,0,100); if(tr) h.trust=clamp(h.trust+tr,0,100); if(v>0||tr>0){ sfx('love'); popTxt(`💗 ${v>=0?'+':''}${v}${tr?`  🤝 +${tr}`:''}`); } else if(v<0) popTxt(`💔 ${v}`); hud(); }
+function addStress(v){ G.stress=clamp(G.stress+v,0,100); hud(); }
+
+/* ---------- ホーム画面:左に江藤くん、右にステータス ---------- */
+function sideBar(v,max,color){ return `<div class="bar"><i style="width:${Math.min(100,Math.round(v/max*100))}%;background:${color}"></i></div>`; }
+function faceIcon(k){ return `<div class="fc" style="background-image:url(${cutSrc(himg(k,1))});background-position:50% ${HER[k].fy}"></div>`; }
+function renderSide(){ if(!G) return; const s=G.st, h=H();
+ $('side').innerHTML=`<h3>📅 ${monthNum(G.t)}月${wOf(G.t)%4+1}週${halfOf(G.t)?'後':'前'}<small>のこり${TURNS-G.t}</small></h3>`+
+  [['からだ','body','#4dabf7'],['くすり','med','#9775fa'],['看護技術','skill','#20c997'],['思いやり','care','#ff8fb8'],['体力','hp','#fab005']].map(([n,k,c])=>`<div class="r"><span>${n}</span>${sideBar(s[k],60,c)}<b>${s[k]}</b></div>`).join('')+
+  `<div class="r"><span>ストレス</span>${sideBar(G.stress,100,G.stress>=80?'#fa5252':'#adb5bd')}<b>${G.stress}</b></div>`+
+  `<div class="money"><span>💴 ${G.money}円</span><span>📖 ${h.ch}/5章</span></div>`+
+  `<div class="her">${faceIcon(G.her)}<div class="bars">${HN()} ${G.lover?'<span class="lover">💑恋人</span>':''} 💗${h.love} 🤝${h.trust}${sideBar(h.love,100,'#ff6b9a')}${sideBar(h.trust,100,'#4dabf7')}</div></div>`;
+}
+/* 江藤くんの独り言:いまの状況(ストレス・試験・告白チャンス・ヒロイン・お金など)から1つえらぶ。右から左へ流れ、流れ終わると次の独り言に */
+const MONO_MONTH=['看護学校、思ったより女子が多いっす','骨って約200個もあるんすね…','胸骨圧迫は1分間に100〜120回っす','夏休み、何するかな…','あっついっす…熱中症に気をつけるっす',
+ '息を吸うと横隔膜が下がるっす','学園祭、なにやるんすかね','原尿のグルコースは、ほぼ100%再吸収っす','手洗いは感染予防の基本っす','副交感神経は休むモードっす','くすりは水かぬるま湯で飲むっす','もうすぐ2年生…なれるかな'];
+const MONO_ANY=['左心室は壁が分厚いっす。覚えたっす','カルイ、また変なうわさ流してないっすかね','ガイコツ先輩、今日もどこかでカタカタしてそうっす','看護師になったら、まず母ちゃんの血圧はかるっす','購買のやきそばパン、今日は買えるかな'];
+function monoLines(){ if(!G) return ['…']; const h=H(), n=HN(), t=G.t, out=[];
+ if(G.stress>=80) out.push('つかれたっす…今週はちゃんと休みたいっす','ストレスで頭が回らないっす…');
+ if(G.stress<=10&&t>4) out.push('体が軽いっす!何でもできそうっす');
+ const ex=Object.keys(FIX).map(Number).find(x=>x>=t&&x<=t+4&&/試験/.test(FIX_NAME[x]||'')); if(ex!==undefined) out.push(`もうすぐ${FIX_NAME[ex]}っす…自習しなきゃっす`,'まちがいノート、見直しとくっす');
+ const ch=CHANCES.find(c=>c.t>=t&&c.t<=t+4); if(ch&&!G.lover) out.push(`${ch.name}、${n}さんと過ごせたらいいなっす…`);
+ if(G.lover) out.push(`${n}のこと考えると、教科書が頭に入らないっす`,`今度の休み、${n}とどこ行こうかな…`);
+ else if(h.love>=40) out.push(`${n}さん、最近よく笑ってくれるっす`);
+ else if(h.love<10&&t>6) out.push(`${n}さんと、もっと話したいっす…`);
+ if(t-h.last>=3&&t>2&&!G.lover) out.push(`最近、${n}さんと話してないっす…`);
+ if(G.money<3000) out.push('金欠っす…バイトしなきゃっす');
+ if(G.miss.length>=5) out.push(`まちがいノートが${G.miss.length}問もたまってるっす…`);
+ const base=[MONO_MONTH[mIdx(t)],...MONO_ANY];
+ return out.length&&Math.random()<0.7?out:base; }
+let monoLast='';
+function monoNext(){ const el=$('monoT'); if(!el) return; let ls=monoLines(), s=pick(ls); if(ls.length>1&&s===monoLast) s=pick(ls.filter(x=>x!==monoLast)); monoLast=s;
+ el.textContent=s; if(el.style) el.style.animationDuration=Math.max(7,s.length*0.45+4)+'s'; $('mono').dataset.t=String(G?G.t:''); }
+try{ $('monoT').addEventListener('animationiteration',monoNext); }catch(e){}
+function home(on){ $('pic').classList.toggle('left',!!on); $('side').style.display=on?'block':'none'; $('mono').style.display=on?'block':'none'; if(on){ renderSide(); if($('mono').dataset.t!==String(G&&G.t)) monoNext(); } }
+
+/* ---------- タイトルとヒロイン選択 ---------- */
+function title(){
+ state='title'; bgm('title'); home(false); $('title').style.display='flex'; $('msg').style.display='none'; $('note').style.display='none'; pic(null); $('snd').textContent=AU.on?'🔊':'🔇';
+ document.title=`ときめき江藤くん ver${VERSION}`;
+ $('title').innerHTML=`<h1><em>ときめき</em><br>江藤くん</h1><p>看護学校の1年間 ver${VERSION}<br><small>ガンバレ！江藤くん 最強ナース烈伝</small></p><div class="duo"><img src="${cutSrc(himg('saki',2))}" alt=""><img src="${cutSrc(himg('yui',2))}" alt=""></div><div class="credit">音楽:魔王魂</div>`;
+ const sv=loadG();
+ label('ときめき江藤くん',`エンド ${Object.keys(ENDS).length}/${ENDINGS.length} ・ 思い出 ${Object.keys(ALBUM).length}`);
+ const list=[{t:'▶ はじめから(ヒロインをえらぶ)',cls:'pink',wide:true,f:selectHer}];
+ if(sv) list.push({t:`▶ つづきから(${HER[sv.her].short}・${when(sv.t)})`,cls:'main',wide:true,f:()=>{ G=loadG(); $('title').style.display='none'; turn(); }});
+ list.push({t:'🎞 エンディング一覧',f:openEnds},{t:'📒 名鑑・図鑑',f:()=>openRec('help',title)});
+ buttons(list,2);
+}
+function selectHer(){
+ $('title').innerHTML=`<h1 style="font-size:22px">だれと1年を過ごす?</h1><div class="sel">${['saki','yui'].map(k=>`<div><img src="${cutSrc(himg(k,1))}" alt=""><b>${HER[k].name}</b><span>${HER[k].prof}<br>テーマ「${HER[k].theme}」</span></div>`).join('')}</div>`;
+ label('ヒロインをえらぶ','あとから変えられない');
+ buttons([{t:'💗 サキと過ごす',cls:'pink',f:()=>start('saki')},{t:'💗 ユイと過ごす',cls:'pink',f:()=>start('yui')},{t:'もどる',wide:true,f:title}],2);
+}
+function start(k){ G=newGame(k); try{ localStorage.removeItem('tk_save2'); }catch(e){} $('title').style.display='none'; saveG(); opening(); }
+
+/* ---------- 入学式 ---------- */
+function opening(){
+ bg('hall'); bgm('school'); hud(); state='talk'; label('4月 入学式'); album('op');
+ const k=G.her;
+ talk([['sys','4月。看護専門学校の入学式。'],['eto','オレ、今日から看護学生っす。…まわり、女子ばっかりっすね。','06'],
+  ['sys','式のあと、教室で――'],
+  ...(k==='saki'?[['saki','あなたが江藤くん?入学式でいびきをかいていたのは。私は委員長の一ノ瀬サキ。',1],['eto','いびきじゃないっす。深呼吸っす。','19'],['saki','…呼吸の中枢がどこにあるかも知らなさそうな顔ね。',4]]
+   :[['yui','あの…となり、いいかな。春日ユイです。社会人入学で、勉強は10年ぶりなの。',1],['eto','オレより年上っすね。お姉さんって呼んでいいっすか。','06'],['yui','ふふ、ユイでいいよ。1年間、よろしくね。',2]]),
+  ['karui','よっ、江藤っち!オレはカルイ。この学校のことなら何でも聞いて!女子の気持ちも、だいたいわかる!'],['eto','だいたいって何すか。','19'],
+  ['sys',`こうして、江藤くんの看護学生生活が始まった。\n1週間は前半・後半の2回。行動をえらんで、知識と${HN()}との関係を育てよう。`]],()=>{ addLove(k,3); turn(); });
+}
+
+/* ---------- ターンの流れ ---------- */
+function turn(){
+ gx(); tmStop(); if(G.t>=TURNS) return finalDay(); hud(); saveG(); $('note').style.display='none';
+ const fx=FIX[G.t]; if(fx&&!G.fixDone[G.t]){ G.fixDone[G.t]=1; return fx(); }
+ if(G.actDone) return endTurn();
+ if(G.sick){ G.sick=false; G.actDone=true; home(true); pic(etoCard(4)); say('eto','…熱っぽいっす。ストレスがたまりすぎて、体調くずしたっす。今回は休むっす。','09'); addStress(-40); label('🤒 体調不良'); clearPane(); return nextBtn(endTurn); }
+ menu();
+}
+function menu(){
+ state='menu'; bg(mIdx(G.t)>=8&&mIdx(G.t)<=10?'winter':'school'); bgm('school'); pic(etoCard(G.stress>=80?4:1)); home(true); hud();
+ const u=unitNow(G.t), uname=u?UNIT_NAME[u]:'これまでのまとめ';
+ say('sys',`${when(G.t)}。何をする?`+(G.stress>=80?'\n⚠ ストレスがたまっていて、効果が半分になる…':''));
+ label(`今月の授業:${uname}`,`のこり ${TURNS-G.t}`);
+ const h=H();
+ buttons([
+  {t:'📚 授業\nからだ・くすり',f:actClass},{t:'📖 自習\nまちがいの復習',f:actStudy},
+  {t:'💉 実技練習\n看護技術',f:actSkill},{t:'🤝 ボランティア\n思いやり',f:actVol},
+  {t:'🏃 部活\n体力',f:actJog},{t:'💴 バイト\nお金',f:actJob},
+  {t:'🛌 休む\nストレス回復',f:actRest},{t:`💗 ${HN()}に会う`,cls:'pink',f:meet},
+  {t:`🌸 デートに誘う(💴3000)`,dis:G.money<3000||h.love<20,f:date},{t:'📱 カルイに聞く',f:askKarui},
+  {t:`🛵 通学路の勝負\n${roadInfo()}`,f:actRoad},{t:'📒 記録\n名鑑・図鑑・友達',f:()=>openRec('mate',menu)}
+ ],2,'menu');
+}
+function finishAct(){ G.actDone=true; saveG(); clearPane();
+ const ev=rollOtherEvent(); if(ev){ return nextBtn(()=>{ album('oe_'+ev.id); G.cool[ev.id]=G.t; if(ev.once) G.once[ev.id]=1; state='talk'; ev.run(()=>{ clearPane(); nextBtn(endTurn); }); }); }
+ nextBtn(endTurn);
+}
+function endTurn(){
+ const h=H(); const wasHalf=halfOf(G.t);
+ if(wasHalf===1){
+  if(G.t-h.last>=3&&h.love>0&&!G.lover) h.love=Math.max(0,h.love-2); // すれちがい
+  if(G.stress>=90) G.sick=true;
+ }
+ G.t++; G.actDone=false; saveG();
+ if(wasHalf===1&&wOf(G.t-1)%4===3) return monthSummary(); // 月のまとめ
+ if(wasHalf===1) return weekEnd();
+ turn();
+}
+/* 週の終わり:告白チャンスの前はカルイの「脈ありメーター」、ほかはときどき予告 */
+function weekEnd(){
+ const nextChance=CHANCES.find(c=>c.t>=G.t&&c.t<G.t+2);
+ if(nextChance&&!G.lover){ const r=Math.round(confessRate()/10); state='talk';
+   return talk([['karui',`江藤っち!もうすぐ「${nextChance.name}」だぜ。${HN()}の脈ありメーター、オレの見立てだと…`],['karui',r>=7?`${r}割!かなり脈ありだ!`:r>=4?`${r}割ってとこかな。もうひと押し!`:`${r}割…。今はまだ友達って感じだな。`]],turn); }
+ const nf=Object.keys(FIX).map(Number).find(x=>x>G.t&&x<=G.t+3&&FIX_NAME[x]);
+ if(nf&&Math.random()<0.5){ state='talk'; return talk([['karui',`来週あたり「${FIX_NAME[nf]}」があるらしいぜ。準備しとけよ!`]],turn); }
+ turn();
+}
+function monthSummary(){
+ state='note'; home(false); pic(null); hud(); const h=H(), m=monthNum(G.t-1);
+ say('sys',`${m}月が終わった。${G.t>=TURNS?'':'来月もがんばろう!'}`);
+ $('note').innerHTML=`<h2>📅 ${m}月のまとめ</h2><div class="row">${faceIcon(G.her).replace('class="fc"','class="fc"')}<div style="flex:1">${HN()} ${G.lover?'💑恋人':''} 💗${h.love} 🤝${h.trust}<div class="bar"><i style="width:${h.love}%;background:#ff6b9a"></i></div><div class="bar" style="margin-top:3px"><i style="width:${h.trust}%;background:#4dabf7"></i></div></div></div>`+
+  `<ul><li>からだの知識 ${G.st.body} ・ 病気とくすり ${G.st.med}</li><li>看護技術 ${G.st.skill} ・ 思いやり ${G.st.care} ・ 体力 ${G.st.hp}</li><li>ストレス ${G.stress} ・ お金 ${G.money}円</li><li>${HN()}の物語 ${h.ch}/5章 ・ まちがいノート ${G.miss.length}問</li><li>思い出アルバム ${Object.keys(ALBUM).length}枚</li></ul>`+
+  `<p class="by">${G.t>=TURNS?'いよいよ修了式。':`来月の授業は「${unitNow(G.t)?UNIT_NAME[unitNow(G.t)]:'これまでのまとめ'}」。`}${!G.lover?`告白されるには、💗と🤝の両方と「${HER[G.her].needName}」が大事。`:'恋人になっても、進級試験に受かってこそ最高のエンド!'}</p>`;
+ $('note').style.display='block'; label(`${m}月のまとめ`,'ここでやめても、つづきから遊べる');
+ buttons([{t:'つぎの月へ ▶',cls:'main',f:()=>{ $('note').style.display='none'; turn(); }}]);
+}
+function askKarui(){ state='talk'; G.friend++; const h=H(), r=Math.round(confessRate()/10);
+ const tips=[`${HN()}は「${HER[G.her].needName}」がある人に弱いらしいぜ。`,`3回くらい会わないと、気持ちが冷めちゃうかもな。`,`デートは💗がぐっと上がるけど、お金がいるぞ。`,`ストレスは80をこえると何やっても半分の効果だ。90で体調くずすぞ。`,`まちがえた問題は「自習」で復習できる。試験に出るぜ!`];
+ talk([['karui',G.lover?`もう恋人なんだろ?うらやましいぜ!あとは進級試験だな。`:`${HN()}の今の脈ありメーターは…${r}割ってとこだな。`],['karui',pick(tips)]],()=>menu());
+}
+/* 行動 */
+function actClass(){ state='act'; const u=unitNow(G.t), units=u?[u]:learnedUnits(G.t); addStress(6);
+ quiz(3,`📚 授業:${u?UNIT_NAME[u]:'まとめ'}`,(ok,got)=>{ let b=0,m=0; got.forEach(q=>{ if(UNIT_ST[q.u]==='med') m+=3; else b+=3; }); if(b) addSt('body',b); if(m) addSt('med',m);
+   home(true); pic(etoCard(ok>=2?2:4)); say('sys',`授業おわり。3問中 ${ok}問 正解。`+(b?`\nからだの知識 +${b}`:'')+(m?`\n病気とくすり +${m}`:'')); label('📚 授業'); finishAct(); },null,units); }
+function actStudy(){ state='act'; addStress(4); const units=learnedUnits(G.t);
+ quiz(3,`📖 自習(まちがいノート ${G.miss.length}問)`,(ok,got)=>{ let b=0,m=0; got.forEach(q=>{ if(UNIT_ST[q.u]==='med') m+=2; else b+=2; }); if(b) addSt('body',b); if(m) addSt('med',m);
+   home(true); pic(etoCard(1)); say('sys',`自習おわり。${ok}問 正解。まちがいノートは のこり ${G.miss.length}問。`); label('📖 自習'); finishAct(); },null,units,true); }
+function actSkill(){ state='act'; bg('room'); addStress(6); let pts=0, n=0;
+ say('sys','実習室で、看護技術の練習。\nまずは器具の名前と形を覚えよう。名前の順に、器具の絵をならべる。3回やる。');
+ (function one(){ if(n>=3){ const v=addSt('skill',2+pts); home(true); pic(etoCard(pts>=10?2:1)); say('sys',`練習おわり。正しくならべた器具 ${pts}/12\n看護技術 +${v}`); label('💉 実技練習'); return finishAct(); }
+   n++; label(`🧰 実技練習 ${n}/3`); nextBtn(()=>order('atk',g=>{ pts+=g.n; say('sys',`🧰 ${g.n} / 4 正しくならべた(${n}/3)`+ordMissText(g)); label(`🧰 実技練習 ${n}/3`,`合計 ${pts}`); nextBtn(one); })); })(); }
+const VOL=[
+ {q:'病院のボランティア。入院中のおばあさんが「家に帰りたい…」とつぶやいた。',opts:[['帰れないっすよ。入院中なんで。',-1,'事実だけど、気持ちを受けとめていない…'],['そうですよね、お家が恋しいですよね。',2,'まず気持ちを受けとめる。それだけで安心することがある'],['元気出してください!',1,'はげましも大事。でも、まず気持ちを聞いてから']]},
+ {q:'車いすの男性が、自動販売機の前で困っている。',opts:[['だまって押していく。',-1,'急に押すと驚かせる。まず声をかける'],['何かお手伝いしましょうか?',2,'まず声をかけて、相手の希望を聞く'],['大変っすね。がんばってください。',0,'気づいたなら、声をかけて手伝おう']]},
+ {q:'小児病棟で、注射をこわがって泣いている子がいる。',opts:[['泣いても注射は終わらないっすよ。',-1,'正しいけれど、こわさによりそっていない'],['こわいよね。終わったら、一緒にシール選ぼうか。',2,'こわい気持ちを認めて、終わったあとの楽しみを伝える'],['男なら泣くな!',-2,'性別で決めつけない。気持ちによりそう']]},
+ {q:'耳が遠いおじいさんが、受付の説明を聞きとれずに困っている。',opts:[['もう一回だけ言うっすよ!(大声で早口)',-1,'大声で早口だと、かえって聞きとりにくい'],['正面から、ゆっくり、はっきり話す。紙に書いて見せる',2,'口の動きが見えるように正面から、ゆっくり。筆談も役に立つ'],['あとで家族に聞いてください',-1,'本人に伝わる方法を工夫しよう']]},
+ {q:'外国から来た患者さんが、言葉が通じず不安そう。',opts:[['日本語で話してください',-2,'相手を責めても伝わらない'],['身ぶりや絵、翻訳アプリを使って、笑顔でゆっくり伝える',2,'伝える工夫と、安心させる表情が大事'],['ほかの人を呼んでくるっす',0,'助けを呼ぶのも大事。そのあいだ、そばで安心させよう']]}
+];
+function actVol(){ state='act'; bg('hosp'); const v=pick(VOL); VOLNOW=v; addStress(3);
+ say('sys',v.q); label('🤝 ボランティア','どう声をかける?');
+ buttons(shuffle(v.opts).map(o=>({t:o[0],f:b=>{ VOLNOW=null; disableAll(); const g=addSt('care',o[1]>=2?8:o[1]===1?4:o[1]===0?2:1); b.classList.add(o[1]>=2?'right':o[1]<0?'wrong':''); say('sys',(o[1]>=2?'⭕ ':o[1]<0?'△ ':'○ ')+o[2]+`\n思いやり +${g}`); finishAct(); }})),1); }
+function actJog(){ state='act'; bg('park'); const v=addSt('hp',6); addStress(-6); home(true); pic(etoCard(2)); say('eto',`部活で走ってきたっす。気持ちいいっす。\n体力 +${v}、ストレス -6`,'02'); label('🏃 部活'); finishAct(); }
+function actJob(){ state='act'; bg('hall'); G.money+=4000; addStress(8); popTxt('💴 +4000'); home(true); pic(etoCard(1)); say('eto','コンビニのバイト、おわったっす。4000円ゲットっす。','15'); label('💴 バイト'); finishAct(); }
+function actRest(){ state='act'; bg('pink'); addStress(-30); home(true); pic(etoCard(2)); say('eto','今回はゆっくり休んだっす。ストレス -30','02'); label('🛌 休む'); finishAct(); }
+
+/* ---------- 告白される確率 ---------- */
+function confessRate(){ const h=H(), need=G.st[HER[G.her].need];
+ const r=(h.love-40)*1.2+(h.trust-30)*0.8+Math.min(15,Math.max(0,(need-15)/2))+h.ch*5-(G.stress>=80?10:0);
+ return Math.round(clamp(r,0,95)); }
+const CHANCES=[{t:tOf(18,1),name:'夏祭り',bg:'summer'},{t:tOf(27,1),name:'学園祭の後夜祭',bg:'night'},{t:tOf(35,1),name:'クリスマス',bg:'winter'},{t:tOf(41,0),name:'バレンタイン',bg:'pink'},{t:tOf(47,1),name:'修了式のあと',bg:'night'}];
+function chance(c,done){ state='talk'; home(false); pic(null); bg(c.bg); bgm('date'); const k=G.her, h=H(); h.last=G.t; album('ch_'+c.name);
+ const scene={'夏祭り':[['sys','夏祭りの夜。浴衣の人たちでにぎわっている。'],[k,k==='saki'?'…別に、あなたと来たかったわけじゃないから。たまたまよ。':'江藤くん、りんごあめ半分こしよ?',k==='saki'?3:2]],
+  '学園祭の後夜祭':[['sys','学園祭の後夜祭。校庭のまん中でキャンプファイヤーが燃えている。'],[k,k==='saki'?'…今日の模擬店、あなたがいて助かったわ。':'火、きれいだね。…ねえ、少し歩かない?',1]],
+  'クリスマス':[['sys','クリスマスの夜。駅前のイルミネーションがまぶしい。'],[k,k==='saki'?'寒いわね。…手、冷たくない?':'わあ、きれい…。江藤くんと見られてよかった。',3]],
+  'バレンタイン':[['sys','2月14日。放課後の昇降口。'],[k,k==='saki'?'…これ。べ、勉強を教えてもらったお礼よ。それだけ。':'これ、手作りなの。…受けとってくれる?',3]],
+  '修了式のあと':[['sys','修了式のあと。夕焼けの屋上。1年間が終わろうとしている。'],[k,k==='saki'?'…1年、あっという間だったわね。':'1年、ありがとう。江藤くんがいてくれて、よかった。',1]]}[c.name];
+ if(G.lover){ return talk(scene.concat([[k,k==='saki'?'…こうして一緒にいられるの、悪くないわね。':'恋人になってから、毎日がもっと楽しいよ。',2]]),()=>{ addLove(k,5); addStress(-10); done(); }); }
+ const rate=confessRate(), win=Math.random()*100<rate;
+ talk(scene,()=>{
+  if(!win){ return talk([[k,k==='saki'?'…今日は、楽しかった。また、勉強も見てあげる。':'今日はありがとう。…これからも、仲良くしてね。',1],['sys',`(${HN()}は何か言いかけて、やめたようだ。)\n告白されなかった…。でも、まだチャンスはある。`]],()=>{ addLove(k,3); done(); }); }
+  sfx('bell');
+  talk([[k,k==='saki'?'…江藤くん。私、ずっと言えなかったことがあるの。':'江藤くん…あのね、聞いてほしいことがあるの。',4],
+   [k,k==='saki'?'あなたのこと…好き。完ぺきじゃない私でも、いいなら…つきあって、ください。':'私…あなたのことが好き。年上だけど…私と、つきあってくれますか?',3]],()=>{
+   say('sys',`${HN()}に告白された!`); label('💗 告白された!');
+   buttons([{t:'💗 オレもっす!よろしくお願いします!',cls:'pink',f:()=>{ G.lover=true; album('lover'); addLove(k,10,10); talk([['eto','オレも…ずっと好きだったっす!','c3'],[k,k==='saki'?'…ばか。顔、真っ赤よ。…私もだけど。':'うれしい…!これからも、よろしくね。',2],['sys','2人は恋人になった。\nでも、看護学生の1年はまだ続く。進級試験に受かってこそ、最高のエンディング!']],done); }},
+    {t:'…ごめん。今は看護の勉強に集中したいっす',f:()=>{ G.declined=true; talk([['eto','…ごめん。今は、看護師になることだけ考えたいっす。','c4'],[k,'…そっか。うん、江藤くんらしいね。応援してる。',4]],done); }}],1); }); });
+}
+
+/* ---------- 学校行事・試験(決まったターンに起こる) ---------- */
+function fixEnd(){ G.actDone=true; saveG(); clearPane(); nextBtn(endTurn); }
+function exam(n,title,key){ state='talk'; home(false); bg('school'); bgm('test'); album('ex_'+key);
+ talk([['sys',`${title}!全${n}問。\n6割以上で合格。`],['karui','江藤っち、勉強してきた?オレはしてない!'],['eto','オレはしてきたっす。…たぶん。','12']],()=>
+  quiz(n,`📝 ${title}`,ok=>{ const pass=ok>=Math.ceil(n*0.6); G[key]=ok; if(pass) addSt('body',ok); else addStress(20);
+   home(false); pic(etoCard(pass?2:4)); say('sys',`${n}問中 ${ok}問 正解。`+(pass?'\n合格!':'\n…不合格。ストレスが増えた。')+(key==='exam2'?`\n${pass?'これで2年生に進級できる!':'このままでは留年…'}`:'')); label('📝 試験'); fixEnd(); },null,learnedUnits(G.t)));
+}
+const FIX={}, FIX_NAME={};
+function fix(w,h,name,fn){ FIX[tOf(w,h)]=fn; FIX_NAME[tOf(w,h)]=name; }
+fix(5,0,'解剖学の授業',()=>{ state='talk'; home(false); bg('room'); bgm('event'); album('fx_anat');
+ talk([['sys','5月。解剖学の授業で、骨格模型が登場した。'],['gai','カタカタ…。新入生諸君、ワシの骨の名前、言えるかの?'],['eto','ガイコツ先輩!?なんでここにいるんすか。','13'],['gai','ワシは全国の看護学校をめぐっておるのじゃ。さあ、問題じゃ!']],()=>
+  quiz(2,'🦴 解剖学の授業',ok=>{ addSt('body',4+ok*3); G.gai++; say('gai',ok===2?'カタカタ!見事じゃ!':'カタ…まだまだじゃのう。'); label('🦴 解剖学'); fixEnd(); },'gai',['bone'])); });
+fix(6,1,'体育祭',()=>{ state='talk'; home(false); bg('park'); bgm('event'); album('fx_sports'); const strong=G.st.hp>=12;
+ talk([['sys','5月の体育祭。クラス対抗リレーの最終走者は江藤くん!'],['donaru','江藤!体力はつけてきたんだろうな!'],
+  ...(strong?[['sys','江藤くんは2人を抜いて、1位でゴール!'],[G.her,G.her==='saki'?'…やるじゃない。ちょっと見直したわ。':'すごーい!江藤くん、かっこよかったよ!',2]]
+   :[['sys','…途中でばてて、3位に落ちてしまった。'],['eto','体力、もっとつけとけばよかったっす…。','09']])],()=>{ if(strong){ addLove(G.her,8); addSt('hp',3); } else addStress(5); fixEnd(); }); });
+fix(8,0,'救命講習',()=>{ state='talk'; home(false); bg('room'); bgm('event'); album('fx_bls'); const k=G.her;
+ talk([['sys','6月。救命講習。2人1組で心肺蘇生の練習をする。'],[k,k==='saki'?'…ペア、江藤くんとね。足を引っぱらないでよ。':'江藤くんとペアだね。よろしくね。',k==='saki'?1:2],['sys','人形が倒れている。最初にすることは?']],()=>choose([
+   ['周りの安全を確かめ、肩をたたいて大声で呼びかける',true,'安全確認 → 反応の確認。反応がなければ、119番とAEDを指名してたのむ'],
+   ['すぐに胸骨圧迫を始める',false,'まず安全と反応を確かめる。そのあと呼吸を見て、普段どおりでなければ胸骨圧迫'],
+   ['脈を1分間はかる',false,'市民の救命では脈は確かめない。反応と呼吸で判断する']],ok1=>{
+   say('sys','次は胸骨圧迫。1分間に100〜120回のテンポで、「押す!」を20回タップ!'); nextBtn(()=>compress4('🫀 胸骨圧迫の練習',20,pct=>{ const s=pct>=80?3:pct>=50?2:pct>=25?1:0, v=addSt('skill',3+(ok1?3:0)+s*2); addLove(k,4,ok1&&s>=2?6:2);
+     talk([['sys',`講習おわり。看護技術 +${v}`],[k,k==='saki'?'…やるじゃない。本番でも、その落ちつきが大事よ。':'江藤くん、頼もしかったよ。',k==='saki'?2:3]],fixEnd); })); })); });
+/* 旧『ガンバレ！江藤くん』の行事(教室編・体育編・購買編) */
+fix(1,0,'クラスの自己紹介',()=>{ state='talk'; gx(); home(false); bg('school'); bgm('event'); album('fx_class');
+ const m=pick(MATES.filter(x=>!G.mt.f.includes(x.id)));
+ talk([['sys','4月第2週。1時間目の生物は「細胞」。'],['eto','そういえば、クラスの人とまだちゃんと話してないっす。とりあえず、全員に自己紹介してくるっす。','06'],['sys',`まずは、${m.kind}の${m.name}に話しかけてみよう。\n話が3回合えば、友達になれる。`]],()=>{ foe=m;
+  talk(m.pre,()=>mateChat(m,()=>talk([['sys',`クラスには、まだ話していない人がいる。休み時間に話しかけてくるかも。\n9人全員と友達になると、ハヤカワ先生の小テストを受けられる。(メニューの「📒 記録」で見られる)`]],fixEnd))); }); });
+fix(10,0,'体育の持久走',()=>peEvent());
+fix(25,0,'購買のやきそばパン',()=>shopEvent());
+fix(14,0,'前期試験',()=>exam(6,'前期試験','exam1'));
+fix(18,1,'夏祭り',()=>chance(CHANCES[0],fixEnd));
+fix(21,0,'基礎看護実習',()=>{ state='talk'; home(false); bg('hosp'); bgm('event'); album('fx_jisshu');
+ talk([['sys','9月。はじめての基礎看護実習。担当は、明日手術をひかえた高齢の男性。'],['kibishi','江藤くん。患者さんは不安そうよ。あなたなら、どう声をかける?']],()=>choose([
+   ['目線を合わせて名前を呼び、「何か心配なことはありますか」とゆっくり聞く',true,'まず相手の不安を聞く。目線を合わせ、名前を呼び、ゆっくり話す'],
+   ['「大丈夫っすよ!手術なんて一瞬っす!」と明るく言う',false,'根拠のない「大丈夫」は、かえって不安にさせることがある。まず気持ちを聞く'],
+   ['忙しそうなので、話しかけないでおく',false,'声をかけることも看護。不安を表に出せない人もいる']],ok=>{ addSt('care',ok?6:2); addSt('skill',ok?4:1);
+   talk([['kibishi',ok?'…合格よ。患者さんの顔、少しやわらいだわね。':'…看護は、相手の気持ちを聞くところから始まるのよ。']],fixEnd); })); });
+fix(27,1,'学園祭',()=>chance(CHANCES[1],fixEnd));
+fix(30,0,'病院見学',()=>{ state='talk'; home(false); bg('hosp'); bgm('event'); album('fx_hosp'); const k=G.her;
+ talk([['sys','11月。大学病院の見学。ベテランの看護師さんが、患者さんの手をにぎって話を聞いている。'],[k,k==='saki'?'…知識だけじゃ、ああはなれないのね。':'子どもの病棟、見られるかな。…ドキドキする。',k==='saki'?4:1],['eto','オレも、あんなふうになりたいっす。','12']],()=>{ addSt('care',4); addLove(k,4); fixEnd(); }); });
+fix(34,0,'後期中間試験',()=>exam(6,'後期中間試験','examMid'));
+fix(35,1,'クリスマス',()=>chance(CHANCES[2],fixEnd));
+fix(37,0,'かぜの流行',()=>{ state='talk'; home(false); bg('winter'); bgm('event'); album('fx_flu'); const k=G.her;
+ talk([['sys','1月。学校でかぜが大流行。クラスの半分がマスク姿だ。'],[k,'…ごほっ。ちょっと、のどが痛いかも。',4],['sys','感染を広げないために、まず何をすすめる?']],()=>choose([
+   ['マスクをして、手洗い・手指消毒。熱があれば無理せず休む',true,'せきエチケットと手指衛生が基本。発熱時は休んで、うつさない・こじらせない'],
+   ['気合いで授業に出る。休むのはもったいない',false,'無理をすると悪化し、周りにもうつしてしまう'],
+   ['のどにいいから、みんなで同じペットボトルを回し飲み',false,'回し飲みは感染を広げる']],ok=>{ addSt('med',ok?5:1); addLove(k,ok?6:0,ok?6:0); talk([[k,ok?'ありがとう。今日は早めに帰って休むね。':'…うーん、やっぱり休んだほうがいいかな。',ok?2:1]],fixEnd); })); });
+fix(41,0,'バレンタイン',()=>chance(CHANCES[3],fixEnd));
+fix(46,0,'進級試験',()=>exam(10,'進級試験','exam2'));
+fix(47,1,'修了式',()=>finalDay());
+
+/* ---------- ヒロインに会う・デート ---------- */
+const TALKS={
+ saki:[
+  {s:'図書室で、サキが教科書を読んでいる。',q:['saki','何?今いいところなんだけど。',1],o:[['その教科書、枕にちょうどいいっすよね。',-3,['saki','…最低。',4]],['何読んでるんすか?',6,['saki','心臓の刺激伝導系。…興味あるなら、少しだけ教えてあげる。',1]],['邪魔してすみません。終わるまで待ってるっす。',12,['saki','…別に、邪魔じゃないわよ。座れば?',3],12]]},
+  {s:'朝の教室。サキの目の下にクマがある。',q:['saki','…何じろじろ見てるの。',1],o:[['クマすごいっすね。パンダみたいっす。',-3,['saki','…あなたって本当にデリカシーがないのね。',4]],['眠そうっすね。',5,['saki','昨日、3時まで勉強してたから。',1]],['無理してないっすか?顔色が少し心配っす。',12,['saki','…心配してくれるの?…ありがと。',3],12]]},
+  {s:'実習のあと。サキが小テストの点を見つめている。',q:['saki','98点…。1問、まちがえた…。',4],o:[['98点で落ちこむの、ぜいたくっすよ。',-2,['saki','あなたにはわからないわよ。',4]],['すごいっすね!',5,['saki','…すごくない。満点じゃなきゃ意味ないの。',1]],['いつも本気だから、悔しいんすよね。',12,['saki','…うん。わかってくれる人、はじめてかも。',3],12]]},
+  {s:'帰り道。サキが自販機の前で立ち止まっている。',q:['saki','…甘いもの、好き?',1],o:[['好きっす!おごりっすか?',-2,['saki','なんで私がおごるのよ。',4]],['好きっす。サキさんは?',6,['saki','…実は、いちごミルクが好き。内緒よ。',2]],['今日がんばってたんで、オレがおごるっす。',12,['saki','…ずるい。そういうの。',3],12]]},
+  {s:'雨の日の昇降口。サキが空を見上げている。',q:['saki','…天気予報、外れたわね。',4],o:[['委員長でも予報は外すんすね。',-2,['saki','私が外したんじゃないわよ。',4]],['オレの傘、使うっすか?',8,['saki','…あなたはどうするの。…一緒に入ればいいでしょ。',3]],['駅まで送るっす。風邪ひいたら試験にひびくっすよ。',14,['saki','…ほんと、そういうところ。…ありがとう。',3],30]]},
+  {s:'放課後の教室。サキが進路のパンフレットを見ている。',q:['saki','…ねえ、あなたはどうして看護師になろうと思ったの?',1],o:[['なんとなくっす。',-2,['saki','…なんとなくで、ここまで続かないでしょ。',4]],['人を助けられたら、かっこいいからっす。',6,['saki','単純ね。…でも、悪くないわ。',2]],['助けてもらったことがあるんす。今度はオレが返す番っす。',14,['saki','…そう。私も、似たようなものよ。',3],30]]}
+ ],
+ yui:[
+  {s:'休み時間。ユイが参考書を広げて、ため息をついている。',q:['yui','うーん…10年ぶりの勉強って、むずかしいね。',4],o:[['10年って、オレ小学生っすよ。',-3,['yui','…あはは、そうだよね…。',4]],['わかんないとこ、あるんすか?',6,['yui','うん、ちょっとだけ。…あとで聞いてもいい?',1]],['ブランクがあっても、毎日やってるのすごいっす。',12,['yui','…そう言ってもらえると、がんばれる。ありがとう。',3],12]]},
+  {s:'中庭。ユイが小さな子と話しているのを見かけた。',q:['yui','近所の子なの。…子どもって、やっぱりかわいいね。',2],o:[['子ども、うるさくないっすか?',-3,['yui','…そっか、江藤くんはそう思うんだね。',4]],['ユイさん、子どもに好かれそうっす。',6,['yui','ふふ、保育士やってたからね。',2]],['小児看護師になったら、きっとみんな安心するっす。',12,['yui','…そうなれたらいいな。江藤くん、ありがとう。',3],12]]},
+  {s:'雨の日の玄関。ユイが空を見上げている。',q:['yui','傘、忘れちゃった…。',4],o:[['ドンマイっす。じゃあオレ帰るっす。',-3,['yui','あ…うん、またね…。',4]],['駅まで走ればいけるっすよ。',3,['yui','…そうだね、がんばってみる。',1]],['オレの傘、入っていくっすか?',12,['yui','…いいの?…じゃあ、お言葉に甘えて。',3],12]]},
+  {s:'放課後。ユイが手作りのクッキーを配っている。',q:['yui','よかったら、どうぞ。甘さひかえめにしたの。',1],o:[['ちょっと形がいびつっすね。',-3,['yui','…ごめんね、不器用で。',4]],['いただきます!うまいっす!',6,['yui','よかった!',2]],['甘さひかえめって、みんなの健康を考えてくれたんすね。',12,['yui','…気づいてくれたの、江藤くんだけだよ。',3],12]]},
+  {s:'夕方の公園。ユイがベンチでノートを見返している。',q:['yui','…私、みんなより遅れてるのかな。',4],o:[['年のせいっすかね。',-4,['yui','…そう、だよね。',4]],['いっしょに復習するっすか?',8,['yui','うん!江藤くんの説明、わかりやすいんだ。',2]],['ユイさんは遅れてないっす。自分のペースで進んでるだけっす。',14,['yui','…ありがとう。その言葉、ずっと覚えておくね。',3],30]]},
+  {s:'朝の電車。ユイが車内で、具合の悪そうなおばあさんに席をゆずっている。',q:['yui','あ、江藤くん。おはよう。',1],o:[['朝から立ちっぱなし、大変っすね。',2,['yui','ふふ、平気だよ。',1]],['ユイさん、やさしいっすね。',6,['yui','保育士のときのくせかな。',2]],['おばあさん、顔色だいじょうぶそうっすか?一緒に見てるっす。',14,['yui','…うん。江藤くんも、看護師さんの顔してるね。',3],30]]}
+ ]
+};
+function meet(){ const k=G.her, h=H(); h.last=G.t; state='talk'; home(false);
+ const c=CH[k][h.ch]; if(c&&c.ok()) return c.run(()=>{ h.ch++; album(`${k}_ch${h.ch}`); finishAct(); });
+ const t=TALKS[k][(G.t+h.ch)%TALKS[k].length]; bg('school');
+ say('sys',t.s); pic(himg(k,1));
+ next(()=>{ say(...t.q); chat3(k,t.o,()=>finishAct()); });
+}
+function date(){ G.money-=3000; const k=G.her, h=H(); h.last=G.t; state='talk'; home(false); bg('park'); bgm('date'); album(`${k}_date`);
+ const plans=k==='saki'?[[['sys','日曜日。サキと、科学博物館の「人体のふしぎ展」へ。'],['saki','…デートで博物館なんて、あなたにしてはいい選択ね。',2],['eto','心臓の模型、でかいっすね!左心室、ほんとに分厚いっす。','06'],['saki','ふふ、ちゃんと勉強してるじゃない。…今日は、楽しかった。',3]],
+   [['sys','日曜日。サキと、駅前のカフェで勉強デート。'],['saki','…ここ、静かでいいわね。あなた、意外とお店選びのセンスあるのね。',2],['eto','いちごミルクがあるって聞いたんで。','15'],['saki','…覚えてたの?…ずるい。',3]]]
+  :[[['sys','日曜日。ユイと、動物ふれあい広場へ。'],['yui','わあ、ウサギ!ふわふわ…!',2],['eto','ユイさん、子どもみたいにはしゃいでるっす。','15'],['yui','…もう、からかわないで。でも、今日はありがとう。すごく楽しかった。',3]],
+   [['sys','日曜日。ユイと、海辺の公園を散歩。'],['yui','潮風、気持ちいいね。…社会人のころは、休みの日もずっと疲れてたんだ。',1],['eto','今日は、ゆっくりするっす。','02'],['yui','うん。…江藤くんといると、肩の力がぬけるの。',3]]];
+ talk(pick(plans),()=>{ addLove(k,G.lover?10:15); addStress(-15); say('sys',`${HN()}との距離が、ぐっと縮まった気がする。`); label('🌸 デート'); finishAct(); });
+}
+
+/* ---------- ヒロインの物語(全5章) ---------- */
+const CH={
+ saki:[
+  {ok:()=>H().love>=12&&wOf(G.t)>=1,run:done=>{ bg('lib'); bgm('event');
+   talk([['sys','【サキ 第1章:出会い】\n放課後の図書室。'],['saki','…江藤くん。小テスト、わかってる?',1],['eto','…わかってないっす。','08'],['saki','しょうがないわね。私が問題を出すから、答えて。',1]],()=>
+    quiz(3,'📖 サキの勉強会',ok=>{ addLove('saki',8,ok*6); addSt('body',ok*2); talk([['saki',ok>=2?`${ok}問正解。…やればできるじゃない。また教えてあげても、いいわよ。`:`${ok}問…。でも、最後まで逃げなかったのは、えらいと思う。`,ok>=2?2:1]],done); },'saki',learnedUnits(G.t))); }},
+  {ok:()=>H().love>=25&&wOf(G.t)>=9,run:done=>{ bg('school'); bgm('event');
+   talk([['sys','【サキ 第2章:ライバル】\n前期試験が近づいたある日。'],['anki','一ノ瀬。今度の前期試験、1位はオレがもらう。'],['saki','…受けて立つわ。',1],['sys','その日から、サキは毎晩遅くまで勉強を続けた。そして――'],['saki','…あれ…目の前が…。',4],['eto','サキさん!?顔、真っ青っす!','13'],['sys','サキがしゃがみこんだ。どうする?']],()=>choose([
+    ['すぐ座らせて休ませ、先生に知らせる',true,'まず転ばないように低い姿勢にして休ませる。体調の変化は、ひとりで判断せず先生に報告'],
+    ['「気合いっす!」と立たせて勉強を続けさせる',false,'めまいがあるときに立たせると、倒れてけがをするおそれがある'],
+    ['エナジードリンクを飲ませる',false,'カフェインで無理をさせても解決しない。休息と睡眠が必要']],ok=>{
+    addLove('saki',ok?12:3,ok?18:5); talk(ok?[['saki','…ありがとう。私、1位じゃなきゃって、ずっと無理してた。',3],['eto','1位じゃなくても、サキさんはサキさんっす。','12'],['saki','…ばか。…でも、ちょっと楽になった。',2]]:[['saki','…ごめん、少し休むわ…。',4],['sys','結局、サキは保健室で休むことになった。']],done); })); }},
+  {ok:()=>H().love>=38&&wOf(G.t)>=20,run:done=>{ bg('night'); bgm('event');
+   talk([['sys','【サキ 第3章:家族】\n秋の夜、サキから電話がかかってきた。'],['saki','…ねえ。少し、話を聞いてくれる?',4],['saki','うち、両親とも医師なの。「看護師でいいのか、医学部に行き直せ」って言われて…。',4]],()=>{ say('saki','…あなたなら、どう思う?',4);
+    chat3('saki',[['医者のほうがかっこいいっすよ。',-5,['saki','…そう。あなたもそう思うのね。',4]],['サキさんが決めればいいと思うっす。',6,['saki','…それができたら、苦労しないわよ。',1]],['サキさんが看護師になりたい理由、聞かせてほしいっす。それが答えっす。',14,['saki','…理由…。うん。あなたになら、話せるかも。',3],30,15]],v=>{ if(v>=10) addLove('saki',0,10); done(); }); }); }},
+  {ok:()=>H().love>=48&&wOf(G.t)>=28,run:done=>{ bg('hosp'); bgm('event');
+   talk([['sys','【サキ 第4章:本音】\n病院見学のあと、2人は中庭のベンチに座った。'],['saki','…私ね、小さいころ、おばあちゃんが入院してたの。',1],['saki','そのとき、毎日おばあちゃんの手をにぎって話を聞いてくれた看護師さんがいた。私も、ああなりたかったの。',3],['saki','…ねえ。もし不安そうな患者さんがいたら、あなたはどうする?']],()=>choose([
+    ['目線を合わせて、名前を呼んで、ゆっくり話を聞く',true,'相手の不安を受けとめることが、看護の第一歩'],
+    ['「大丈夫っすよ」とだけ言って、すぐ次の仕事に行く',false,'忙しくても、まず気持ちを聞くことが安心につながる'],
+    ['難しい医学用語でくわしく説明する',false,'わかりやすい言葉で、相手のペースに合わせることが大事']],ok=>{
+    addLove('saki',ok?12:4,ok?15:5); talk(ok?[['saki','…うん。それ、あの看護師さんと同じ。',2],['saki','私、やっぱり看護師になる。家族にも、ちゃんと言うわ。',1],['eto','サキさんなら、ぜったいなれるっす。','02']]:[['saki','…看護って、むずかしいわね。私もまだまだだわ。',1]],done); })); }},
+  {ok:()=>(H().love>=55||G.lover)&&wOf(G.t)>=40,run:done=>{ bg('lib'); bgm('event');
+   talk([['sys','【サキ 第5章:満点より大事なもの】\n進級試験の前。2人は図書室で向き合っていた。'],['saki',G.lover?'一緒に合格しましょ。…約束よ。':'…最後の試験。私と勉強、しない?',G.lover?3:1],['saki','総まとめの問題、出すわよ。',1]],()=>
+    quiz(4,'📖 サキと試験勉強',ok=>{ addSt('body',ok*2); addSt('med',ok); addLove('saki',8,ok*3); talk([['saki',ok>=3?'完ぺきね。…私たち、いいコンビかも。':'大丈夫。まちがえたところを覚えれば、それでいいの。満点じゃなくていいのよ。',ok>=3?2:3],['sys','サキの口から「満点じゃなくていい」という言葉が出た。']],done); },'saki',learnedUnits(G.t))); }}
+ ],
+ yui:[
+  {ok:()=>H().love>=12&&wOf(G.t)>=1,run:done=>{ bg('lib'); bgm('event');
+   talk([['sys','【ユイ 第1章:出会い】\n放課後の教室。ユイがひとりで残っている。'],['yui','江藤くん…。私、やっぱり勉強についていけないかも。',4],['eto','じゃあ、一緒に問題やるっす。オレが読むんで、ユイさんが答えてください。','06'],['yui','…うん、やってみる。',1]],()=>
+    quiz(3,'📖 ユイと勉強',ok=>{ addLove('yui',8,ok*6); addSt('care',5); talk([['yui',ok>=2?`${ok}問も合ってた…!江藤くん、教えるの上手だね。`:`${ok}問…でも、ひとりよりずっと楽しかった。ありがとう。`,ok>=2?2:3]],done); },null,learnedUnits(G.t))); }},
+  {ok:()=>H().love>=25&&wOf(G.t)>=9,run:done=>{ bg('park'); bgm('event');
+   talk([['sys','【ユイ 第2章:子どもたち】\n保育園のボランティア。ユイは子どもたちに大人気だ。'],['sys','そのとき、走っていた子が転んで、ひざから血が出た!'],['yui','たいへん…!江藤くん、手伝って!',4],['sys','ひざの擦り傷に、砂がついて血がにじんでいる。まずどうする?']],()=>choose([
+    ['水道の流水で、傷の砂や汚れをよく洗い流す',true,'擦り傷は、まず流水でよく洗って汚れを落とす。出血が続くときは清潔なガーゼで押さえる(圧迫止血)'],
+    ['消毒液をたっぷりかけて、すぐ絆創膏をはる',false,'まず流水で汚れを落とすのが大事。汚れが残ったままだと治りにくい'],
+    ['ティッシュでごしごしこする',false,'こすると傷が広がる。流水でやさしく洗う']],ok=>{
+    addLove('yui',ok?12:3,ok?18:5); talk(ok?[['yui','…泣きやんだ。江藤くん、すごく落ちついてた。',2],['eto','ユイさんが子どもを安心させてくれたからっす。','06'],['yui','…私、やっぱり小児看護師になりたい。',3]]:[['yui','あ、待って、まず洗ったほうが…。',4],['sys','ユイが手早く流水で洗ってくれた。']],done); })); }},
+  {ok:()=>H().love>=38&&wOf(G.t)>=20,run:done=>{ bg('night'); bgm('event');
+   talk([['sys','【ユイ 第3章:年の差】\n学園祭の準備のあと。ユイがぽつりとつぶやいた。'],['yui','…みんな若くて、元気で。私だけ、場ちがいな気がするの。',4],['yui','26歳で看護学生なんて、遅すぎたのかな…。',4]],()=>{ say('yui','…江藤くんは、どう思う?',4);
+    chat3('yui',[['たしかに、ちょっと年上っすね。',-5,['yui','…だよね。',4]],['気にしすぎっすよ!',6,['yui','…うん。そうだね。',1]],['保育士の経験は、ユイさんにしかない武器っす。遅すぎる夢なんて、ないっす。',14,['yui','…!…その言葉、ずっと誰かに言ってほしかった。',3],30,15]],v=>{ if(v>=10) addLove('yui',0,10); done(); }); }); }},
+  {ok:()=>H().love>=48&&wOf(G.t)>=28,run:done=>{ bg('hosp'); bgm('event');
+   talk([['sys','【ユイ 第4章:小児病棟】\n実習で訪れた小児病棟。免疫の弱い子どもたちが入院している。'],['yui','江藤くん、この部屋の子は抵抗力が弱いんだって。入る前に、何に気をつける?',1]],()=>choose([
+    ['手洗い・手指消毒をして、体調が悪いときは入らない',true,'免疫の弱い子どもには、持ちこまないことが一番の感染予防'],
+    ['元気づけるために、外で遊んだままの手でハイタッチ',false,'手には目に見えない菌やウイルスがついている。必ず手指衛生を'],
+    ['せきが出ているけど、マスクなしで少しだけ',false,'体調が悪いときは入らない。せきエチケットも大事']],ok=>{
+    addLove('yui',ok?12:4,ok?15:5); addSt('med',ok?4:1); talk(ok?[['yui','さすが!…ねえ、あの子、退院したら保育園に行くんだって。',2],['yui','いつか、こういう子たちの笑顔を守れる看護師になりたい。',3],['eto','ユイさんなら、なれるっす。オレが保証するっす。','02']]:[['yui','…感染予防、もう一回いっしょに確認しよっか。',1]],done); })); }},
+  {ok:()=>(H().love>=55||G.lover)&&wOf(G.t)>=40,run:done=>{ bg('lib'); bgm('event');
+   talk([['sys','【ユイ 第5章:夢のつづき】\n進級試験の前。ユイの部屋…ではなく、図書室。'],['yui',G.lover?'一緒に2年生になろうね。…約束。':'最後の試験、いっしょに勉強しよう?',G.lover?3:1],['eto','総まとめ、オレが問題読むっす。','06']],()=>
+    quiz(4,'📖 ユイと試験勉強',ok=>{ addSt('body',ok*2); addSt('care',3); addLove('yui',8,ok*3); talk([['yui',ok>=3?'やった、ほとんど合ってる!…10年ぶりでも、ちゃんと夢に近づけてるね。':'まちがえたところ、覚えればいいんだよね。…あきらめないって決めたから。',ok>=3?2:3]],done); },null,learnedUnits(G.t))); }}
+ ]
+};
+
+/* ---------- ほかのキャラのイベント(行動のあとに確率で起こる) ---------- */
+const OEV=[
+ /* 旧『ガンバレ！江藤くん』の教室編:クラスメイトが話しかけてくる(cd=次に起こるまでのターン数)/全員と友達になったら小テスト */
+ {id:'mate',cd:2,w:4,ok:()=>{ gx(); return G.t>=3&&G.mt.f.length<MATES.length; },run:done=>mateEvent(done)},
+ {id:'mtest',cd:2,w:4,ok:()=>{ gx(); return G.mt.f.length>=MATES.length&&!G.mt.test; },run:done=>teacherTest(done)},
+ {id:'karui_gokon',ok:()=>wOf(G.t)>=4&&!G.lover,run:done=>talk([['karui','江藤っち!今度の土曜、他校との合コン行かね?'],['eto','合コンっすか…。','08']],()=>{ label('どうする?'); buttons([
+   {t:'行く!',f:()=>{ addStress(-10); addLove(G.her,-8); G.friend++; talk([['sys','…楽しかったが、うわさはすぐに広まった。'],[G.her,G.her==='saki'?'…合コン、楽しかった?別に、どうでもいいけど。':'合コン、行ったんだ…。ふーん…。',4]],done); }},
+   {t:`断る(${HN()}がいるし)`,f:()=>{ addLove(G.her,4); G.friend++; talk([['karui','かーっ、一途だねえ!いいぜ、オレが代わりに楽しんでくる!']],done); }}],1); })},
+ {id:'anki_battle',ok:()=>wOf(G.t)>=3,run:done=>talk([['anki','江藤。オレとテスト勝負だ。3問中2問以上で、お前の勝ちにしてやる。'],['eto','受けて立つっす!','05']],()=>quiz(3,'⚔ アンキとテスト勝負',ok=>{ const win=ok>=2; if(win){ addSt('body',3); addLove(G.her,G.her==='saki'?5:3); } else addStress(5);
+   talk([['anki',win?'…くっ、やるな。次は負けん。':'フッ、まだまだだな。'],...(win?[[G.her,G.her==='saki'?'…アンキに勝つなんて、少しは見直したわ。':'江藤くん、すごい!',2]]:[])],done); },'anki',learnedUnits(G.t)))},
+ {id:'kibishi_test',ok:()=>wOf(G.t)>=6,run:done=>talk([['kibishi','江藤くん、抜き打ちの実技テストよ。言った順に、器具をそろえてちょうだい。']],()=>{ label('🧰 キビシ主任の抜き打ちテスト'); order('atk',g=>{ const s=g.all?3:g.n>=3?2:g.n>=2?1:0; addSt('skill',s*2+1); talk([['kibishi',['…やり直しね。','…まあまあね。','合格。手が落ちついてきたわね。','完ぺき。…あなた、案外いい看護師になるかもね。'][s]]],done); }); })},
+ {id:'yae_soudan',ok:()=>G.stress>=40,run:done=>talk([['sys','購買でパンを買っていると――'],['yae','あんた、顔が疲れてるよ。…はい、これおまけ。ちゃんと寝てるのかい?'],['eto','ヤエさん…しみるっす。','07']],()=>{ addStress(-15); done(); })},
+ {id:'kizawa_rival',ok:()=>wOf(G.t)>=16&&!G.lover,run:done=>talk([['kizawa','フッ…'+HN()+'さん、今度オレとお茶でもどうかな?'],[G.her,'え…えっと…。',4],['eto','ちょっと待つっす!','05'],['kizawa','ほう、江藤。じゃあ知識で勝負だ。2問正解できたら、引いてやろう。']],()=>quiz(2,'⚔ キザワとの勝負',ok=>{ const win=ok>=2;
+   if(win) addLove(G.her,8,4); else addLove(G.her,-5);
+   talk(win?[['kizawa','…今日のところは、引いてやる。'],[G.her,G.her==='saki'?'…助けてくれたの?…ありがと。':'江藤くん、ありがとう…!',3]]:[['kizawa','フッ、勝負あったな。'],[G.her,'…あ、私、用事があるから!',4],['sys','なんとかその場はおさまったが、江藤くんは少し情けなかった。']],done); },'kizawa',learnedUnits(G.t)))},
+ {id:'mizuki_help',ok:()=>wOf(G.t)>=8,run:done=>talk([['mizuki','江藤くん!グラウンドで、後輩が足首をひねったの!']],()=>choose([
+   ['動かさずに冷やして、足を少し高くして休ませる',true,'ねんざは安静・冷却・圧迫・挙上が基本。痛みが強いときは受診'],
+   ['痛みをがまんさせて、そのまま走らせる',false,'無理に動かすと悪化する'],
+   ['温めるために、熱いタオルを巻く',false,'けがの直後は冷やすのが基本']],ok=>{ addSt('care',ok?4:1); addSt('skill',ok?3:0); talk([['mizuki',ok?'ありがとう!手当て、すごく手ぎわよかったよ。':'…あ、冷やしたほうがいいみたい!']],done); }))},
+ {id:'gai_quiz',ok:()=>wOf(G.t)>=8,run:done=>talk([['gai','カタカタ…また会ったのう、江藤。ひとつ問題じゃ。']],()=>quiz(1,'🦴 ガイコツ先輩の問題',ok=>{ G.gai++; if(ok) addSt('body',3); talk([['gai',ok?'カタカタ!よかろう。…ワシとおぬし、気が合うのう。':'カタ…骨身にしみて覚えるのじゃ。']],done); },'gai',learnedUnits(G.t)))},
+ {id:'honehara_report',ok:()=>wOf(G.t)>=10,run:done=>talk([['honehara','ほっほっ。江藤くん、レポートの課題じゃ。この2問に答えてみなさい。']],()=>quiz(2,'📝 ホネハラ教授のレポート',ok=>{ addSt('body',ok*2); addSt('med',ok); talk([['honehara',ok===2?'見事じゃ。骨くんも感心しとるわい。':'ほっほっ、また来なさい。']],done); },'honehara',learnedUnits(G.t)))},
+ {id:'donaru_run',ok:()=>wOf(G.t)>=2,run:done=>talk([['donaru','江藤!今日は特別に持久走だ!']],()=>{ const ok=G.st.hp>=10; if(ok){ addSt('hp',3); addStress(-5); } else addStress(8);
+   talk([['sys',ok?'江藤くんは最後まで走りきった!':'…途中でばててしまった。'],['donaru',ok?'よし!その体力が実習で生きるぞ!':'体力をつけろ!看護は体が資本だ!']],done); })},
+ {id:'rain_umbrella',ok:()=>G.t-H().last<=2,run:done=>talk([['sys','下校のとき、急に雨がふってきた。'],[G.her,G.her==='saki'?'…傘、ないの?しょうがないわね、入りなさいよ。':'江藤くん、傘ある?…入っていく?',3]],()=>{ addLove(G.her,5); done(); })}
+];
+function rollOtherEvent(){ if(Math.random()>0.38) return null;
+ const ok=OEV.filter(e=>!G.once[e.id]&&(G.t-(G.cool[e.id]??-99))>=(e.cd||8)&&e.ok()); if(!ok.length) return null;
+ const bag=ok.flatMap(e=>Array(e.w||1).fill(e)); return pick(bag); } // w=起こりやすさ(ふつう1)
+
+/* =====================================================================
+   旧『ガンバレ！江藤くん 最強ナース烈伝』の物語(2026-11-23 作り手の指定で、ときめき江藤くんに完全移植)
+   ・通学編(旧第1話) → 行動「🛵 通学路」:道をふさぐ相手とバトル(FOES)
+   ・教室編(旧第2話) → 行事「クラスの自己紹介」+イベント「クラスメイト」、全員と友達でハヤカワ先生の小テスト(MATES TEACHER)
+   ・購買編(旧第3話) → 行事「購買のやきそばパン」10月(LINE3 BOSS3)
+   ・体育編(旧第4話) → 行事「体育の持久走」6月、助けた人名鑑(PEOPLE)
+   ・注射器のタイミングゲージ → 器具ならべ(TOOLS order)
+   セリフの who:'foe' は、いま話している相手(foe)の名前と絵を出す。null は地の文
+   ===================================================================== */
+let foe=null;
 const FOES = [
  {n:'01',name:'マッスル先輩',kind:'朝トレ中の大学生',theme:'細胞の構造',
   pre:[['foe','おい そこの金髪!バイクに乗るまえに、自分の細胞に感謝したか?'],['eto','してないっす。てか朝から上半身ハダカはキツいっす。','19'],['foe','なにぃ!? 筋肉は細胞のかたまりだぞ!細胞クイズで勝負だ!']],
@@ -312,534 +789,6 @@ const FOES = [
    {q:'自分の意思で動かせる筋肉(随意筋)はどれ?',a:'骨格筋',w:['心筋','胃や腸の平滑筋','血管の平滑筋'],ex:'骨格筋は随意筋。心筋と平滑筋は意思では動かせない不随意筋です。'},
    {q:'筋肉が収縮するとき、ミオシンフィラメントの間にすべりこむものは?',a:'アクチンフィラメント',w:['コラーゲン繊維','フィブリン','ヘモグロビン'],ex:'アクチンフィラメントがミオシンフィラメントの間にすべりこんで筋肉が縮みます。ATPとカルシウムイオンが必要です。'}]}
 ];
-FOES.forEach((f,i)=>{ f.id='f'+f.n; f.img='foes/'+f.n+'.jpg'; f.lv=10+i*2; f.hp=f.boss?4:3; f.im=new Image(); f.im.src=f.img; });
-{ const x=FOES.find(f=>f.extra); x.hp=3; x.lv=40; x.im=new Image(); x.im.src=x.img; }
-const P_MAX = 3;
-
-/* ===== 単元のまとめ(カバンの本で読める) ===== */
-const SUM={
- '01':['すべての生物は細胞からなる。細胞は細胞膜で包まれ、遺伝情報としてDNAをもつ','真核細胞:核をもつ(動物・植物・菌類など)','原核細胞:核をもたない(大腸菌・乳酸菌・シアノバクテリア)','核=DNAを含む/ミトコンドリア=呼吸の場/葉緑体=光合成の場','植物細胞だけにあるもの:細胞壁・葉緑体・発達した液胞'],
- '02':['ATP(アデノシン三リン酸)=「エネルギーの通貨」','ATP → ADP+リン酸 に分解されるとき、エネルギーが放出される','呼吸:有機物+酸素 → 二酸化炭素+水+エネルギー(ATP)','呼吸の場はミトコンドリア','代謝=同化(合成・エネルギーを吸収)+異化(分解・エネルギーを放出)'],
- '03':['酵素=生体触媒。主成分はタンパク質','基質特異性:決まった基質にだけ作用する','最適温度(ヒトでは約35〜40℃)と最適pHがある','高温では立体構造がこわれ、はたらきを失う(失活)','アミラーゼ→デンプン/ペプシン→タンパク質/リパーゼ→脂肪/カタラーゼ→過酸化水素'],
- '04':['血液=有形成分(赤血球・白血球・血小板)+液体成分(血しょう)','赤血球:ヘモグロビンで酸素を運ぶ','白血球:免疫/血小板:血液凝固/血しょう:栄養分・老廃物の運搬','ヘモグロビンは酸素の多い肺で酸素と結合し、酸素が少なく二酸化炭素の多い組織で酸素を離す','体液=血液・組織液・リンパ液'],
- '05':['傷口に血小板が集まる → フィブリン(繊維状タンパク質)ができる → 血球をからめて血ぺいになる','採血した血液を静置すると、血ぺい(沈殿)と血清(上ずみ)に分かれる','線溶:傷が治ると、フィブリンが分解されて血ぺいが溶ける'],
- '06':['心臓は2心房2心室。全身へ送り出す左心室の壁がもっとも厚い','体循環:左心室 → 大動脈 → 全身 → 大静脈 → 右心房','肺循環:右心室 → 肺動脈 → 肺 → 肺静脈 → 左心房','肺動脈には静脈血、肺静脈には動脈血が流れる','洞房結節(右心房)=ペースメーカー。拍動のリズムをつくる'],
- '07':['第1の防御:皮膚・粘膜(物理的防御)、リゾチーム・胃酸など(化学的防御)','第2の防御:食作用(好中球・マクロファージ・樹状細胞)=自然免疫','炎症:食細胞が集まり、赤くはれて熱をもつ','樹状細胞は異物の情報をT細胞に伝え(抗原提示)、獲得免疫につなぐ'],
- '08':['体液性免疫:ヘルパーT細胞がB細胞を活性化 → 形質細胞(抗体産生細胞)が抗体をつくる → 抗原抗体反応','細胞性免疫:キラーT細胞が感染細胞を直接攻撃する','抗体=免疫グロブリンというタンパク質','一部のT細胞・B細胞は記憶細胞として残る(免疫記憶)'],
- '09':['二次応答:同じ抗原の2度目の侵入では、速く強い反応が起こる','予防接種(ワクチン):二次応答を利用して発症を防ぐ','血清療法:抗体を含む血清を注射する治療','アレルギー:過敏な免疫反応。重いものはアナフィラキシーショック','エイズ:HIVがヘルパーT細胞に感染して免疫不全に','自己免疫疾患:自分の組織を攻撃してしまう(関節リウマチなど)'],
- '10':['血糖値の調節:グルコース ⇔ グリコーゲン(貯蔵)','解毒:アンモニア → 尿素、アルコールの分解','胆汁をつくる(脂肪の消化を助ける。消化酵素は含まない)','血しょう中のタンパク質の合成、熱の発生','肝門脈:消化管で吸収した栄養分を含む血液が肝臓に入る血管'],
- '11':['ネフロン(腎単位)=腎小体(糸球体+ボーマンのう)+細尿管','ろ過:糸球体 → ボーマンのう。できた液が原尿(血球・タンパク質はろ過されない)','再吸収:グルコースは100%、水は約99%、無機塩類は必要な量','バソプレシン(脳下垂体後葉):水の再吸収を促進 → 尿量が減る','鉱質コルチコイド(副腎皮質):ナトリウムイオンの再吸収を促進'],
- '12':['血糖値はふつう約0.1%(血液100mL中に約100mg)','下げる:インスリン(すい臓ランゲルハンス島B細胞)','上げる:グルカゴン(A細胞)、アドレナリン(副腎髄質)、糖質コルチコイド(副腎皮質)','調節の中枢は間脳の視床下部','糖尿病:インスリンの不足や作用の低下で、高血糖がつづく'],
- '13':['ホルモン:内分泌腺 → 血液 → 標的器官(受容体をもつ細胞)に作用','視床下部 → 脳下垂体前葉 → 各内分泌腺。フィードバックで分泌量を調節','チロキシン(甲状腺):代謝を促進','アドレナリン(副腎髄質):血糖値・心拍数を上げる','パラトルモン(副甲状腺):血液中のカルシウムイオン濃度を上げる'],
- '14':['交感神経(活動・緊張時):拍動促進、瞳孔拡大、気管支拡張、消化抑制、立毛筋収縮','副交感神経(休息時):拍動抑制、瞳孔縮小、気管支収縮、消化促進','2つはたがいに反対の作用(拮抗作用)','中枢は間脳の視床下部','交感神経は脊髄から、副交感神経は中脳・延髄・脊髄の下部から出る'],
- '15':['恒常性(ホメオスタシス):体内環境を一定に保つ。中枢は間脳の視床下部','寒いとき:皮膚の血管と立毛筋が収縮(放熱を減らす)、代謝を促進(発熱を増やす)、ふるえ','代謝を高めるホルモン:チロキシン・アドレナリン・糖質コルチコイド','暑いとき:発汗、皮膚の血管の拡張(放熱を増やす)','フィードバック:結果が原因側にもどって作用し、調節するしくみ'],
- '16':['ニューロン=細胞体+樹状突起+軸索。接続部はシナプス','中枢神経系(脳・脊髄)/末梢神経系(体性神経・自律神経)','大脳:思考・記憶・感覚/小脳:体の平衡/中脳:姿勢・瞳孔反射','間脳:恒常性の中枢/延髄:呼吸・拍動の中枢','脳死:脳幹をふくむ脳全体の機能が停止した状態'],
- '17':['デンプン →(アミラーゼ)→ マルトース → グルコース','タンパク質 →(ペプシン・トリプシン)→ アミノ酸','脂肪 →(リパーゼ)→ 脂肪酸+モノグリセリド。胆汁が消化を助ける','小腸の柔毛で吸収:グルコース・アミノ酸は毛細血管へ、脂肪はリンパ管へ','大腸:おもに水分を吸収'],
- '18':['空気の通り道:鼻 → 気管 → 気管支 → 肺胞','肺胞と毛細血管の間でガス交換(酸素は血液へ、二酸化炭素は肺胞へ)','息を吸う:横隔膜が収縮して下がり、ろっ骨が上がる','息をはく:横隔膜がゆるんで上がり、ろっ骨が下がる','呼吸の中枢は延髄。血液中の二酸化炭素濃度が上がると呼吸が速くなる'],
- '19':['細胞周期=間期(G1期 → S期 → G2期)+分裂期(M期)','S期にDNAが複製されて2倍になり、分裂で半分ずつに分かれる','前期:染色体が現れる/中期:赤道面に並ぶ','後期:両極へ分かれる/終期:核ができ、細胞質が分かれる','娘細胞は母細胞と同じ遺伝情報をもつ'],
- 'b1':['成人の骨は約200個。体を支える・内臓を守る・運動の支点になる','骨はカルシウムの貯蔵庫。骨の中の骨髄では血球がつくられる(造血)','骨は、こわす細胞(破骨細胞)とつくる細胞(骨芽細胞)のはたらきで、つねに作りかえられている','関節:骨と骨のつなぎ目。じん帯が骨どうしをつなぐ','けん(腱):筋肉を骨につなぐ'],
- 'b2':['骨格筋:骨を動かす。横紋筋で、意思で動かせる(随意筋)','心筋:心臓の筋肉。横紋筋だが、意思では動かせない(不随意筋)','平滑筋:内臓や血管の筋肉。不随意筋','筋収縮:アクチンフィラメントがミオシンフィラメントの間にすべりこむ。ATPとカルシウムイオンが必要','曲げる筋肉と伸ばす筋肉が対になってはたらく(例:上腕二頭筋と上腕三頭筋)','筋肉は体の熱もつくっている'],
- 'sn':['★インスリンは血糖値を下げる唯一のホルモン(←3回出た!)','★体循環は左心室から、肺循環は右心室から。「左から全身」で覚えろ','★肺動脈には静脈血が流れる。名前にだまされるな','★原尿のグルコースは100%再吸収。尿に糖が出たら異常','★交感神経=戦うモード、副交感神経=休むモード','★抗体をつくるのは形質細胞(B細胞が変身したもの)。T細胞じゃない','★DNAはA−T、G−C。RNAにはTがなくてU','★DNAの複製は間期。分裂期にやると思うな','★恒常性の中枢は間脳の視床下部。呼吸と拍動の中枢は延髄','★血液凝固は 血小板 → フィブリン → 血ぺい。上ずみが血清','(らくがき)ねむい。腹へった。板書が速すぎる。'],
- 'st1':['バイタルサイン=「生きているしるし」。体温・脈拍・呼吸・血圧(+意識)','体温:わきの下で、ふつう36〜37℃くらい','脈拍:成人の安静時は1分間に60〜100回','呼吸:成人の安静時は1分間に12〜20回','血圧:心臓が縮んだときが最高血圧(収縮期)、広がったときが最低血圧(拡張期)','血圧の目安:120/80mmHg未満が正常'],
- 'st2':['心音「ドッ・クン」の2つの音は、心臓の弁が閉じる音','Ⅰ音:心房と心室の間の弁(房室弁)が閉じる音','Ⅱ音:動脈の入り口の弁(動脈弁)が閉じる音','呼吸音:空気が気管支や肺を出入りする音。左右をくらべて聞く','血圧測定:腕をしめつけてからゆるめ、血液が流れはじめる音を聞いて測る','おなかに当てると、腸が動く音(ぜん動音)も聞こえる'],
- 'me1':['三大栄養素=炭水化物・タンパク質・脂質','炭水化物:おもなエネルギー源。1gあたり約4kcal','タンパク質:筋肉・酵素・抗体などの材料。1gあたり約4kcal','脂質:エネルギーの貯蔵、細胞膜の成分。1gあたり約9kcal','五大栄養素=三大栄養素+ビタミン+無機質(ミネラル)'],
- 'hs0':['第1章 生物の特徴:細胞の構造、呼吸とATP、酵素(2〜4ページ)','第2章 遺伝子とそのはたらき:体細胞分裂、遺伝子とDNA(5〜6ページ)','第3章 血液と循環・肝臓・腎臓(7〜11ページ)','第4章 消化と呼吸(12〜13ページ)','第5章 神経とホルモン・恒常性(14〜18ページ)','第6章 免疫(19〜21ページ)','第7章 骨と筋肉(22〜23ページ)','「つぎ ▶」で1ページずつ読める。看護学校の解剖生理学・生化学の土台になる内容'],
- /* 看護学校の教科書(専門基礎分野)。いまは「何を学ぶ科目か」と「高校生物とのつながり」だけ */
- 'n_ana':['からだの形と、器官がどこにあるかを学ぶ科目。生理学とまとめて「解剖生理学」として教える学校も多い','骨格(成人で約200個の骨)、筋肉、内臓の位置、血管や神経の通り道など','「右心房」「左心室」のように、名前と場所をセットで覚えるのが基本','高校生物とのつながり:心臓のつくり、腎臓のネフロン、骨と筋肉','📌 くわしい中身は、後日アップデート予定'],
- 'n_phy':['からだの「はたらき」を学ぶ科目。看護学校でいちばん大事な基礎の1つ','心臓と循環、呼吸、腎臓と尿、神経、ホルモン、体温調節など','「なぜ脈が速くなるのか」「なぜ尿の量が変わるのか」を、しくみで説明できるようにする','高校生物とのつながり:恒常性、自律神経、ホルモン、腎臓、血糖値の調節がそのまま土台になる','📌 くわしい中身は、後日アップデート予定'],
- 'n_bc':['からだの中で起こる化学反応を学ぶ科目','酵素、糖・脂質・タンパク質の代謝、ATP、DNAからタンパク質がつくられるしくみなど','高校生物とのつながり:酵素、呼吸とATP、遺伝子のはたらき(転写・翻訳)','📌 くわしい中身は、後日アップデート予定'],
- 'n_nut':['栄養素のはたらきと、食事のとり方を学ぶ科目','五大栄養素、エネルギー量、消化と吸収、病気に合わせた食事(治療食)など','高校生物とのつながり:消化と吸収(第3話)、肝臓のはたらき','カバンの「給食の献立表」も入口になる','📌 くわしい中身は、後日アップデート予定'],
- 'n_pat':['病気がなぜ起こり、からだにどんな変化が起きるかを学ぶ科目','炎症、腫瘍(がん)、血栓や梗塞などの循環障害、細胞や組織の変化など','高校生物とのつながり:細胞、血液凝固、免疫','📌 くわしい中身は、後日アップデート予定'],
- 'n_mic':['細菌・ウイルス・真菌などの微生物と、感染のしくみを学ぶ科目','感染経路、消毒と滅菌、免疫、ワクチンなど','高校生物とのつながり:原核細胞と真核細胞、自然免疫と獲得免疫、予防接種','手洗いなどの感染予防は、看護の仕事に直結する','📌 くわしい中身は、後日アップデート予定'],
- 'n_pha':['薬がからだにどう効くか、どんな副作用があるかを学ぶ科目','薬が吸収されて、全身に運ばれ、分解され、排出されるまでの流れ。薬の種類と使うときの注意など','高校生物とのつながり:ホルモンと受容体、肝臓の解毒、腎臓の排出','📌 くわしい中身は、後日アップデート予定'],
- 'n_dis':['循環器・呼吸器・消化器・腎臓・脳神経・内分泌など、臓器ごとに病気と治療を学ぶ科目(臨床医学)','例:心不全、肺炎、糖尿病、脳梗塞など','解剖学・生理学・病理学を使って「どこが・どう悪くなったか」を理解する','高校生物とのつながり:心臓、腎臓、血糖値、神経の単元','📌 くわしい中身は、後日アップデート予定'],
- 'n_soc':['公衆衛生学:地域や集団の健康を守るしくみ(感染症対策、健康診断、健康に関する統計など)','社会福祉:医療保険、介護保険、年金など、くらしを支える制度','看護に関係する法律:保健師助産師看護師法など。看護師の仕事の範囲を決めている','高校生物とのつながりは少なめ。ニュースで聞く制度と結びつけると覚えやすい','📌 くわしい中身は、後日アップデート予定'],
- 'bls1':['倒れている人を見たら:① 周りの安全を確認 ② 肩をやさしくたたき、大声で呼びかけて反応を見る','反応がなければ:大声で助けを呼び、だれかを指名して「119番通報」と「AEDを持ってくる」をたのむ','呼吸を見る:胸とおなかの動きを10秒以内で。普段どおりの呼吸がない・わからない・しゃくりあげるような呼吸 → 心停止と考える','胸骨圧迫:胸の真ん中(胸骨の下半分)を、深さ約5cm(6cmをこえない)、1分間に100〜120回。毎回もとの高さまで戻し、中断はできるだけ短く','人工呼吸は、訓練を受けていてできる場合に、胸骨圧迫30回と人工呼吸2回を組み合わせて行う','救急隊に引き継ぐまで続ける。※実際の手順は、消防署などの救命講習で身につけよう'],
- 'bls2':['AEDが届いたら、まず電源を入れる(ふたを開けると入る機種もある)。あとは音声の指示にしたがう','電極パッドを貼る:右胸の上(鎖骨の下)と、左胸の下の横(わきの下)。心臓をはさむように','胸がぬれていたらふく。貼り薬ははがす。ペースメーカーなどのふくらみがあれば、そこを避けて貼る','解析中は体に触れない。「ショックが必要です」と言われたら、全員が離れたのを確かめてショックボタン','ショックのあとは、すぐに胸骨圧迫を再開。AEDは約2分ごとに解析するので、パッドは貼ったまま','小学生以上は成人用のパッド。未就学児には小児用を使う(なければ成人用)'],
- 'dg1':['消化管=食べ物の通り道:口 → 食道 → 胃 → 十二指腸(小腸のはじめ)→ 小腸 → 大腸 → 肛門','消化腺=消化液をつくる器官:だ液腺・胃腺・すい臓・肝臓など。食べ物はすい臓や肝臓の中は通らない','胆汁:肝臓でつくられ、胆のうにためられて十二指腸へ。消化酵素は含まないが、脂肪を細かい粒にして(乳化)消化を助ける','消化管のかべは平滑筋。ぜん動運動で食べ物を先へ送る','消化管の運動や消化液の分泌は、副交感神経でさかんになり、交感神経でおさえられる'],
- 'dg2':['だ液:アミラーゼ(デンプン → マルトース)。中性でよくはたらく','胃液:ペプシン(タンパク質を分解)。塩酸を含む強い酸性(pH約2)','すい液:アミラーゼ・トリプシン(タンパク質)・リパーゼ(脂肪)。三大栄養素すべての消化酵素を含む','小腸の柔毛の表面:マルターゼ(マルトース → グルコース)など、最後の分解をする酵素がある','最終産物:デンプン → グルコース(ブドウ糖)/タンパク質 → アミノ酸/脂肪 → 脂肪酸+モノグリセリド','吸収:グルコース・アミノ酸 → 毛細血管 → 肝門脈 → 肝臓/脂肪酸・モノグリセリド → 柔毛の中で脂肪にもどり、リンパ管へ'],
- 'me2':['ビタミンA:不足すると、暗いところで見えにくくなる(夜盲症)','ビタミンB1:不足すると脚気','ビタミンC:不足すると壊血病','ビタミンD:カルシウムの吸収を助ける。不足すると骨が弱くなる','ビタミンK:血液凝固に必要','鉄:ヘモグロビンの成分。不足すると貧血','カルシウム:骨や歯の成分'],
- '20':['DNA=ヌクレオチド(リン酸+糖+塩基)がつながった鎖。二重らせん構造','塩基の相補性:A−T、G−C。RNAではTのかわりにU','転写(DNA → mRNA)→ 翻訳(mRNA → タンパク質)=セントラルドグマ','ゲノム:その生物がもつ遺伝情報の1組。ヒトの体細胞の染色体は46本','体の細胞はどれも同じゲノムをもつが、はたらく遺伝子がちがう(分化)']
-};
-/* ===== 通学路(バイクの縦スクロール) =====
-   道が上から流れてくる。◀▶で車線変更、▲▼で速さを変える。障害物にぶつかると次のバトルで やる気が減る。
-   区間を走りきると、道をふさぐ相手が現れてバトル。10人倒して最後の区間を走りきると校門 */
-const OP=[[null,'朝8時。看護学校へバイクで向かう江藤くん。'],['eto','今日こそ遅刻しないで着くっす。…なんかイヤな予感するけど。','06'],
- [null,'◀▶で車線を変えて、🚧をよけよう。ぶつかると、次のバトルで やる気が減る。\n🍙を取ると回復。▲で加速、▼で減速。']];
-const ED=[[null,'キーンコーンカーンコーン…'],['eto','10人に絡まれてギリ間に合ったっす。通学だけで生物の予習おわったんすけど。','15']];
-let ACT=[];
-/* 通学編の相手:校門のDNA先生は固定、残り9人は19人から毎回ランダム */
-function randomRoster(){ return shuffle(FOES.filter(f=>f.n!=='20'&&!f.extra).map(f=>f.n)).slice(0,9).concat('20'); }
-function setRoster(ns){
- ACT=ns.map(n=>FOES.find(f=>f.n===n));
- ACT.forEach((f,i)=>{ f.boss=(i===9); f.lv=12+i*3; f.hp=f.boss?Math.min(4,f.qs.length):3; });
-}
-function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-setRoster(['01','02','03','04','05','06','07','08','09','20']);
-
-/* ===== 状態 ===== */
-const $=id=>document.getElementById(id);
-let state='title', dir='u', beaten=[], bang=null;
-let foe=null, eHP=0, eMax=1, pHP=0, queue=[], combo=0, bMiss=0, qT=0;
-
-/* ===== 江藤くん(全身) ===== */
-const FACE={normal:'01',joy:'06',sad:'16'};
-/* 画面に出すキャラ画像は、白い背景を透明にした .webp を使う(make_transparent.py で作成)。無ければ .jpg にもどす */
-function cutImg(src){ return /\.jpg$/.test(src)?`<img src="${src.replace(/\.jpg$/,'.webp')}" onerror="this.onerror=null;this.src='${src}'" alt="">`:`<img src="${src}" alt="">`; }
-function etoSVG(mood){ return cutImg(`faces/${FACE[mood]||mood}.jpg`); }
-function foeArt(f){ return cutImg(f.img); }
-
-/* ===== 描画(マップ) ===== */
-const etoIm=new Image(); etoIm.src='faces/01.jpg';
-const cv=$('cv'), ctx=cv.getContext('2d'); let ts=40, vw=0, vh=0;
-function resize(){ const r=$('top').getBoundingClientRect(), d=window.devicePixelRatio||1; vw=r.width; vh=r.height; cv.width=vw*d; cv.height=vh*d; ctx.setTransform(d,0,0,d,0,0); ts=Math.floor(vw/8); }
-window.addEventListener('resize',resize);
-function draw(){
- requestAnimationFrame(draw);
- const now=performance.now(), dt=Math.min(0.05,(now-(RIDE.last||now))/1000); RIDE.last=now;
- if(state==='title'||state==='battle') return;
- if(EP===2) return drawRoom();
- if(EP===3) return drawLine();
- if(EP===4) return drawField();
- if(state==='ride') rideTick(dt);
- drawRide();
-}
-/* ---- バイク走行 ---- */
-const RIDE={lane:1,lx:1,speed:1,dist:0,goal:13,obs:[],pops:[],spawn:1,inv:0,crash:0,hurt:0,foeY:null,scroll:0,seg:-1,last:0};
-const RIM=[0,1,2,3].map(i=>{ const im=new Image(); im.src='ride/'+i+'.png'; return im; });
-const RV=0.42; // 道が流れる速さ(画面の高さに対する割合/秒、速さ1のとき)
-function rideSeg(){ Object.assign(RIDE,{seg:beaten.length,dist:0,obs:[],pops:[],spawn:1.2,foeY:null,inv:0,crash:0,goal:beaten.length>=ACT.length?7:12+Math.min(beaten.length,6)*0.5}); }
-function ridePop(t,lane,y,c){ RIDE.pops.push({t,lane,y,c,life:0.9}); }
-function rideMove(d){
- if(d==='l') RIDE.lane=Math.max(0,RIDE.lane-1); else if(d==='r') RIDE.lane=Math.min(2,RIDE.lane+1);
- else if(d==='u') RIDE.speed=Math.min(1.8,+(RIDE.speed+0.4).toFixed(1)); else if(d==='d') RIDE.speed=Math.max(0.6,+(RIDE.speed-0.4).toFixed(1));
- sfx('step'); hud();
-}
-function rideTick(dt){
- const R1=RIDE, v=RV*R1.speed*dt;
- R1.dist+=R1.speed*dt; R1.scroll+=v; R1.inv-=dt; R1.crash-=dt;
- R1.lx+=(R1.lane-R1.lx)*Math.min(1,dt*12);
- R1.spawn-=dt*R1.speed;
- if(R1.spawn<=0&&R1.foeY===null&&R1.dist<R1.goal-1.2){
-   const hard=Math.min(R1.seg,9); R1.spawn=Math.max(0.55,1.25-hard*0.06)+Math.random()*0.5;
-   const l=Math.floor(Math.random()*3); R1.obs.push({lane:l,y:-0.08,k:Math.random()<0.16?'🍙':'🚧'});
-   if(hard>=3&&Math.random()<0.25+hard*0.04){ const l2=(l+1+Math.floor(Math.random()*2))%3; R1.obs.push({lane:l2,y:-0.08,k:'🚧'}); }
- }
- R1.obs.forEach(o=>{ o.y+=v;
-   if(!o.done&&o.lane===R1.lane&&Math.abs(o.y-0.8)<0.05){ o.done=true;
-     if(o.k==='🍙'){ o.gone=true; if(R1.hurt>0){ R1.hurt--; ridePop('やる気 回復!',o.lane,0.72,'#1f8a48'); } else ridePop('おいしい!',o.lane,0.72,'#1f8a48'); sfx('ok'); hud(); }
-     else if(R1.inv<=0){ R1.hurt=Math.min(2,R1.hurt+1); R1.inv=1.2; R1.crash=0.6; o.gone=true; ridePop('いてっ! やる気-1',o.lane,0.7,'#d7263d'); sfx('hit'); hud(); } } });
- R1.obs=R1.obs.filter(o=>o.y<1.15&&!o.gone);
- R1.pops.forEach(p=>{ p.life-=dt; p.y-=dt*0.12; }); R1.pops=R1.pops.filter(p=>p.life>0);
- if(R1.dist>=R1.goal&&R1.foeY===null){ R1.foeY=-0.15; sfx('enc'); }
- if(R1.foeY!==null){ R1.foeY+=v*0.8; if(R1.foeY>=0.58){ R1.foeY=null; if(beaten.length>=ACT.length) return ending(); encounter(ACT[beaten.length]); } }
-}
-function drawRide(){
- const top=34, H=vh-top, rw=Math.min(vw*0.72,320), x0=(vw-rw)/2, lw=rw/3, sy=y=>top+y*H, sc=RIDE.scroll*H;
- ctx.textAlign='center'; ctx.textBaseline='middle';
- ctx.fillStyle='#7ccf6b'; ctx.fillRect(0,0,vw,vh);
- const step=70, base=Math.floor(sc/step);
- for(let i=-1;i<H/step+2;i++){ const k=base-i, y=top+i*step+(sc%step); [[x0/2,1],[vw-x0/2,2]].forEach(([x,s])=>{ const h=Math.abs((k*7+s*13+k*s*5)%9); const d=h<3?'🌳':h===3?'🏠':h===4?'🌼':h===5?'🏢':h===6?'🌳':''; if(d){ ctx.font=Math.min(40,x0*0.7)+'px serif'; ctx.fillText(d,x,y); } }); }
- ctx.fillStyle='#8d99a6'; ctx.fillRect(x0,top,rw,H); ctx.fillStyle='#f2f2f2'; ctx.fillRect(x0,top,4,H); ctx.fillRect(x0+rw-4,top,4,H);
- for(let j=1;j<3;j++) for(let y=-40+(sc%40);y<H;y+=40) ctx.fillRect(x0+lw*j-2,top+y,4,20);
- RIDE.obs.forEach(o=>{ ctx.font=lw*0.55+'px serif'; ctx.fillText(o.k,x0+lw*(o.lane+0.5),sy(o.y)); });
- if(RIDE.foeY!==null){ const y=sy(RIDE.foeY);
-   if(beaten.length>=ACT.length){ ctx.font=lw*1.4+'px serif'; ctx.fillText('🏫',vw/2,y); }
-   else { const f=ACT[beaten.length]; ctx.fillStyle='rgba(215,38,61,.25)'; ctx.fillRect(x0,y-lw*0.1,rw,lw*0.2);
-     faceAt(f.im,vw/2,y,lw*0.55,f.boss?'#d7263d':'#0d1b2a'); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(vw/2+lw*0.6,y-lw*0.6,lw*0.22,0,7); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle='#0d1b2a'; ctx.stroke();
-     ctx.fillStyle='#d7263d'; ctx.font='900 '+lw*0.3+'px sans-serif'; ctx.fillText('!',vw/2+lw*0.6,y-lw*0.58); } }
- const ex=x0+lw*(RIDE.lx+0.5), ey=sy(0.8), s=lw*1.4, lean=RIDE.lane-RIDE.lx;
- if(!(RIDE.inv>0&&Math.floor(RIDE.inv*10)%2)){
-   const im=RIM[RIDE.crash>0?3:lean<-0.08?1:lean>0.08?2:0];
-   if(im.complete&&im.naturalWidth) ctx.drawImage(im,ex-s/2,ey-s/2,s,s);
-   else { ctx.save(); ctx.translate(ex,ey); ctx.rotate(RIDE.crash>0?0.5:lean*0.35); ctx.font=s*0.62+'px serif'; ctx.fillText('🛵',0,s*0.12); ctx.restore(); faceAt(etoIm,ex,ey-s*0.28,s*0.2,'#ffe14d',true); } }
- RIDE.pops.forEach(p=>{ ctx.globalAlpha=Math.min(1,p.life*2); ctx.fillStyle=p.c; ctx.font='900 '+Math.max(13,lw*0.18)+'px sans-serif'; ctx.fillText(p.t,x0+lw*(p.lane+0.5),sy(p.y)); }); ctx.globalAlpha=1;
- ctx.fillStyle='rgba(13,27,42,.5)'; ctx.fillRect(0,top,vw,6); ctx.fillStyle='#ffe14d'; ctx.fillRect(0,top,vw*Math.min(1,RIDE.dist/RIDE.goal),6);
- ctx.textAlign='left'; ctx.fillStyle='#0d1b2a'; ctx.font='900 13px sans-serif'; ctx.fillText('速さ '+'▶'.repeat(Math.round((RIDE.speed-0.2)/0.4)),8,vh-14); ctx.textAlign='center';
-}
-/* ===== サウンド(BGM・効果音はすべてブラウザ内で合成) ===== */
-const AU={ctx:null,on:true,bg:null,name:null,timer:null};
-try{ AU.on = localStorage.getItem('eto_snd')!=='off'; }catch(e){}
-function auInit(){
- try{
-  if(!AU.ctx){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return; AU.ctx=new C();
-    AU.master=AU.ctx.createGain(); AU.master.gain.value=AU.on?0.6:0; AU.master.connect(AU.ctx.destination);
-    const n=AU.ctx.sampleRate*0.3, buf=AU.ctx.createBuffer(1,n,AU.ctx.sampleRate), d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=Math.random()*2-1; AU.noise=buf; }
-  if(AU.ctx.state==='suspended') AU.ctx.resume();
-  /* 最初のタップまでは音を出せない(ブラウザの決まり)ので、ここでタイトル曲を始める */
-  if(AU.el&&AU.el.paused&&!document.hidden){ const pr=AU.el.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
-  else if(!AU.name&&state==='title') setTimeout(()=>{ if(state==='title') bgm('title'); },0);
- }catch(e){ AU.ctx=null; }
-}
-['click','pointerup','touchend','keydown'].forEach(n=>document.addEventListener(n,auInit,true));
-/* 別のタブ・アプリに切りかえたら音を止め、もどったら再開する */
-document.addEventListener('visibilitychange',()=>{ try{ if(AU.el){ if(document.hidden) AU.el.pause(); else { const pr=AU.el.play(); if(pr&&pr.catch) pr.catch(()=>{}); } } if(AU.ctx){ if(document.hidden) AU.ctx.suspend(); else AU.ctx.resume(); } }catch(e){} });
-const hz=m=>440*Math.pow(2,(m-69)/12);
-function tone(dest,f,t,d,type,vol){ const c=AU.ctx,o=c.createOscillator(),g=c.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
- g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0008,t+d); o.connect(g); g.connect(dest); o.start(t); o.stop(t+d+0.03); return o; }
-function noise(t,d,vol){ const c=AU.ctx,s=c.createBufferSource(),g=c.createGain(); s.buffer=AU.noise; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0008,t+d); s.connect(g); g.connect(AU.master); s.start(t); s.stop(t+d+0.02); }
-function seq(notes,step,type,vol,len){ const t0=AU.ctx.currentTime+0.01; notes.forEach((m,i)=>{ if(m) tone(AU.master,hz(m),t0+i*step,len||step*1.6,type,vol); }); }
-function sfx(k){
- if(!AU.ctx||!AU.on) return;
- try{ const t=AU.ctx.currentTime+0.01;
-  if(k==='click') tone(AU.master,900,t,0.05,'square',0.05);
-  else if(k==='step') tone(AU.master,150,t,0.04,'triangle',0.08);
-  else if(k==='enc'){ seq([72,0,72,0,79,84,91],0.07,'square',0.09); }
-  else if(k==='ok') seq([79,84,88],0.07,'square',0.1);
-  else if(k==='ng'){ const o=tone(AU.master,220,t,0.35,'sawtooth',0.1); o.frequency.exponentialRampToValueAtTime(110,t+0.3); }
-  else if(k==='hit') noise(t,0.14,0.25);
-  else if(k==='win') seq([72,76,79,84,0,79,84,88],0.11,'square',0.1,0.3);
-  else if(k==='lose') seq([67,63,60,55,48],0.22,'triangle',0.14,0.4);
-  else if(k==='tick') tone(AU.master,1250,t,0.06,'square',0.06);
-  else if(k==='goal') seq([72,72,76,79,0,77,81,84,0,83,86,91],0.13,'square',0.1,0.35);
- }catch(e){}
-}
-/* 曲データ:[音の高さ(MIDI番号), 長さ(拍)]。0 は休み */
-const SONGS={
- map:{bpm:132,type:'square',lead:[[76,.5],[79,.5],[84,1],[83,.5],[79,.5],[76,1],[77,.5],[81,.5],[79,1],[76,1],[0,1],[74,.5],[77,.5],[81,1],[79,.5],[77,.5],[74,1],[76,1],[79,1],[72,1],[0,1],
-   [81,.5],[84,.5],[81,1],[79,.5],[76,.5],[79,1],[77,.5],[76,.5],[74,1],[79,1],[0,1],[72,.5],[76,.5],[79,.5],[84,.5],[83,1],[81,1],[79,1],[74,1],[72,1.5],[0,.5]],
-  bass:[48,48,53,48,50,43,48,43,53,48,50,43,48,53,43,48].flatMap(n=>[[n,1],[n+7,1]])},
- battle:{bpm:160,type:'square',lead:[[69,.5],[72,.5],[76,.5],[81,.5],[79,1],[76,1],[77,.5],[76,.5],[74,.5],[72,.5],[74,1],[76,1],[69,.5],[72,.5],[76,.5],[81,.5],[83,1],[84,1],[83,.5],[81,.5],[80,.5],[76,.5],[81,2],
-   [84,1],[83,.5],[81,.5],[79,1],[76,1],[77,1],[76,.5],[74,.5],[76,2],[74,.5],[76,.5],[77,.5],[79,.5],[81,1],[83,1],[84,.5],[83,.5],[81,.5],[80,.5],[81,2]],
-  bass:[45,50,45,40,45,50,50,40].flatMap((n,i)=>i===7?[[40,.5],[52,.5],[40,.5],[52,.5],[45,.5],[57,.5],[45,.5],[57,.5]]:[0,1,2,3].flatMap(()=>[[n,.5],[n+12,.5]]))}
-};
-/* 場面ごとの曲名:title ride battle boss class test shop counter
-   BGM_FILES にファイルがあればそれを流し(bgm/ フォルダ、ループ再生)、無ければ下の合成音で代用する */
-SONGS.ride={bpm:150,type:'square',lead:SONGS.map.lead,bass:SONGS.map.bass};
-SONGS.title={bpm:112,type:'triangle',tr:-2,lead:SONGS.map.lead,bass:SONGS.map.bass};
-SONGS.class={bpm:108,type:'triangle',tr:5,lead:SONGS.map.lead,bass:SONGS.map.bass};
-SONGS.boss={bpm:184,type:'sawtooth',tr:-5,lead:SONGS.battle.lead,bass:SONGS.battle.bass};
-SONGS.test={bpm:132,type:'triangle',tr:-3,lead:SONGS.battle.lead,bass:SONGS.battle.bass};
-SONGS.shop={bpm:152,type:'square',tr:2,lead:SONGS.map.lead,bass:SONGS.map.bass};
-SONGS.counter={bpm:170,type:'square',tr:3,lead:SONGS.battle.lead,bass:SONGS.battle.bass};
-/* 音楽ファイル:魔王魂(https://maou.audio/ 作曲 森田交一)。ゲームへの組み込みは規約で可、クレジットは任意(タイトルに表記)。
-   曲だけを取り出して配るのは規約違反なので、bgm/ の中身を素材として配らないこと */
-const BGM_FILES={title:'bgm/title.mp3',ride:'bgm/ride.mp3',battle:'bgm/battle.mp3',boss:'bgm/boss.mp3',class:'bgm/class.mp3'};
-const BGM_VOL=0.45;
-const BGM_NG={}; // 読みこめなかった曲(合成音で代用する)
-function stopBgm(){ clearTimeout(AU.timer); AU.name=null; if(AU.bg){ try{ AU.bg.gain.value=0; AU.bg.disconnect(); }catch(e){} AU.bg=null; }
- if(AU.el){ try{ AU.el.pause(); AU.el.currentTime=0; }catch(e){} AU.el=null; } }
-function bgm(name){
- if(AU.name===name) return; stopBgm();
- /* 曲のファイルが無いとき(GitHub Pages の公開版など)は、下の合成音で代わりに鳴らす */
- if(BGM_FILES[name]&&!BGM_NG[name]&&typeof Audio!=='undefined'){ try{ const el=new Audio(BGM_FILES[name]); el.loop=true; el.volume=BGM_VOL; el.muted=!AU.on;
-   el.onerror=()=>{ BGM_NG[name]=1; if(AU.el===el){ AU.el=null; AU.name=null; bgm(name); } }; AU.el=el; AU.name=name; const pr=el.play(); if(pr&&pr.catch) pr.catch(()=>{}); return; }catch(e){} }
- if(!AU.ctx) return;
- try{ const c=AU.ctx, sg=SONGS[name]||SONGS.map, g=c.createGain(), spb=60/sg.bpm, tr=sg.tr||0; g.connect(AU.master); AU.bg=g; AU.name=name;
-  let t=c.currentTime+0.08;
-  (function sched(){ if(AU.bg!==g) return; if(c.state!=='running'){ AU.timer=setTimeout(sched,500); return; } let a=t,b=t;
-    sg.lead.forEach(([m,l])=>{ if(m) tone(g,hz(m+tr),a,l*spb*0.92,sg.type,0.05); a+=l*spb; });
-    sg.bass.forEach(([m,l])=>{ if(m) tone(g,hz(m+tr),b,l*spb*0.9,'triangle',0.11); b+=l*spb; });
-    t=a; AU.timer=setTimeout(sched,Math.max(50,(t-c.currentTime-0.4)*1000)); })();
- }catch(e){}
-}
-/* クリアのジングル:ファイルがあれば1回だけ流し、無ければ合成音 */
-function jingle(){ stopBgm(); if(BGM_FILES.clear&&typeof Audio!=='undefined'&&AU.on){ try{ const el=new Audio(BGM_FILES.clear); el.volume=BGM_VOL; const pr=el.play(); if(pr&&pr.catch) pr.catch(()=>sfx('goal')); return; }catch(e){} } sfx('goal'); }
-function sndToggle(){ AU.on=!AU.on; auInit(); if(AU.master) AU.master.gain.value=AU.on?0.6:0; if(AU.el) AU.el.muted=!AU.on; $('snd').textContent=AU.on?'🔊':'🔇'; try{ localStorage.setItem('eto_snd',AU.on?'on':'off'); }catch(e){} }
-
-/* ===== UI 共通 ===== */
-function label(l,r){ $('lblL').textContent=l; $('lblR').textContent=r||''; }
-function say(who,text,extra,face){
- const m=$('msg'); m.style.display='block';
- const name= who==='eto'?'江藤くん':who==='foe'?foe.name:null;
- m.innerHTML=(who==='eto'?`<img class="pf" src="faces/${face||'01'}.jpg" alt="">`:'')+(name?`<span class="who ${who}">${name}</span><br>`:'')+text.replace(/\n/g,'<br>')+(extra?`<small>${extra}</small>`:'');
- m.scrollTop=0;
-}
-function buttons(list,cols,scroll){
- const p=$('pane'); p.className=(cols===2?'c4':'c1')+(scroll?' scroll':''); p.innerHTML=''; p.scrollTop=0;
- list.forEach(o=>{ const b=document.createElement('button'); b.textContent=o.t; if(o.cls) b.className=o.cls; if(o.wide) b.style.gridColumn='1 / -1'; if(o.dis) b.disabled=true; b.onclick=()=>{ sfx('click'); o.f(b); }; p.appendChild(b); });
-}
-function next(f,t){ buttons([{t:t||'つぎへ ▶',cls:'main',f:b=>{ if(b.disabled) return; b.disabled=true; f(); }}]); }
-function talk(lines,done){ let i=0; (function step(){ if(i>=lines.length) return done(); const [w,t,fc]=lines[i++]; say(w,t,null,fc); next(step); })(); }
-function anim(el,c){ el.classList.remove(c); void el.offsetWidth; el.classList.add(c); }
-function hud(){ $('hudR').textContent=`倒した ${beaten.length}/${ACT.length} ・ やる気 ${'♥'.repeat(P_MAX-RIDE.hurt)}${'♡'.repeat(RIDE.hurt)}`; }
-
-/* ===== セーブ・図鑑(この端末のブラウザ内) ===== */
-function save(){ if(EP!==1) return; try{ localStorage.setItem('eto_battle3',JSON.stringify({r:ACT.map(f=>f.n),b:beaten,bt:bento})); }catch(e){} }
-function load(){ try{ return JSON.parse(localStorage.getItem('eto_battle3')||'null'); }catch(e){ return null; } }
-let DEX={}, CLEARS=0;
-try{ DEX=JSON.parse(localStorage.getItem('eto_dex')||'{}'); CLEARS=+(localStorage.getItem('eto_clears')||0); }catch(e){}
-function dexSave(){ try{ localStorage.setItem('eto_dex',JSON.stringify(DEX)); localStorage.setItem('eto_clears',CLEARS); }catch(e){} }
-function dexSeen(f){ DEX[f.n]=DEX[f.n]||{w:0,p:0}; dexSave(); }
-function dexWin(f,perfect){ const d=DEX[f.n]=DEX[f.n]||{w:0,p:0}; d.w++; if(perfect) d.p=1; dexSave(); }
-function dexStat(){ let seen=0,won=0,perf=0; FOES.forEach(f=>{ const d=DEX[f.n]; if(d){ seen++; if(d.w) won++; if(d.p) perf++; } }); return {seen,won,perf,rate:Math.round((won+perf)/(FOES.length*2)*100)}; }
-function openDex(back){
- padStop(); state='dex'; const st=dexStat(); $('title').style.display='none';
- $('note').innerHTML=`<h2>📖 図鑑 やり込み度 ${st.rate}%</h2><p class="by">出会った ${st.seen}/${FOES.length} ・ 倒した ${st.won}/${FOES.length} ・ ノーミス撃破★ ${st.perf}/${FOES.length} ・ 通学クリア ${CLEARS}回</p><div class="dexg">${FOES.map(f=>{ const d=DEX[f.n], c=!d?'un':d.w?'won':'seen';
-   return `<div class="dx ${c}"><img src="${f.img}" alt=""><b>${d?f.name:'???'}</b><i>${!d?'まだ出会っていない':d.w?f.theme:'未撃破'}</i><span>${d&&d.p?'★':''}${d&&d.w?' ×'+d.w:''}</span></div>`; }).join('')}</div>`;
- $('note').style.display='block'; $('note').scrollTop=0; label('図鑑:相手は毎回ランダム。全員ノーミスで100%');
- buttons([{t:'とじる',cls:'main',f:()=>{ $('note').style.display='none'; back(); }}]);
-}
-
-/* ===== タイトル:エピソード選択 ===== */
-function title(){
- state='title'; stopBgm(); bgm('title'); tStop(); t4Stop(); $('battle').classList.remove('shop'); $('title').style.display='flex'; $('snd').textContent=AU.on?'🔊':'🔇'; $('battle').style.display='none'; $('msg').style.display='none'; $('note').style.display='none';
- document.title=`ガンバレ！江藤くん 最強ナース烈伝 ver${VERSION}`;
- $('title').innerHTML=`<h1><em>ガンバレ！</em><br>江藤くん</h1><div class="sub">最強ナース烈伝</div><div class="ver">ver${VERSION}</div><p>エピソードをえらぼう</p>${etoSVG('joy')}<div class="credit">音楽:魔王魂</div>`;
- label('エピソードをえらぶ','第5話〜 じゅんび中');
- const r2=loadR(), r3=load3();
- buttons([
-  {t:`第1話 通学編${CLEARS?' ✅':''}\n学校までたどり着く`,cls:'main ep',wide:true,f:menu1},
-  {t:`第2話 1時間目の教室編${r2&&r2.c?' ✅':''}\n自己紹介して友達をつくる(細胞)`,cls:'main ep',wide:true,f:menu2},
-  {t:`第3話 昼休みの購買編${r3.c?' ✅':''}\n売り切れる前にパンを買う(消化と吸収)`,cls:'main ep',wide:true,f:()=>start3()},
-  {t:`第4話 体育編${load4().c?' ✅':''}\n困っている人を助ける(救命処置)`,cls:'main ep',wide:true,f:menu4},
-  {t:`📖 図鑑 ${dexStat().rate}%`,f:()=>openDex(title)},
-  {t:`📒 名鑑 ${meikanStat().rate}%`,f:()=>openMeikan('all',title)}
- ],2);
-}
-function start1(){ EP=1; setRoster(randomRoster()); beaten=[]; bento=1; Object.assign(RIDE,{lane:1,lx:1,speed:1,hurt:0,seg:-1}); save(); $('title').style.display='none'; opening(); }
-function menu1(){
- EP=1; const sv=load();
- if(!(sv&&sv.r&&sv.b&&sv.b.length)) return start1();
- label('第1話 通学編(相手10人は毎回ランダム)');
- buttons([{t:`▶ つづきから(${sv.b.length}人撃破)`,cls:'main',f:()=>{ setRoster(sv.r); bento=sv.bt===0?0:1; beaten=sv.b; Object.assign(RIDE,{lane:1,lx:1,speed:1,hurt:0,seg:-1}); $('title').style.display='none'; toMap(); }},{t:'はじめから',f:start1},{t:'もどる',f:title}]);
-}
-function menu2(){
- const sv=loadR();
- if(!(sv&&(sv.f.length||Object.keys(sv.h||{}).length))) return start2(true);
- label('第2話 1時間目の教室編');
- buttons([{t:`▶ つづきから(友達 ${sv.f.length}人)`,cls:'main',f:()=>start2(false)},{t:'はじめから',f:()=>start2(true)},{t:'もどる',f:title}]);
-}
-function opening(){ state='talk'; hud(); foe=null; talk(OP,toMap); }
-
-/* ===== カバン(予習用アイテム) ===== */
-let bento=1, CARDS=[], ci=0;
-const ITEMS=[
- {icon:'📓',name:'先輩のお下がりノート',say:'もらったはいいけど、落書きだらけっす。字、汚いっすね。',face:'19',pages:['sn']},
- {icon:'🩺',name:'聴診器',say:'自分の心臓を聞いてみたら、思ったよりふつうだったっす。',face:'01',pages:['st1','st2']},
- {icon:'🍛',name:'給食の献立表',say:'今日の日替わり、また唐揚げっす。3日連続っす。',face:'15',pages:['me1','me2']},
- {icon:'📱',name:'バキバキのスマホ',say:'画面バキバキで指切りそうっす。メモアプリの「まちがいノート」だけは生きてるっす。',face:'08',pages:['miss']},
- {icon:'🧾',name:'購買のチラシ',say:'裏に消化の表が印刷されてるっす。なんで購買のチラシに?',face:'19',pages:['dg1','dg2','17']},
- {icon:'🧬',name:'高校の生物の本',say:'高校の教科書、ちゃんと取っといたっす。表紙に落書きあるけど。',face:'06',pages:['hs0','01','02','03','19','20','04','05','06','10','11','17','18','16','14','13','12','15','07','08','09','b1','b2']},
- /* 看護学校の教科書(専門基礎分野)。いまは概要だけ。中身は後日アップデート予定 */
- {icon:'🦴',name:'解剖学の教科書',say:'ずっしり重いっす。骨の名前だけで1冊終わりそうっす。',face:'08',pages:['n_ana']},
- {icon:'🫀',name:'生理学の教科書',say:'看護学校でいちばん大事だって、先輩が言ってたっす。',face:'06',pages:['n_phy']},
- {icon:'🧪',name:'生化学の教科書',say:'化学式が出てきた瞬間、目がすべったっす。',face:'19',pages:['n_bc']},
- {icon:'🥗',name:'栄養学の教科書',say:'読んでたら腹へってきたっす。',face:'15',pages:['n_nut']},
- {icon:'🔬',name:'病理学の教科書',say:'病気の写真、朝メシ前に見るもんじゃないっす。',face:'13',pages:['n_pat']},
- {icon:'🦠',name:'微生物学の教科書',say:'読むと、手を洗いたくなる本っす。',face:'08',pages:['n_mic']},
- {icon:'💊',name:'薬理学の教科書',say:'薬の名前、カタカナ多すぎっす。',face:'19',pages:['n_pha']},
- {icon:'🏥',name:'疾病論の教科書',say:'分厚すぎて、枕にちょうどいいっす。…冗談っす。',face:'18',pages:['n_dis']},
- {icon:'⚖️',name:'健康支援と社会保障の教科書',say:'法律の話もあるんすね。看護師って奥が深いっす。',face:'01',pages:['n_soc']},
- {icon:'🫀',name:'救命処置のポスター',say:'保健室の前に貼ってあったポスターっす。…今度は、ちゃんと写真に撮ってきたっす。',face:'06',pages:['bls1','bls2']},
- {icon:'📒',name:'助けた人名鑑',desc:'助けた人の記録(感謝の名鑑・美女名鑑)',open:()=>openMeikan('all',()=>{ state='bag'; $('note').style.display='block'; openPocket('tool'); })},
- {icon:'🃏',name:'単語カード',desc:'一問一答。問題をめくって答えを確認',open:()=>openCards(true)},
- {icon:'🍱',name:'母ちゃんの弁当',desc:'バトル中に使うと やる気が全回復(通学1回につき1個)',open:it=>openInfo(it,bento>0?'<p class="by">のこり 1個</p><ul><li>バトル中、答えをえらぶ画面に「🍱 弁当を食べる」ボタンが出ます。</li><li>使うと やる気が全回復。通学1回につき1個だけ。</li></ul>':'<p class="by">のこり 0個(もう食べた)</p><ul><li>次の通学で、また1個もらえます。</li></ul>','フタを開けたら全部茶色だったっす。でも、うまいんすよね。','02')},
- {icon:'🦴',name:'骨格標本のキーホルダー',desc:'振ると、骨と筋肉を出題する11人目が現れる',open:it=>openInfo(it,'<ul><li>振ると、理科室の骨格標本「ガイコツ先輩」が現れてバトルになります。</li><li>出題は「骨と筋肉」。先に「高校の生物の本」の第7章(骨と筋肉)で予習しよう。</li><li>通学路の10人とは別の、おまけの相手です。図鑑にものります。</li></ul>','なんでこんなの付けてるのか、自分でもわかんないっす。','08',{t:'🦴 振ってみる',f:()=>{ $('note').style.display='none'; encounter(FOES.find(f=>f.extra)); }})}
-];
-const PAGE_T={b1:'骨のしくみ',b2:'筋肉のしくみ',miss:'まちがいノート',sn:'先輩の「ここが出る!」',st1:'バイタルサイン',st2:'聴診器で聞こえる音',me1:'三大栄養素',me2:'ビタミンとミネラル',dg1:'消化管と消化腺',dg2:'消化酵素の一覧',hs0:'目次',bls1:'心肺蘇生(CPR)の流れ',bls2:'AEDの使い方',
- n_ana:'解剖学:からだの形と構造',n_phy:'生理学:からだのはたらき',n_bc:'生化学:からだの中の化学反応',n_nut:'栄養学:栄養素と食事',
- n_pat:'病理学:病気がなぜ起こるか',n_mic:'微生物学:細菌・ウイルスと感染',n_pha:'薬理学:薬の効き方と副作用',n_dis:'疾病論:臓器ごとの病気と治療',n_soc:'健康支援と社会保障制度'};
-const pageT=k=>PAGE_T[k]||FOES.find(f=>f.n===k).theme;
-let MISS=[]; try{ MISS=JSON.parse(localStorage.getItem('eto_miss')||'[]'); }catch(e){}
-function addMiss(q){ if(MISS.some(m=>m.q===q.q)) return; MISS.unshift({q:q.q,a:q.a,ex:q.ex}); MISS=MISS.slice(0,30); try{ localStorage.setItem('eto_miss',JSON.stringify(MISS)); }catch(e){} }
-function closeBag(){ $('note').style.display='none'; toMap(); }
-/* カバンは「ポケット」4つに分けて見せる。トップ → ポケット → アイテム。もどるボタンは bagBack() */
-const POCKETS=[
- {k:'book',icon:'📚',name:'高校の教科書・プリント',desc:'高校生物の単元のまとめを読む',items:['高校の生物の本','購買のチラシ']},
- {k:'nurse',icon:'🏥',name:'看護学校の教科書',desc:'入学後に学ぶ専門基礎科目。いまは各科目の紹介だけで、くわしい中身は後日アップデート予定',
-  items:['解剖学の教科書','生理学の教科書','生化学の教科書','栄養学の教科書','病理学の教科書','微生物学の教科書','薬理学の教科書','疾病論の教科書','健康支援と社会保障の教科書'],
-  groups:[['人体の構造と機能(からだのしくみ)',4],['疾病の成り立ちと回復の促進(病気と治療)',4],['健康支援と社会保障制度',1]]},
- {k:'rev',icon:'📝',name:'復習',desc:'まちがい・出るところ・一問一答',items:['バキバキのスマホ','先輩のお下がりノート','単語カード']},
- {k:'ns',icon:'🩺',name:'看護のおまけ',desc:'高校生物の少し先',items:['救命処置のポスター','聴診器','給食の献立表']},
- {k:'tool',icon:'🧰',name:'どうぐ',desc:'バトルで使う・図鑑・名鑑',items:['助けた人名鑑','母ちゃんの弁当','骨格標本のキーホルダー']}];
-const BAG_REC={1:'単語カード',2:'高校の生物の本',3:'購買のチラシ',4:'救命処置のポスター'}; // その話のおすすめ
-let bagPocket=null;
-const itemByName=n=>ITEMS.find(it=>it.name===n);
-const itemDesc=it=>it.desc||it.pages.map(pageT).join('、');
-function useItem(it){ return it.open?it.open(it):openItem(it,0); }
-function bagBack(){ return bagPocket?openPocket(bagPocket):openBag(); }
-function openBag(){
- padStop(); state='bag'; bagPocket=null; const rec=itemByName(BAG_REC[EP]);
- $('note').innerHTML=`<h2>🎒 カバン</h2><p class="by">ポケットをえらんで、予習しよう。</p>${rec?sayBox(`今回は「${rec.icon} ${rec.name}」がおすすめっす。`,'06'):''}<ul>${POCKETS.map(p=>`<li>${p.icon} <b>${p.name}</b>(${p.items.length})<small>${p.desc.split('。')[0]}</small></li>`).join('')}</ul>`;
- $('note').style.display='block'; $('note').scrollTop=0; label('カバン:ポケットをえらぶ');
- const list=[]; if(rec) list.push({t:`⭐ おすすめ:${rec.icon} ${rec.name}`,wide:true,f:()=>useItem(rec)});
- POCKETS.forEach((p,i)=>list.push({t:`${p.icon} ${p.name}`,wide:POCKETS.length%2===1&&i===POCKETS.length-1,f:()=>openPocket(p.k)}));
- list.push({t:'とじる',cls:'main',wide:true,f:closeBag}); buttons(list,2);
-}
-function openPocket(k){
- const p=POCKETS.find(x=>x.k===k), its=p.items.map(itemByName); bagPocket=k;
- const li=it=>`<li>${it.icon} <b>${it.name}</b><small>${itemDesc(it)}</small></li>`;
- let body, at=0;
- if(p.groups) body=p.groups.map(([g,n])=>{ const part=its.slice(at,at+n); at+=n; return `<p class="by" style="margin-top:8px">■ ${g}</p><ul>${part.map(li).join('')}</ul>`; }).join('');
- else body=`<ul>${its.map(li).join('')}</ul>`;
- $('note').innerHTML=`<div class="pg">🎒 カバン › ${p.icon} ${p.name}</div><h2>${p.icon} ${p.name}</h2><p class="by">${p.desc}</p>${body}`;
- $('note').scrollTop=0;
- const list=its.map(it=>({t:it.icon+' '+it.name.replace('の教科書',''),f:()=>useItem(it)}));
- if(k==='tool') list.push({t:'📖 図鑑',f:()=>openDex(()=>{ state='bag'; $('note').style.display='block'; openPocket('tool'); })});
- if(list.length%2) list[list.length-1].wide=true;
- const many=list.length>6; label(p.name,many?'下にスクロール ▼':'');
- list.push({t:'◀ カバンにもどる',cls:'main',wide:true,f:openBag}); buttons(list,2,many);
-}
-function sayBox(text,face){ return `<div class="say"><img src="faces/${face}.jpg" alt=""><span>${text}</span></div>`; }
-function openInfo(it,html,sayText,face,act){
- $('note').innerHTML=`<div class="pg">${it.icon} ${it.name}</div>${sayBox(sayText,face)}<h2>${it.name}</h2>${html}`; $('note').scrollTop=0; label(it.name);
- const list=[]; if(act) list.push(Object.assign({wide:true},act)); list.push({t:'◀ もどる',cls:'main',wide:true,f:bagBack}); buttons(list,2);
-}
-function openItem(it,i){
- const k=it.pages[i], f=FOES.find(x=>x.n===k); let body;
- if(k==='miss') body = MISS.length ? `<ul>${MISS.map(m=>`<li><b>Q.</b> ${m.q}<br><b>A.</b> <span class="ans">${m.a}</span><small>${m.ex}</small></li>`).join('')}</ul>` : '<p class="by">まだ まちがえた問題はありません。バトルでまちがえると、ここに自動で記録されます。</p>';
- else body = `${f?`<p class="by">出題してくる相手:${f.name}</p>`:''}<ul>${SUM[k].map(l=>`<li>${l}</li>`).join('')}</ul>`;
- $('note').innerHTML=`<div class="pg">${it.icon} ${it.name} ${i+1} / ${it.pages.length}</div>${i===0?sayBox(it.say,it.face):''}<h2>${pageT(k)}</h2>${body}`;
- $('note').scrollTop=0; label(it.name,`${i+1} / ${it.pages.length}`);
- buttons([{t:'◀ まえ',dis:i===0,f:()=>openItem(it,i-1)},{t:'つぎ ▶',dis:i===it.pages.length-1,f:()=>openItem(it,i+1)},{t:'◀ もどる',cls:'main',wide:true,f:bagBack}],2);
-}
-function openCards(fresh,shown){
- if(fresh===true||!CARDS.length){ CARDS=shuffle(FOES.flatMap(f=>f.qs.map(q=>({q:q.q,a:q.a,ex:q.ex,th:f.theme})))); ci=0; }
- const c=CARDS[ci];
- $('note').innerHTML=`<div class="pg">🃏 単語カード ${ci+1} / ${CARDS.length}</div><p class="by">${c.th}</p><div class="card"><b>Q.</b> ${c.q.replace(/\n/g,'<br>')}</div>${shown?`<div class="card back"><b>A.</b> <span class="ans">${c.a}</span><small>${c.ex}</small></div>`:'<p class="by" style="text-align:center">頭の中で答えてから「答えを見る」</p>'}`;
- $('note').scrollTop=0; label('単語カード',`${ci+1} / ${CARDS.length}`);
- buttons([shown?{t:'つぎのカード ▶',wide:true,f:()=>{ ci=(ci+1)%CARDS.length; openCards(false,false); }}:{t:'答えを見る',wide:true,f:()=>openCards(false,true)},{t:'◀ もどる',cls:'main',wide:true,f:bagBack}],2);
-}
-
-/* ===== マップ移動 ===== */
-function padUI(side,center){
- const p=$('pane'); p.className='c1';
- p.innerHTML='<div id="mapui"><div id="pad"><button class="u" data-d="u">▲</button><button class="l" data-d="l">◀</button><button class="c" id="padC"></button><button class="r" data-d="r">▶</button><button class="d" data-d="d">▼</button></div><div id="side"></div></div>';
- if(center){ $('padC').innerHTML=center.t; $('padC').onclick=()=>{ padStop(); sfx('click'); center.f(); }; } else $('padC').style.visibility='hidden';
- side.forEach(o=>{ const b=document.createElement('button'); b.className='sideBtn'; b.innerHTML=o.t; b.onclick=()=>{ sfx('click'); o.f(); }; $('side').appendChild(b); });
- p.querySelectorAll('#pad button[data-d]').forEach(b=>{
-   b.addEventListener('pointerdown',e=>{ e.preventDefault(); padStop(); move(b.dataset.d); if(state==='map') padTimer=setInterval(()=>move(b.dataset.d),170); });
-   ['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,padStop));
- });
-}
-function toMap(){
- if(EP===2) return toRoom();
- if(EP===3) return toLine();
- if(EP===4) return toField();
- padStop(); state='ride'; bang=null; bgm('ride'); foe=null; $('msg').style.display='none'; $('battle').style.display='none'; $('battle').classList.remove('room'); $('hudL').textContent='🛵 通学路';
- if(RIDE.seg!==beaten.length) rideSeg(); hud();
- label('◀▶で車線変更/▲▼で速さ/🎒で予習',beaten.length>=ACT.length?'🏫 校門はすぐそこ':'🚩 学校をめざせ');
- padUI([],{t:'🎒<br>カバン',f:openBag});
-}
-let padTimer=null;
-function padStop(){ if(padTimer){ clearInterval(padTimer); padTimer=null; } }
-['pointerup','pointercancel','blur'].forEach(n=>window.addEventListener(n,padStop));
-const DV={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]};
-function move(d){
- if(state==='ride') return rideMove(d);
- if(state!=='map'){ padStop(); return; }
- if(EP===2) return moveRoom(d);
- if(EP===3) return moveLine(d);
-}
-document.addEventListener('keydown',e=>{ const k={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r'}[e.key]; if(k) move(k); });
-
-/* ===== 絡まれる → バトル ===== */
-function encounter(f){
- padStop(); state='talk'; foe=f; bang=f.id; dexSeen(f); stopBgm(); sfx('enc'); $('pane').innerHTML=''; label('!','');
- setTimeout(()=>{ label(`${f.kind}に絡まれた!`); talk(f.pre,()=>startBattle(f)); },600);
-}
-function setBars(){
- const e=$('eBar'), p=$('pBar'), er=Math.max(0,eHP)/eMax, pr=pHP/P_MAX;
- e.style.width=er*100+'%'; e.className=er<=0.34?'low':er<=0.67?'mid':'';
- p.style.width=pr*100+'%'; p.className=pr<=0.34?'low':pr<=0.67?'mid':'';
- $('pNum').textContent=`やる気 ${pHP} / ${P_MAX}`+(combo>=2?` ・ 🔥${combo}コンボ`:'');
-}
-function startBattle(f){
- const hurt=RIDE.hurt; RIDE.hurt=0;
- bgm(f.boss?'boss':'battle'); state='battle'; eMax=f.hp*10; eHP=eMax; pHP=Math.max(1,P_MAX-hurt); combo=0; bMiss=0; queue=shuffle(f.qs);
- const b=$('battle'); b.style.display='block'; b.classList.remove('room'); anim(b,'flash');
- $('foe').className=''; $('me').className='';
- $('foe').innerHTML=foeArt(f); $('me').innerHTML=etoSVG(f.boss?'12':'05');
- $('eName').textContent=f.name; $('eLv').textContent='Lv.'+f.lv; setBars();
- $('hudL').textContent=(f.boss?'👑 ボス戦:':'⚔️ バトル:')+f.theme;
- say(null,`${f.kind}の ${f.name}が\n勝負をしかけてきた!`+(hurt?`\n(ぶつかったせいで、やる気が ${hurt} へっている)`:''),'速く答えるほど、ダメージアップ。答えたあとは、器具の絵4枚を名前の順にならべる。4つ正しければ、正解ならクリティカル、不正解なら攻撃をよけられる');
- label('バトル開始'); next(ask);
-}
-function useBento(q){
- bento=0; pHP=P_MAX; setBars(); sfx('win'); $('me').innerHTML=etoSVG('02');
- say('eto','母ちゃんの弁当、今日も全部茶色っす。でもうまいっす。やる気、全回復っす。',null,'02'); label('🍱 やる気 全回復'); next(()=>ask(q));
-}
-function ask(q0){
- if(!(q0&&q0.q)&&!queue.length) queue=shuffle(foe.qs);
- const q=(q0&&q0.q)?q0:queue.shift(); $('me').innerHTML=etoSVG(pHP===1?'13':foe.boss?'12':'01');
- say('foe',q.q); label('答えをえらべ(速いほど強い)',combo>=2?`🔥${combo}コンボ中`:'相手の残り '+eHP);
- const list=shuffle([q.a,...q.w]).map(t=>({t,f:b=>answer(t,b,q)}));
- if(bento>0&&pHP<P_MAX) list.push({t:'🍱 弁当を食べる(やる気 全回復)',wide:true,f:()=>useBento(q)});
- buttons(list,2); qT=performance.now();
-}
-/* 医療器具ならべ(2026-11-23 作り手の指定で、注射器のタイミングゲージ → 神経衰弱 → これに変更)
-   答えるたびに、器具の名前が4つ並ぶ。下の絵4枚を、名前の順にタップして並べる(並べた絵をタップすると外せる)。
-   4つ全部正しいと、正解のとき→クリティカル(×1.5)、不正解のとき→攻撃をよける。
-   正解のときは 2〜3個で×1.0、0〜1個で×0.7。
-   order(kind,cb):kind='atk'|'dodge'。cb({n:正しく並べた数, all:4つ全部か, miss:まちがえた器具の配列}) */
-const TOOLS=[
- {id:'T01',e:'🩺',name:'聴診器',use:'心臓の音・呼吸の音・おなかの音(腸の動き)を聞く。血圧を測るときにも使う'},
- {id:'T02',e:'🌡️',name:'電子体温計',use:'体温を測る。わきの下では、先をくぼみの奥に当て、少し斜め下からはさむ'},
- {id:'T03',e:'🩸',name:'血圧計',use:'腕帯(マンシェット)を上腕に巻いて血圧を測る。巻く強さは指が1〜2本入るくらい'},
- {id:'T04',e:'☝️',name:'パルスオキシメーター',use:'指先にはさみ、血液中の酸素の割合(SpO2)と脈拍を測る。ふつうは96〜99%'},
- {id:'T05',e:'💉',name:'注射器',use:'薬を注射する・採血する。使った針はキャップをせず、そのまま専用の容器へ捨てる'},
- {id:'T06',e:'🎗️',name:'駆血帯',use:'採血や点滴のとき、腕をしばって静脈を浮き出させる。巻いたままにするのは1分以内が目安'},
- {id:'T07',e:'💧',name:'点滴セット',use:'輸液(点滴)を静脈に入れる。点滴筒で落ちる速さを見て、クレンメで調節する'},
- {id:'T08',e:'🥢',name:'鑷子(せっし)',use:'いわゆるピンセット。消毒したガーゼや綿球を、手でさわらずにつまむ'},
- {id:'T09',e:'🫘',name:'膿盆(のうぼん)',use:'そら豆の形の皿。使ったガーゼや器具を一時的に置く。うがいの水を受けることも'},
- {id:'T10',e:'🔨',name:'打腱器',use:'ひざなどの腱をたたいて、反射(しつがい腱反射など)を調べる'}];
-/* 絵は tools/T01.webp → 無ければ .jpg → それも無ければ絵文字 */
-function toolImgErr(img){ const id=img.dataset.id; if(!img.dataset.jpg){ img.dataset.jpg=1; img.src='tools/'+id+'.jpg'; return; }
- const t=TOOLS.find(x=>x.id===id); img.outerHTML='<b class="ord-e">'+(t?t.e:'❓')+'</b>'; }
-const toolImg=t=>`<img src="tools/${t.id}.webp" data-id="${t.id}" alt="" onerror="toolImgErr(this)">`;
-let ORD=null; // いまの問題 {ans:[器具4つ(名前の順)], put:[スロットに置いた器具 or null]}
-function order(kind,cb){
- const ans=shuffle(TOOLS.slice()).slice(0,4); ORD={ans,put:[null,null,null,null]}; let live=true;
- const p=$('pane'); p.className='ord'; p.innerHTML=''; p.scrollTop=0;
- const slots=ans.map((t,i)=>{ const b=document.createElement('button'); b.className='ordslot'; b.dataset.i=i;
-   b.onclick=()=>{ if(!live||!ORD.put[i]) return; sfx('click'); ORD.put[i]=null; draw(); }; p.appendChild(b); return b; });
- const pics=shuffle(ans.slice()).map(t=>{ const b=document.createElement('button'); b.className='ordpic'; b.dataset.id=t.id; b.innerHTML=toolImg(t);
-   b.onclick=()=>{ if(!live||ORD.put.includes(t)) return; const i=ORD.put.indexOf(null); if(i<0) return; sfx('click'); ORD.put[i]=t; draw(); if(!ORD.put.includes(null)) finish(); };
-   p.appendChild(b); return b; });
- function draw(){
-   slots.forEach((b,i)=>{ const t=ORD.put[i]; b.className='ordslot'+(t?' put':'');
-     b.innerHTML=`<span class="ord-n">${i+1}. ${ans[i].name}</span><span class="ord-box">${t?toolImg(t):''}</span>`; });
-   pics.forEach(b=>{ const used=ORD.put.some(t=>t&&t.id===b.dataset.id); b.className='ordpic'+(used?' used':''); b.disabled=used; });
- }
- function finish(){ live=false; const ok=ans.map((t,i)=>ORD.put[i]===t), n=ok.filter(Boolean).length;
-   slots.forEach((b,i)=>{ b.className='ordslot put '+(ok[i]?'ok':'ng'); });
-   setTimeout(()=>cb({n,all:n===4,miss:ans.filter((t,i)=>!ok[i])}),900); }
- draw();
-}
-/* まちがえた器具の使い方を、セリフ枠の下に出す */
-const ordMissText=g=>g.miss.length?'\n\n📌 '+g.miss.map(t=>`${t.name}:${t.use}`).join('\n📌 '):'';function popDmg(text,cls){ const d=document.createElement('div'); d.className='dmg '+(cls||''); d.textContent=text; $('battle').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1000); }
-function afterAnswer(){ setBars(); setTimeout(()=>{ const pn=$('pane'); if(pn.className==='ord'){ pn.className='c1'; pn.innerHTML=''; } [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
-   b.onclick=()=>{ if(b.disabled) return; b.disabled=true; if(eHP<=0) winBattle(); else if(pHP<=0) loseBattle(); else ask(); };
-   $('pane').appendChild(b); },400); }
-function answer(t,btn,q){
- const ok=t===q.a, sec=(performance.now()-qT)/1000;
- [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); });
- if(ok){
-   combo++; const fast=sec<4; let dmg=10+(fast?3:0)+Math.min(6,(combo-1)*2); sfx('ok'); $('me').innerHTML=etoSVG('11');
-   say(null,`正解!${fast?' ⚡はやい!':''}${combo>=2?` 🔥${combo}コンボ!`:''}\n器具の絵を、名前の順にならべろ!4つ正しければクリティカル!`); label('⭕ 正解!器具をならべろ');
-   setTimeout(()=>order('atk',g=>{ const m=g.all?1.5:g.n>=2?1:0.7; dmg=Math.max(1,Math.round(dmg*m)); eHP-=dmg;
-     sfx('hit'); anim($('me'),'atk'); setTimeout(()=>anim($('foe'),'hit'),200); popDmg((g.all?'クリティカル!! ':'')+'-'+dmg,g.all?'crit':m<1?'weak':''); $('me').innerHTML=etoSVG(eHP<=0?(foe.boss?'20':'02'):m>=1?'11':'08');
-     say(null,`🧰 ${g.n} / 4 正しくならべた!`+(g.all?'\n💥 クリティカル!':'')+`\n${foe.name}に ${dmg}ダメージ!`+ordMissText(g),q.ex); label(g.all?'💥 クリティカル':m>=1?'⭕ ダメージ':'△ ならべまちがい…',eHP>0?'相手の残り '+eHP:'');
-     afterAnswer(); }),350);
- }else{
-   btn.classList.add('wrong'); combo=0; bMiss++; addMiss(q); sfx('ng'); queue.push(q); $('me').innerHTML=etoSVG('13');
-   say(null,`不正解…。正解は「${q.a}」。\n${foe.name}の こうげき!器具を4つ正しく ならべて よけろ!`); label('❌ 不正解…器具をならべろ');
-   setTimeout(()=>order('dodge',g=>{ const dodged=g.all;
-     anim($('foe'),'atk2');
-     if(dodged){ sfx('step'); popDmg('ミス!','miss'); $('me').innerHTML=etoSVG('18'); say(null,'🧰 4つ全部 正しくならべた!\nひらりと よけた!やる気は へらなかった。',q.ex); label('💨 回避成功'); }
-     else { pHP--; sfx('hit'); setTimeout(()=>anim($('me'),'hit'),200); $('me').innerHTML=etoSVG('sad'); say(null,`🧰 ${g.n} / 4 …よけきれなかった。\n江藤くんの やる気が さがった!`+ordMissText(g),q.ex); label('💥 くらった'); }
-     afterAnswer(); }),350);
- }
- setBars();
-}
-function winBattle(){
- stopBgm(); sfx('win'); $('me').innerHTML=etoSVG(foe.boss?'20':'02'); anim($('foe'),'faint'); say(null,`${foe.name}との 勝負に 勝った!`+(bMiss===0?'\n★ノーミス撃破!':'')); label('🎉 勝利');
- next(()=>{ const f=foe; talk(f.win,()=>{ if(!f.extra) beaten.push(f.id); dexWin(f,bMiss===0); save(); toMap(); }); });
-}
-function loseBattle(){
- stopBgm(); sfx('lose'); $('me').innerHTML=etoSVG('09'); say(null,'江藤くんは やる気が なくなった…。\nバイクも なぜか エンストした。'); label('💤 敗北');
- next(()=>{ say('eto','…解説読んだら思い出したっす。もう一回やらせてください。',null,'17'); $('me').innerHTML=etoSVG('17'); next(()=>startBattle(foe),'再挑戦する'); });
-}
-
-/* =====================================================================
-   第2話 1時間目の教室編:自己紹介して友達をつくる(単元:細胞)
-   ・教室を自由に歩き、クラスの9人に話しかける
-   ・話が3回合えば友達。2回かみ合わないと、その場はおひらき(友好度は残る)
-   ・9人と友達になると先生の小テスト。友達に1人1回だけ聞ける
-   ===================================================================== */
-let EP=1;
-const RW=9, RH=10;
 const MATES=[
  {z:'Z01',name:'ネムロ',kind:'居眠りの常習犯',topic:'生物の共通性',prof:'授業中の9割は寝ているが、寝言はすべて教科書どおり。',
   pre:[['eto','江藤っす。よろしくっす。…寝てるっすね。起きてくださーい。','19'],['foe','むにゃ…起きてるよ…。生きものはみんな…細胞で…ぐう。'],[null,'(寝言で生物の話をしている。話を合わせてみよう)']],
@@ -896,7 +845,6 @@ const MATES=[
       {q:'光合成で、二酸化炭素と水からつくられるものは!?',a:'有機物と酸素',w:['有機物と二酸化炭素','水と窒素','二酸化炭素と酸素'],ex:'光合成:二酸化炭素 + 水 + 光エネルギー → 有機物(デンプンなど)+ 酸素。'},
       {q:'葉緑体にふくまれる、光を吸収する緑色の色素は!?',a:'クロロフィル',w:['ヘモグロビン','アントシアン','メラニン'],ex:'クロロフィルが光エネルギーを吸収します。葉が緑色に見えるのはこの色素のため。'}]}
 ];
-MATES.forEach((m,i)=>{ m.id='m'+m.z; m.img='zako/'+m.z+'.jpg'; m.im=new Image(); m.im.src=m.img; m.x=1+(i%3)*3; m.y=3+Math.floor(i/3)*2; });
 const TEACHER={id:'t1',name:'ハヤカワ先生',kind:'板書が速すぎる先生',x:4,y:1,
   img:'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><rect width="200" height="300" fill="#2f5d50"/><text x="100" y="175" text-anchor="middle" font-size="120">👨‍🏫</text><rect x="128" y="8" width="64" height="30" rx="8" fill="#0d1b2a"/><text x="160" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#ffe14d">仮</text></svg>'),
   pre:[['foe','はい注目。板書は3秒で消します。小テストを始めますよ。'],['eto','先生、友達が9人できたんで、助けてもらっていいっすか。','06'],['foe','…よろしい。ただし、友達に聞けるのは1人1回までです。']],
@@ -907,144 +855,6 @@ const TEACHER={id:'t1',name:'ハヤカワ先生',kind:'板書が速すぎる先�
       {q:'動物細胞には、ふつう見られないものは?',a:'葉緑体',w:['ミトコンドリア','核','細胞膜'],ex:'葉緑体・細胞壁・発達した液胞は植物細胞の特徴です。'},
       {q:'大きい順に正しく並んでいるものは?',a:'ヒトの赤血球 > 大腸菌 > ウイルス',w:['大腸菌 > ヒトの赤血球 > ウイルス','ウイルス > 大腸菌 > ヒトの赤血球','ヒトの赤血球 > ウイルス > 大腸菌'],ex:'ヒトの赤血球は約7〜8μm、大腸菌は約2〜3μm、ウイルスは約0.1μm以下(電子顕微鏡でないと見えない)。'},
       {q:'植物細胞と動物細胞の「両方にある」ものの組み合わせは?',a:'核・ミトコンドリア・細胞膜',w:['核・葉緑体・細胞壁','細胞壁・液胞・葉緑体','葉緑体・ミトコンドリア・細胞壁'],ex:'核・ミトコンドリア・細胞膜は真核細胞に共通。葉緑体と細胞壁は植物細胞の特徴です。'}]};
-TEACHER.im=new Image(); TEACHER.im.src=TEACHER.img;
-const OP2=[[null,'1時間目。教室に入った江藤くん。知り合いは、まだ1人もいない。'],['eto','とりあえず、全員に自己紹介してくるっす。','06']];
-let R={x:4,y:8,rx:4,ry:8,friends:[],hearts:{},clear:false}, awk=0, rq=[], tq=[], ti=0, tscore=0, helps=[];
-function saveR(){ try{ localStorage.setItem('eto_ep2',JSON.stringify({f:R.friends,h:R.hearts,c:R.clear})); }catch(e){} }
-function loadR(){ try{ return JSON.parse(localStorage.getItem('eto_ep2')||'null'); }catch(e){ return null; } }
-function start2(fresh){
- EP=2; const sv=fresh?null:loadR();
- R={x:4,y:8,rx:4,ry:8,friends:sv?sv.f:[],hearts:sv?sv.h:{},clear:sv?!!sv.c:false};
- MATES.forEach(m=>m.qs.forEach((q,i)=>{ q.done = R.friends.includes(m.id) || i<(R.hearts[m.id]||0); }));
- if(fresh) saveR(); $('title').style.display='none'; dir='u';
- if(fresh){ state='talk'; foe=null; $('hudL').textContent='🏫 1時間目の教室'; $('hudR').textContent=''; talk(OP2,toRoom); } else toRoom();
-}
-function toRoom(){
- padStop(); state='map'; bgm('class'); foe=null; $('msg').style.display='none'; $('battle').style.display='none'; $('battle').classList.remove('room');
- $('hudL').textContent='🏫 1時間目の教室'; $('hudR').textContent=`友達 ${R.friends.length} / ${MATES.length}`;
- label(R.friends.length<MATES.length?'クラスの人にぶつかって話しかけよう':'黒板の前の先生に話しかけよう','単元:細胞');
- padUI([{t:'👥<br>友達',f:openFriends}],{t:'🎒<br>カバン',f:openBag});
-}
-function mateAt(x,y){ return MATES.find(m=>m.x===x&&m.y===y); }
-function moveRoom(d){
- dir=d; const nx=R.x+DV[d][0], ny=R.y+DV[d][1];
- if(nx===TEACHER.x&&ny===TEACHER.y) return talkTeacher();
- const m=mateAt(nx,ny); if(m) return talkMate(m);
- if(nx<0||nx>=RW||ny<1||ny>RH-2) return;
- R.x=nx; R.y=ny; sfx('step');
-}
-function drawRoom(){
- const rs=Math.floor(Math.min(vw/RW,(vh-34)/RH)), ox=(vw-RW*rs)/2, oy=34+((vh-34)-RH*rs)/2;
- R.rx+=(R.x-R.rx)*0.3; R.ry+=(R.y-R.ry)*0.3;
- ctx.fillStyle='#3b2f2a'; ctx.fillRect(0,0,vw,vh);
- for(let y=0;y<RH;y++) for(let x=0;x<RW;x++){ const sx=ox+x*rs, sy=oy+y*rs;
-   if(y===0||y===RH-1){ ctx.fillStyle='#e8dcc0'; ctx.fillRect(sx,sy,rs+1,rs+1); }
-   else { ctx.fillStyle=((x+y)&1)?'#d9b27c':'#d3aa72'; ctx.fillRect(sx,sy,rs+1,rs+1); } }
- ctx.textAlign='center'; ctx.textBaseline='middle';
- ctx.fillStyle='#7a4a21'; ctx.fillRect(ox+rs*1.4,oy+rs*0.1,rs*6.2,rs*0.8); ctx.fillStyle='#2f5d50'; ctx.fillRect(ox+rs*1.5,oy+rs*0.16,rs*6,rs*0.68);
- ctx.fillStyle='#f4f4ec'; ctx.font='700 '+rs*0.3+'px sans-serif'; ctx.fillText('1時間目 生物「細胞」',ox+rs*4.5,oy+rs*0.5);
- ctx.fillStyle='#7a4a21'; ctx.fillRect(ox+rs*4,oy+rs*(RH-1),rs,rs); ctx.fillStyle='#f4f4ec'; ctx.font=rs*0.3+'px sans-serif'; ctx.fillText('出入口',ox+rs*4.5,oy+rs*(RH-0.5));
- const face=(im,cx,cy,r,ring,sq)=>{ ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.clip(); ctx.fillStyle='#fff'; ctx.fillRect(cx-r,cy-r,r*2,r*2);
-   if(im.complete&&im.naturalWidth){ const w=im.naturalWidth,h=im.naturalHeight; if(sq) ctx.drawImage(im,(w-h)/2,0,h,h,cx-r,cy-r,r*2,r*2); else ctx.drawImage(im,0,w*0.12,w,w,cx-r,cy-r,r*2,r*2); }
-   ctx.restore(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.lineWidth=3; ctx.strokeStyle=ring; ctx.stroke(); };
- MATES.forEach(m=>{ const sx=ox+m.x*rs, sy=oy+m.y*rs, fr=R.friends.includes(m.id), h=R.hearts[m.id]||0;
-   ctx.fillStyle='#8a5a2b'; ctx.fillRect(sx+rs*0.04,sy+rs*0.55,rs*0.92,rs*0.4); ctx.fillStyle='#a8743a'; ctx.fillRect(sx+rs*0.04,sy+rs*0.55,rs*0.92,rs*0.1);
-   face(m.im,sx+rs/2,sy+rs*0.42,rs*0.42,fr?'#ffcf33':'#0d1b2a');
-   if(fr){ ctx.font=rs*0.34+'px serif'; ctx.fillText('💛',sx+rs*0.86,sy+rs*0.14); }
-   else if(h){ ctx.fillStyle='#fff'; ctx.fillRect(sx+rs*0.5,sy-rs*0.02,rs*0.5,rs*0.3); ctx.fillStyle='#d7263d'; ctx.font='900 '+rs*0.24+'px sans-serif'; ctx.fillText('♥'+h,sx+rs*0.75,sy+rs*0.14); } });
- const tx=ox+(TEACHER.x+0.5)*rs, ty=oy+(TEACHER.y+0.5)*rs, open=R.friends.length>=MATES.length;
- face(TEACHER.im,tx,ty,rs*0.46,open?'#d7263d':'#777');
- if(!open){ ctx.font=rs*0.4+'px serif'; ctx.fillText('🔒',tx+rs*0.36,ty-rs*0.34); }
- const cx=ox+(R.rx+0.5)*rs, cy=oy+(R.ry+0.5)*rs; face(etoIm,cx,cy,rs*0.46,'#ffe14d',true);
-}
-/* ---- 会話 ---- */
-function chatBars(m){
- const h=R.hearts[m.id]||0; $('eBar').style.width=(h/3*100)+'%'; $('eBar').className='love'; $('eLv').textContent='友好度 '+'♥'.repeat(h)+'♡'.repeat(3-h);
- $('pBar').style.width=((2-awk)/2*100)+'%'; $('pBar').className=awk?'mid':''; $('pNum').textContent=`気まずさ ${awk} / 2`;
-}
-function talkMate(m){
- padStop(); state='talk'; foe=m; $('pane').innerHTML='';
- if(R.friends.includes(m.id)) return talk([['foe','やあ江藤くん。'+m.prof.split('。')[0]+'…って、みんなに言われるんだ。'],['eto','知ってるっす。','06']],toRoom);
- label(`${m.kind}に話しかけた`);
- talk((R.hearts[m.id]||0)?[['foe','あ、さっきの。続き、話そうか。']]:m.pre,()=>startChat(m));
-}
-function startChat(m){
- state='battle'; awk=0; rq=shuffle(m.qs.filter(q=>!q.done));
- const b=$('battle'); b.style.display='block'; b.classList.add('room'); $('foe').className=''; $('me').className='';
- $('foe').innerHTML=cutImg(m.img); $('me').innerHTML=etoSVG('01'); $('eName').textContent=m.name; chatBars(m);
- say(null,`${m.name}と話してみよう。\n話が3回合えば、友達になれる。`); label('会話スタート','話題:'+m.topic); next(()=>chatAsk(m));
-}
-function chatAsk(m){
- const q=rq.shift(); $('me').innerHTML=etoSVG(awk?'13':'01'); say('foe',q.q); label('話を合わせよう','話題:'+m.topic);
- buttons(shuffle([q.a,...q.w]).map(t=>({t,f:b=>chatAnswer(m,t,b,q)})),2);
-}
-function chatAnswer(m,t,btn,q){
- const ok=t===q.a;
- [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); });
- if(ok){ q.done=true; R.hearts[m.id]=(R.hearts[m.id]||0)+1; sfx('ok'); $('me').innerHTML=etoSVG('06'); anim($('foe'),'atk2'); say(null,'話が合った!友好度アップ ♥',q.ex); label('⭕ 話が合った'); }
- else { btn.classList.add('wrong'); awk++; rq.push(q); addMiss(q); sfx('ng'); $('me').innerHTML=etoSVG('08'); say(null,`話がかみ合わなかった…。正解は「${q.a}」。`,q.ex); label('❌ 気まずい…'); }
- chatBars(m); saveR();
- setTimeout(()=>{ const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
-   b.onclick=()=>{ sfx('click'); if((R.hearts[m.id]||0)>=3) return befriend(m);
-     if(awk>=2){ $('me').innerHTML=etoSVG('09'); say('foe','…ごめん、ちょっと用事を思い出した。また後でね。'); label('気まずくなって、会話がおわった'); return next(toRoom,'教室にもどる'); }
-     chatAsk(m); };
-   $('pane').appendChild(b); },350);
-}
-function befriend(m){
- R.friends.push(m.id); saveR(); sfx('win'); $('me').innerHTML=etoSVG('02'); say(null,`${m.name}と 友達になった!`); label('🎉 友達が増えた');
- next(()=>talk(m.win,()=>{ if(R.friends.length>=MATES.length){ state='talk'; $('battle').style.display='none'; foe=null; talk([[null,'クラスの全員と友達になった!\n黒板の前の先生に話しかけよう。']],toRoom); } else toRoom(); }));
-}
-/* ---- 先生の小テスト ---- */
-function talkTeacher(){
- padStop(); state='talk'; foe=TEACHER; $('pane').innerHTML=''; const left=MATES.length-R.friends.length;
- if(left>0) return talk([['foe','授業中です。…と言いたいところですが、まずはクラスになじみなさい。'],[null,`友達があと${left}人できたら、先生に話しかけよう。`]],toRoom);
- talk(TEACHER.pre,startTest);
-}
-function startTest(){
- state='battle'; bgm('test'); tq=shuffle(TEACHER.qs).slice(0,5); ti=0; tscore=0; helps=shuffle(R.friends); foe=TEACHER;
- const b=$('battle'); b.style.display='block'; b.classList.add('room'); $('foe').className=''; $('me').className='';
- $('foe').innerHTML=cutImg(TEACHER.img); $('me').innerHTML=etoSVG('12'); $('eName').textContent=TEACHER.name; testBars();
- say(null,'小テスト開始!全5問。4問正解で合格。\n友達には、1人1回だけ聞ける。'); label('小テスト'); next(()=>testAsk(false));
-}
-function testBars(){ $('eLv').textContent=`小テスト ${Math.min(ti+1,5)} / 5`; $('eBar').style.width=(ti/5*100)+'%'; $('eBar').className='mid'; $('pBar').style.width=(tscore/5*100)+'%'; $('pBar').className=''; $('pNum').textContent=`正解 ${tscore} ・ 聞ける友達 ${helps.length}人`; }
-function testAsk(cutTo2){
- const q=tq[ti]; foe=TEACHER; testBars(); say('foe',`【第${ti+1}問】\n${q.q}`); label('答えをえらぶ',`正解 ${tscore}`);
- const opts=cutTo2?shuffle([q.a,shuffle(q.w)[0]]):shuffle([q.a,...q.w]);
- const list=opts.map(t=>({t,f:b=>testAnswer(t,b,q)}));
- if(!cutTo2&&helps.length) list.push({t:`👥 友達に聞く(のこり${helps.length}人)`,wide:true,f:()=>{ const hid=helps.pop(), m=MATES.find(x=>x.id===hid); sfx('ok'); testBars(); $('foe').innerHTML=cutImg(m.img); say(null,`${m.name}「たぶん、この2つのどっちかだと思う」\n選択肢が2つに減った!`); next(()=>{ $('foe').innerHTML=cutImg(TEACHER.img); testAsk(true); }); }});
- buttons(list,2);
-}
-function testAnswer(t,btn,q){
- const ok=t===q.a;
- [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); });
- if(ok){ tscore++; sfx('ok'); $('me').innerHTML=etoSVG('11'); say(null,'正解!',q.ex); label('⭕ 正解'); }
- else { btn.classList.add('wrong'); addMiss(q); sfx('ng'); $('me').innerHTML=etoSVG('16'); say(null,`不正解…。正解は「${q.a}」。`,q.ex); label('❌ 不正解'); }
- ti++; testBars();
- setTimeout(()=>{ const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
-   b.onclick=()=>{ sfx('click'); if(ti<5) return testAsk(false);
-     if(tscore>=4){ stopBgm(); sfx('win'); $('me').innerHTML=etoSVG('20'); say(null,`5問中 ${tscore}問 正解。合格!`); return next(()=>talk(TEACHER.win,clear2)); }
-     stopBgm(); sfx('lose'); $('me').innerHTML=etoSVG('09'); say('foe',`5問中 ${tscore}問 正解。合格は4問です。もう一度やりましょう。`); next(startTest,'再テストを受ける'); };
-   $('pane').appendChild(b); },350);
-}
-function clear2(){
- state='talk'; foe=null; R.clear=true; saveR(); $('battle').style.display='none'; stopBgm(); jingle(); label('🎉 第2話クリア');
- talk([[null,'キーンコーンカーンコーン…1時間目、終了。'],['eto','友達9人と、細胞の基本。初日にしては上出来っす。','02'],[null,'第2話クリア!\n友達リストは、いつでも「👥 友達」から見られる。']],()=>buttons([{t:'タイトルへもどる',cls:'main',f:title}]));
-}
-function openFriends(){
- padStop(); state='bag';
- $('note').innerHTML=`<h2>👥 友達リスト ${R.friends.length} / ${MATES.length}</h2><p class="by">友達は、先生の小テストで1人1回ずつ助けてくれる。</p><div class="dexg">${MATES.map(m=>{ const fr=R.friends.includes(m.id), h=R.hearts[m.id]||0;
-   return `<div class="dx ${fr?'won':h?'seen':'un'}"><img src="${m.img}" alt=""><b>${fr||h?m.name:'???'}</b><i>${fr?m.prof:h?'友好度 ♥'+h+' / 3':'まだ話していない'}</i></div>`; }).join('')}</div>`;
- $('note').style.display='block'; $('note').scrollTop=0; label('友達リスト'); buttons([{t:'とじる',cls:'main',f:closeBag}]);
-}
-
-/* =====================================================================
-   第3話 昼休みの購買編:売り切れる前にパンを買う(単元:消化と吸収)
-   ・やきそばパンは残り8個。江藤くんの前に9人(Z11〜Z20から毎回9人ランダム)
-   ・▲で前の人に話しかける。問題に正解すると順番をゆずってもらえる(1人抜かす)
-   ・1回答えるごとに、先頭の1人がパンを1個買っていく。1問25秒の制限時間つき
-   ・先頭に着いたら購買のおばちゃんの3問。まちがえると、うしろの人に先に売られる
-   ===================================================================== */
-const BREAD0=8, T3MAX=250;
 const LINE3=[
  {z:'Z11',name:'テツヤ',kind:'徹夜明けの看護学生',topic:'消化管の順路',
   pre:[['eto','すんません、先にパン買わせてもらえないっすか。','01'],['foe','…徹夜明けで、頭が回らない…。食べ物がどこを通るか言えたら…ゆずる…。']],
@@ -1107,7 +917,6 @@ const LINE3=[
       {q:'消化酵素の主成分は?',a:'タンパク質',w:['脂肪','炭水化物','ビタミン'],ex:'酵素の主成分はタンパク質。だから高温では形がこわれて、はたらきを失います(失活)。'},
       {q:'1gあたりのエネルギーがもっとも大きい栄養素は?',a:'脂質',w:['炭水化物','タンパク質','ビタミン'],ex:'1gあたり、脂質は約9kcal、炭水化物とタンパク質は約4kcal。ビタミンはエネルギー源になりません。'}]}
 ];
-const Z3={}; LINE3.forEach(p=>{ Z3[p.z]=p; p.id='l'+p.z; p.img='zako/'+p.z+'.jpg'; p.im=new Image(); p.im.src=p.img; });
 const BOSS3={id:'b3',name:'ヤエさん',kind:'購買のおばちゃん',img:'zako/Z21.jpg',
   pre:[['foe','はい次!…あんた、列を抜かしてきたね?'],['eto','ちゃんとゆずってもらったっす。生物の問題で。','06'],['foe','ふん。うちのパンを食べるなら、消化のことくらい知ってなきゃね!3問正解で売ってあげる!'],[null,'まちがえると、うしろの人に先に売られてしまう!']],
   win:[['foe','…わかってるじゃないか。はい、やきそばパン。よくかんで食べな!'],['eto','あざっす!だ液のアミラーゼ、フル稼働させるっす。','02']],
@@ -1117,152 +926,6 @@ const BOSS3={id:'b3',name:'ヤエさん',kind:'購買のおばちゃん',img:'za
       {q:'消化酵素と、それが分解する物質の組み合わせで正しいのは?',a:'リパーゼ - 脂肪',w:['ペプシン - デンプン','アミラーゼ - タンパク質','トリプシン - 脂肪'],ex:'アミラーゼ→デンプン、ペプシン・トリプシン→タンパク質、リパーゼ→脂肪。'},
       {q:'次のうち、消化酵素を含まない消化液は?',a:'胆汁',w:['だ液','胃液','すい液'],ex:'胆汁は消化酵素を含みませんが、脂肪を乳化して消化を助けます。'},
       {q:'柔毛で吸収されたあと、おもにリンパ管に入る栄養分は?',a:'脂肪',w:['グルコース','アミノ酸','水'],ex:'脂肪酸とモノグリセリドは柔毛の中で脂肪にもどり、リンパ管へ。グルコースとアミノ酸は毛細血管へ入ります。'}]};
-BOSS3.im=new Image(); BOSS3.im.src=BOSS3.img;
-const OP3=[[null,'4時間目終了。昼休みの購買には、名物やきそばパンを求めて長い列ができていた。'],['eto','やきそばパン、残り8個っす。前に9人。…ふつうに並んでたら、ギリギリっす。','08'],
- [null,'▲で前の人に話しかけよう。問題に正解すると、順番をゆずってもらえる。\n1回答えるごとに、先頭の人がパンを1個買っていく。'],['eto','カバンの「購買のチラシ」に、消化の表があったはずっす。','06']];
-let L={line:[],bread:BREAD0,hit:0,miss:0,cHit:0,q:null,ans:false,met:{}}, T3={timer:null,left:0};
-function load3(){ try{ return JSON.parse(localStorage.getItem('eto_ep3')||'null')||{}; }catch(e){ return {}; } }
-function save3(){ const o=load3(); try{ localStorage.setItem('eto_ep3',JSON.stringify({c:true,best:Math.max(o.best||0,L.bread)})); }catch(e){} }
-/* ---- 制限時間(setInterval。答えたら必ず tStop) ---- */
-function tStop(){ if(T3.timer){ clearInterval(T3.timer); T3.timer=null; } }
-function tBar(){ const r=T3.left/T3MAX; $('eBar').style.width=r*100+'%'; $('eBar').className=r<=0.25?'low':r<=0.5?'mid':''; $('eLv').textContent='⏱ '+Math.ceil(T3.left/10)+'秒'; }
-function tStart(onOut){ tStop(); T3.left=T3MAX; tBar();
- T3.timer=setInterval(()=>{ if(document.hidden) return; T3.left--; tBar(); if(T3.left>0&&T3.left<=50&&T3.left%10===0) sfx('tick'); if(T3.left<=0){ tStop(); onOut(); } },100); }
-function ahead3(){ return L.line.indexOf('eto'); }
-function hud3(){ $('hudL').textContent='🥖 昼休みの購買'; $('hudR').textContent=`パン ${L.bread}個 ・ 前に ${ahead3()}人`; }
-function start3(){
- EP=3; padStop(); tStop();
- L={line:shuffle(LINE3.map(p=>p.z)).slice(0,9).concat('eto'),bread:BREAD0,hit:0,miss:0,cHit:0,q:null,ans:false,met:{}};
- LINE3.forEach(p=>{ p.rq=shuffle(p.qs); }); BOSS3.rq=shuffle(BOSS3.qs);
- $('title').style.display='none'; $('battle').style.display='none'; state='talk'; foe=null; hud3(); label('第3話 昼休みの購買編','単元:消化と吸収');
- talk(OP3,toLine);
-}
-function toLine(){
- padStop(); tStop(); state='map'; bgm('shop'); foe=null; $('msg').style.display='none'; $('battle').style.display='none'; $('battle').classList.remove('shop'); hud3();
- label(ahead3()?'▲で前の人に話しかける/🎒で予習':'▲で購買のおばちゃんに話しかける',`🥖 のこり ${L.bread}個`);
- padUI([{t:'📋<br>ルール',f:openRule3}],{t:'🎒<br>カバン',f:openBag});
-}
-function moveLine(d){
- if(d==='u') return talkFront();
- padStop(); label(d==='d'?'うしろに下がったら、順番がなくなるっす':'列からはみ出すと、横入りだと思われるっす','▲で前の人に話しかける');
-}
-function openRule3(){
- padStop(); state='bag';
- $('note').innerHTML=`<h2>📋 購買のルール</h2>${sayBox('パンが売り切れる前に、先頭までたどり着くっす。','06')}<ul><li>▲で前の人に話しかけると、消化と吸収の問題を出してくる。</li><li>正解すると、順番をゆずってもらえる(1人抜かせる)。</li><li>正解でも不正解でも、1回ごとに先頭の人がパンを1個買っていく。</li><li>1問の制限時間は25秒。時間切れは不正解あつかい。</li><li>先頭に着いたら、購買のおばちゃんの3問。まちがえると、うしろの人に先に売られてパンが減る。</li><li>パンが0個になったら売り切れ。カバンの「購買のチラシ」で予習しよう。</li></ul>`;
- $('note').style.display='block'; $('note').scrollTop=0; label('ルール'); buttons([{t:'とじる',cls:'main',f:closeBag}]);
-}
-function shopScreen(p){
- const b=$('battle'); b.style.display='block'; b.classList.remove('room'); b.classList.add('shop'); $('foe').className=''; $('me').className='';
- $('foe').innerHTML=cutImg(p.img); $('eName').textContent=p.name; breadBars();
-}
-function breadBars(){ const r=L.bread/BREAD0; $('pBar').style.width=r*100+'%'; $('pBar').className=r<=0.25?'low':r<=0.5?'mid':''; $('pNum').textContent=`🥖 のこり ${L.bread}個 ・ 前に ${ahead3()}人`; hud3(); }
-function choices3(q,f){ buttons(shuffle([q.a,...q.w]).map(t=>({t,f:b=>f(t,b)})),2); }
-function markRight(q){ [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); }); }
-function nextBtn(f){ setTimeout(()=>{ [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶'; b.onclick=()=>{ if(b.disabled) return; b.disabled=true; sfx('click'); f(); }; $('pane').appendChild(b); },350); }
-/* ---- 列の人との問題 ---- */
-function talkFront(){
- padStop(); tStop(); const i=ahead3();
- if(i===0) return toCounter();
- const p=Z3[L.line[i-1]]; foe=p; state='talk'; $('pane').innerHTML=''; label(`${p.kind}に話しかけた`);
- const lines=L.met[p.z]?[['foe','…もう1問だけ聞くよ。']]:p.pre; L.met[p.z]=1;
- talk(lines,()=>lineAsk(p));
-}
-function lineAsk(p){
- state='battle'; foe=p; shopScreen(p); bgm('shop');
- const q=p.rq.shift(); L.q=q; L.ans=false; $('me').innerHTML=etoSVG(L.bread<=3?'13':'05');
- say('foe',q.q); label('答えをえらべ(25秒)','話題:'+p.topic);
- choices3(q,(t,b)=>lineAnswer(p,t,b,q)); tStart(()=>lineAnswer(p,null,null,q));
-}
-function lineAnswer(p,t,btn,q){
- if(L.ans) return; L.ans=true; tStop(); markRight(q);
- const ok=t===q.a;
- if(ok){ const i=ahead3(); [L.line[i-1],L.line[i]]=[L.line[i],L.line[i-1]]; L.hit++; sfx('ok'); $('me').innerHTML=etoSVG('11'); anim($('foe'),'atk2');
-   say(null,`正解!${p.name}に 順番をゆずってもらった!`,q.ex); label('⭕ 1人抜かした'); }
- else { if(btn) btn.classList.add('wrong'); L.miss++; p.rq.push(q); addMiss(q); sfx('ng'); $('me').innerHTML=etoSVG('16');
-   say(null,`${t===null?'時間切れ…。':'不正解…。'}正解は「${q.a}」。\nゆずってもらえなかった。`,q.ex); label(t===null?'⏱ 時間切れ':'❌ 不正解'); }
- breadBars();
- nextBtn(()=>ok?talk(p.win,afterTurn):afterTurn());
-}
-function afterTurn(){
- state='talk'; const i=ahead3();
- if(i===0) return toCounter();
- const front=Z3[L.line.shift()]; L.bread--; sfx('step'); foe=null; $('battle').style.display='none'; hud3();
- say(null,`先頭の${front.name}が、やきそばパンを買っていった。\n🥖 のこり ${L.bread}個 ・ 前に ${i-1}人`); label('🥖 パンが1個売れた');
- if(L.bread<=0) return next(soldOut);
- next(i-1===0?toCounter:toLine);
-}
-/* ---- 購買のおばちゃん ---- */
-function toCounter(){
- padStop(); tStop(); state='talk'; foe=BOSS3; stopBgm(); shopScreen(BOSS3); $('me').innerHTML=etoSVG('12'); $('eLv').textContent=''; $('eBar').style.width='100%'; $('eBar').className='';
- label('先頭に着いた!','🥖 のこり '+L.bread+'個');
- if(L.met.b3) return counterAsk(); L.met.b3=1; talk(BOSS3.pre,counterAsk);
-}
-function counterAsk(){
- state='battle'; foe=BOSS3; shopScreen(BOSS3); bgm('counter');
- const q=BOSS3.rq.shift(); L.q=q; L.ans=false; $('me').innerHTML=etoSVG(L.bread<=2?'13':'12');
- say('foe',`【${L.cHit+1}問目 / 3】\n${q.q}`); label('答えをえらべ(25秒)',`正解 ${L.cHit} / 3`);
- choices3(q,(t,b)=>counterAnswer(t,b,q)); tStart(()=>counterAnswer(null,null,q));
-}
-function counterAnswer(t,btn,q){
- if(L.ans) return; L.ans=true; tStop(); markRight(q);
- const ok=t===q.a;
- if(ok){ L.cHit++; L.hit++; sfx('ok'); $('me').innerHTML=etoSVG('11'); say(null,`正解!(${L.cHit} / 3)`,q.ex); label('⭕ 正解'); }
- else { if(btn) btn.classList.add('wrong'); L.miss++; L.bread--; BOSS3.rq.push(q); addMiss(q); sfx('ng'); $('me').innerHTML=etoSVG('16');
-   say(null,`${t===null?'時間切れ…。':'不正解…。'}正解は「${q.a}」。\nおばちゃんは、うしろの人に先にパンを売った!(🥖 のこり ${L.bread}個)`,q.ex); label(t===null?'⏱ 時間切れ':'❌ 不正解'); }
- breadBars();
- nextBtn(()=>{ if(L.cHit>=3) return clear3(); if(L.bread<=0) return soldOut(); counterAsk(); });
-}
-function soldOut(){
- tStop(); stopBgm(); sfx('lose'); state='talk'; foe=null; $('battle').style.display='none'; label('💤 売り切れ');
- talk([[null,'「やきそばパン、売り切れでーす!」'],['eto','…マジっすか。残ってるの、具なしのコッペパンだけっす。','16'],['eto','カバンで予習して、もう1回並ぶっす。','17']],
-  ()=>buttons([{t:'もう一度ならぶ',cls:'main',f:()=>start3()},{t:'タイトルへもどる',f:title}]));
-}
-function clear3(){
- tStop(); stopBgm(); sfx('win'); $('me').innerHTML=etoSVG('20'); anim($('foe'),'atk2');
- L.bread--; save3(); const rank=L.miss===0?'★★★ ノーミス!':L.miss<=2?'★★':'★';
- talk(BOSS3.win,()=>{ state='talk'; foe=null; $('battle').style.display='none'; jingle(); label('🎉 第3話クリア');
-   talk([[null,'やきそばパンを手に入れた!'],['eto','並んでる間に、消化と吸収の予習が終わったっす。…もうおなかの中で消化が始まってる気がするっす。','15'],
-     [null,`第3話クリア! 評価 ${rank}\n正解 ${L.hit}問 ・ まちがい ${L.miss}問 ・ 残ったパン ${L.bread}個`]],
-     ()=>buttons([{t:'タイトルへもどる',cls:'main',f:title},{t:'もう一度ならぶ',f:()=>start3()}])); });
-}
-/* ---- 列の描画 ---- */
-function faceAt(im,cx,cy,r,ring,sq){
- ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.clip(); ctx.fillStyle='#fff'; ctx.fillRect(cx-r,cy-r,r*2,r*2);
- if(im.complete&&im.naturalWidth){ const w=im.naturalWidth,h=im.naturalHeight; if(sq) ctx.drawImage(im,(w-h)/2,0,h,h,cx-r,cy-r,r*2,r*2); else ctx.drawImage(im,0,w*0.12,w,w,cx-r,cy-r,r*2,r*2); }
- ctx.restore(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.lineWidth=3; ctx.strokeStyle=ring; ctx.stroke();
-}
-function drawLine(){
- const top=34;
- ctx.fillStyle='#e9eef2'; ctx.fillRect(0,0,vw,vh);
- for(let y=top;y<vh;y+=28) for(let x=((y/28)&1)*28;x<vw;x+=56){ ctx.fillStyle='#dde4ea'; ctx.fillRect(x,y,28,28); }
- const ch=Math.max(70,Math.min(110,(vh-top)*0.24)), cw=Math.min(vw-16,380), cx0=(vw-cw)/2, cy0=top;
- ctx.fillStyle='#f6d7a7'; ctx.fillRect(0,cy0,vw,ch*0.55);
- ctx.fillStyle='#a8682f'; ctx.fillRect(cx0,cy0+ch*0.5,cw,ch*0.45); ctx.fillStyle='#7a4a21'; ctx.fillRect(cx0,cy0+ch*0.5,cw,ch*0.09);
- ctx.textAlign='center'; ctx.textBaseline='middle';
- ctx.fillStyle='#d7263d'; ctx.fillRect(vw/2-ch*0.75,cy0+ch*0.06,ch*1.5,ch*0.32); ctx.fillStyle='#fff'; ctx.font='900 '+ch*0.2+'px sans-serif'; ctx.fillText('購 買',vw/2,cy0+ch*0.22);
- faceAt(BOSS3.im,cx0+ch*0.42,cy0+ch*0.42,ch*0.34,'#d7263d');
- const bx0=cx0+ch*0.9, bs=Math.min(ch*0.3,(cw-ch*1.0)/BREAD0); ctx.font=bs+'px serif';
- for(let i=0;i<BREAD0;i++){ ctx.globalAlpha=i<L.bread?1:0.2; ctx.fillText('🥖',bx0+bs*(i+0.5),cy0+ch*0.74); } ctx.globalAlpha=1;
- const n=L.line.length, per=5, rows=Math.ceil(n/per), slot=Math.min((vw-16)/per,(vh-top-ch-24)/Math.max(rows,1)/1.15), r=slot*0.4, qy0=cy0+ch+slot*0.6;
- const pos=i=>{ const row=Math.floor(i/per), col=i%per, c=row%2?per-1-col:col; return [8+slot*(c+0.5), qy0+row*slot*1.15]; };
- ctx.strokeStyle='#9aa8b5'; ctx.lineWidth=4; ctx.setLineDash([6,6]); ctx.beginPath(); ctx.moveTo(cx0+ch*0.42,cy0+ch*0.8); L.line.forEach((id,i)=>{ const [x,y]=pos(i); ctx.lineTo(x,y); }); ctx.stroke(); ctx.setLineDash([]);
- L.line.forEach((id,i)=>{ const [x,y]=pos(i);
-   if(id==='eto'){ faceAt(etoIm,x,y,r*1.12,'#ffe14d',true); ctx.fillStyle='#ffe14d'; ctx.fillRect(x-slot*0.42,y+r*1.05,slot*0.84,slot*0.24); ctx.fillStyle='#0d1b2a'; ctx.font='900 '+slot*0.17+'px sans-serif'; ctx.fillText(i?'江藤くん':'江藤くん 先頭!',x,y+r*1.05+slot*0.12); }
-   else { faceAt(Z3[id].im,x,y,r,i===0?'#d7263d':'#0d1b2a'); const bx=x-r*0.8, by=y-r*0.8;
-     ctx.fillStyle=i===0?'#d7263d':'#0d1b2a'; ctx.beginPath(); ctx.arc(bx,by,slot*0.13,0,7); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='900 '+slot*0.15+'px sans-serif'; ctx.fillText(i+1,bx,by+1); }
-   if(i===0&&id!=='eto'){ ctx.fillStyle='#d7263d'; ctx.font='900 '+slot*0.17+'px sans-serif'; ctx.fillText('先頭',x,y+r+slot*0.12); } });
-}
-
-/* =====================================================================
-   第4話 体育編:困っている人を助ける(単元:心臓と循環+救命処置)
-   ・グラウンドで困っている人をえらんで助ける。助けた人は「助けた人名鑑」に記録
-   ・ミズキ:立ちくらみの手当て/キザワ:言い訳の矛盾を知識で崩す/タナベさん:心肺蘇生とAED
-   ・手順をまちがえると解説が出て、その手順をやり直す。まちがいの数で★が決まる
-   ※救命処置の内容は JRC 蘇生ガイドライン2020(市民向け)にそって書いた。作り手の確認が必要
-   ===================================================================== */
-const HELP_KEY='eto_help';
-let HELP={}; try{ HELP=JSON.parse(localStorage.getItem(HELP_KEY)||'{}'); }catch(e){}
-function helpSave(){ try{ localStorage.setItem(HELP_KEY,JSON.stringify(HELP)); }catch(e){} }
 const OK=(t,r)=>({t,r,ok:true}), NG=(t,r)=>({t,r,ok:false});
 const PEOPLE=[
  {id:'p_fura',z:'Z27',name:'ミズキ',sex:'f',ep:4,kind:'陸上部の学生',pos:[0.27,0.36],
@@ -1315,11 +978,9 @@ const PEOPLE=[
   win:[[null,'救急隊が到着し、タナベさんは病院へ運ばれた。'],[null,'――数日後。'],['foe','あなたの胸骨圧迫とAEDがなければ、私は今ここにいません。本当にありがとう。'],['eto','…オレ、看護師になったら、もっとちゃんとできるようになるっす。','20']],
   run:done=>blsRun(done)}
 ];
-PEOPLE.forEach(p=>{ p.img='zako/'+p.z+'.jpg'; p.im=new Image(); p.im.src=p.img; });
-const HELPERS={donaru:'zako/Z16.jpg',kibishi:'zako/Z12.jpg'};
+const HELPERS={donaru:'chars/donaru.jpg',kibishi:'chars/kibishi.jpg'};
 const OP4=[[null,'3時間目は体育。グラウンドで持久走だ。'],['eto','走るのは得意っす。…でも、なんか今日はいろいろ起きそうな予感っす。','06'],
  [null,'困っている人を助けよう。助けた人は「📒 助けた人名鑑」に記録される。\nここで学ぶのは、看護の現場でも使う知識と手当て。']];
-/* ---- 心肺蘇生とAED:手順を順番に ---- */
 function blsRun(done){
  const S=[
   n=>step4('① 安全の確認','人が倒れた!まず何をする?',[
@@ -1353,11 +1014,11 @@ function blsRun(done){
      NG('深さ約10cm、1分間に200回','深すぎて、速すぎる。約5cm・100〜120回/分'),
      NG('10回押したら1分休む','止めると血液が流れなくなる。中断はできるだけ短く、押しつづける')],n),
   n=>compress4('⑦ 胸骨圧迫',30,n),
-  n=>{ $('foe').innerHTML=cutImg(HELPERS.kibishi); step4('⑧ AEDが届いた','キビシ主任「AED、持ってきたわ!」\nまずすることは?',[
+  n=>{ pic(HELPERS.kibishi); step4('⑧ AEDが届いた','キビシ主任「AED、持ってきたわ!」\nまずすることは?',[
      OK('AEDの電源を入れる(ふたを開けると入る機種もある)','電源が入ると、音声が手順を教えてくれる。あとは音声の指示にしたがう'),
      NG('説明書を最初から全部読む','読んでいる時間はない。電源を入れれば音声が教えてくれる'),
      NG('胸骨圧迫をやめて、救急車を待つ','AEDを使い、胸骨圧迫も続ける。待つだけではいけない'),
-     NG('AEDを本人から離れた場所に置く','AEDは本人のすぐそばに置いて使う')],()=>{ $('foe').innerHTML=foeArt(foe); n(); }); },
+     NG('AEDを本人から離れた場所に置く','AEDは本人のすぐそばに置いて使う')],()=>{ pic(foe.img); n(); }); },
   n=>step4pick('⑨ 電極パッドを貼る','服を開いて、電極パッドを貼る。どこに貼る?(2つえらぶ)',[
      OK('右胸の上(鎖骨の下)','パッドの絵のとおり、心臓をはさむように貼る'),
      OK('左胸の下の横(わきの下)','パッドの絵のとおり、心臓をはさむように貼る'),
@@ -1382,116 +1043,251 @@ function blsRun(done){
  ];
  let i=0; (function go(){ if(i>=S.length) return done(); S[i++](go); })();
 }
-/* ---- 手順の部品 ---- */
-let F4={done:{},miss:0,c:false}, S4={opts:[],picked:[]}, T4=null;
-function t4Stop(){ if(T4){ clearInterval(T4); T4=null; } }
-function t4Start(sec,onOut){ t4Stop(); let left=sec*10; const show=()=>{ $('eBar').style.width=(left/(sec*10)*100)+'%'; $('eBar').className=left<=sec*3?'low':left<=sec*5?'mid':''; $('eLv').textContent='⏱ '+Math.ceil(left/10)+'秒'; }; show();
- T4=setInterval(()=>{ if(document.hidden) return; left--; show(); if(left>0&&left<=30&&left%10===0) sfx('tick'); if(left<=0){ t4Stop(); onOut(); } },100); }
-function missBar(){ $('pBar').style.width=Math.max(0,100-F4.miss*20)+'%'; $('pBar').className=F4.miss>=3?'low':F4.miss?'mid':''; $('pNum').textContent=`まちがい ${F4.miss}`; }
-function disableAll(){ [...$('pane').children].forEach(b=>b.disabled=true); }
-function step4(title,q,opts,onOk,opt){
- opt=opt||{}; S4={opts,picked:[]}; state='battle'; t4Stop(); say(null,q); label(title,opt.timer?`${opt.timer}秒以内`:''); missBar();
- if(!opt.timer){ $('eLv').textContent=''; $('eBar').style.width='100%'; $('eBar').className=''; }
- const pick=(o,b)=>{ t4Stop(); disableAll();
-   if(o.ok){ sfx('ok'); b.classList.add('right'); say(null,'⭕ '+o.r); label('⭕ 正解'); nextBtn(onOk); }
-   else { F4.miss++; missBar(); sfx('ng'); b.classList.add('wrong'); say(null,'❌ '+o.r); label('❌ もう一度'); nextBtn(()=>step4(title,q,opts,onOk,opt)); } };
- buttons(shuffle(opts).map(o=>({t:o.t,f:b=>pick(o,b)})),1);
- if(opt.timer) t4Start(opt.timer,()=>{ disableAll(); F4.miss++; missBar(); sfx('ng'); say(null,'❌ '+opt.out); label('⏱ 時間切れ'); nextBtn(onOk); });
+const TOOLS=[
+ {id:'T01',e:'🩺',name:'聴診器',use:'心臓の音・呼吸の音・おなかの音(腸の動き)を聞く。血圧を測るときにも使う'},
+ {id:'T02',e:'🌡️',name:'電子体温計',use:'体温を測る。わきの下では、先をくぼみの奥に当て、少し斜め下からはさむ'},
+ {id:'T03',e:'🩸',name:'血圧計',use:'腕帯(マンシェット)を上腕に巻いて血圧を測る。巻く強さは指が1〜2本入るくらい'},
+ {id:'T04',e:'☝️',name:'パルスオキシメーター',use:'指先にはさみ、血液中の酸素の割合(SpO2)と脈拍を測る。ふつうは96〜99%'},
+ {id:'T05',e:'💉',name:'注射器',use:'薬を注射する・採血する。使った針はキャップをせず、そのまま専用の容器へ捨てる'},
+ {id:'T06',e:'🎗️',name:'駆血帯',use:'採血や点滴のとき、腕をしばって静脈を浮き出させる。巻いたままにするのは1分以内が目安'},
+ {id:'T07',e:'💧',name:'点滴セット',use:'輸液(点滴)を静脈に入れる。点滴筒で落ちる速さを見て、クレンメで調節する'},
+ {id:'T08',e:'🥢',name:'鑷子(せっし)',use:'いわゆるピンセット。消毒したガーゼや綿球を、手でさわらずにつまむ'},
+ {id:'T09',e:'🫘',name:'膿盆(のうぼん)',use:'そら豆の形の皿。使ったガーゼや器具を一時的に置く。うがいの水を受けることも'},
+ {id:'T10',e:'🔨',name:'打腱器',use:'ひざなどの腱をたたいて、反射(しつがい腱反射など)を調べる'}];
+
+/* ---------- 旧作の共通部品 ---------- */
+FOES.forEach((f,i)=>{ f.id='f'+f.n; f.img='foes/'+f.n+'.jpg'; f.lv=10+i*2; f.hp=f.boss?4:3; });
+MATES.forEach(m=>{ m.id='m'+m.z; m.img='zako/'+m.z+'.jpg'; });
+LINE3.forEach(p=>{ p.id='l'+p.z; p.img='zako/'+p.z+'.jpg'; });
+PEOPLE.forEach(p=>{ p.img='zako/'+p.z+'.jpg'; });
+/* 何度遊んでも残る記録:通学路の図鑑(DEX)と助けた人名鑑(HELP) */
+let DEX={}, HELP={};
+try{ DEX=JSON.parse(localStorage.getItem('tk_dex')||'{}'); HELP=JSON.parse(localStorage.getItem('tk_help')||'{}'); }catch(e){}
+function recSave(){ try{ localStorage.setItem('tk_dex',JSON.stringify(DEX)); localStorage.setItem('tk_help',JSON.stringify(HELP)); }catch(e){} }
+function dexSeen(f){ DEX[f.n]=DEX[f.n]||{w:0,p:0}; recSave(); }
+function dexWin(f,perfect){ const d=DEX[f.n]=DEX[f.n]||{w:0,p:0}; d.w++; if(perfect) d.p=1; recSave(); }
+/* 1年のセーブ(G)に旧作の進み具合を足す。古いセーブにも足せるように、turn() のたびに呼ぶ */
+function gx(){ if(!G) return; if(!G.road) G.road={b:[]}; if(!G.mt) G.mt={h:{},f:[],test:0}; if(!G.p4) G.p4={}; }
+/* 制限時間(setInterval。答えたら必ず tmStop) */
+let TM=null;
+function tmStop(){ if(TM){ clearInterval(TM); TM=null; } }
+function tmStart(sec,show,onOut){ tmStop(); let left=sec*10; show(sec);
+ TM=setInterval(()=>{ if(document.hidden) return; left--; if(left%10===0) show(left/10); if(left<=0){ tmStop(); onOut(); } },100); }
+/* 4択1問。正解は QNOW(テスト用)。opt.sec で制限時間、opt.right で右上の表示 */
+function ask4(q,head,who,onAns,opt){ opt=opt||{}; QNOW=q; say(who,(head?head+'\n':'')+q.q);
+ const fin=(t,b)=>{ tmStop(); QNOW=null; disableAll(); const ok=t===q.a; [...$('pane').children].forEach(x=>{ if(x.textContent===q.a) x.classList.add('right'); }); if(b&&!ok) b.classList.add('wrong'); sfx(ok?'ok':'ng'); onAns(ok,t===null); };
+ buttons(shuffle([q.a,...q.w]).map(t=>({t,f:b=>fin(t,b)})),2);
+ if(opt.sec) tmStart(opt.sec,s=>{ $('lblR').textContent=(opt.right?opt.right()+' ・ ':'')+'⏱ '+s+'秒'; },()=>fin(null,null)); }
+
+/* ---------- 器具ならべ(旧作の注射器のゲージから、神経衰弱をへて変更) ----------
+   上段に器具の名前4つ、下段に絵4枚。絵を名前の順にタップしてならべる(置いた絵の枠をタップで外せる)。時間制限なし。
+   order(kind,cb):cb({n:正しくならべた数, all:4つ全部か, miss:まちがえた器具}) */
+function toolImgErr(img){ const id=img.dataset.id; if(!img.dataset.jpg){ img.dataset.jpg=1; img.src='tools/'+id+'.jpg'; return; }
+ const t=TOOLS.find(x=>x.id===id); img.outerHTML='<b class="ord-e">'+(t?t.e:'❓')+'</b>'; }
+const toolImg=t=>`<img src="tools/${t.id}.webp" data-id="${t.id}" alt="" onerror="toolImgErr(this)">`;
+let ORD=null;
+function order(kind,cb){
+ const ans=shuffle(TOOLS.slice()).slice(0,4); ORD={ans,put:[null,null,null,null]}; let live=true;
+ const p=$('pane'); p.className='ord'; p.innerHTML=''; p.scrollTop=0;
+ const slots=ans.map((t,i)=>{ const b=document.createElement('button'); b.className='ordslot'; b.dataset.i=i;
+   b.onclick=()=>{ if(!live||!ORD.put[i]) return; sfx('click'); ORD.put[i]=null; draw(); }; p.appendChild(b); return b; });
+ const pics=shuffle(ans.slice()).map(t=>{ const b=document.createElement('button'); b.className='ordpic'; b.dataset.id=t.id; b.innerHTML=toolImg(t);
+   b.onclick=()=>{ if(!live||ORD.put.includes(t)) return; const i=ORD.put.indexOf(null); if(i<0) return; sfx('click'); ORD.put[i]=t; draw(); if(!ORD.put.includes(null)) finish(); };
+   p.appendChild(b); return b; });
+ function draw(){
+   slots.forEach((b,i)=>{ const t=ORD.put[i]; b.className='ordslot'+(t?' put':'');
+     b.innerHTML=`<span class="ord-n">${i+1}. ${ans[i].name}</span><span class="ord-box">${t?toolImg(t):''}</span>`; });
+   pics.forEach(b=>{ const used=ORD.put.some(t=>t&&t.id===b.dataset.id); b.className='ordpic'+(used?' used':''); b.disabled=used; });
+ }
+ function finish(){ live=false; const ok=ans.map((t,i)=>ORD.put[i]===t), n=ok.filter(Boolean).length;
+   slots.forEach((b,i)=>{ b.className='ordslot put '+(ok[i]?'ok':'ng'); }); sfx(n===4?'ok':'ng');
+   setTimeout(()=>{ p.className=''; p.innerHTML=''; cb({n,all:n===4,miss:ans.filter((t,i)=>!ok[i])}); },900); }
+ draw();
 }
-function step4pick(title,q,opts,need,onOk,after){
- S4={opts,picked:[]}; state='battle'; t4Stop(); say(null,q); label(title,`あと ${need}つ`); missBar(); $('eLv').textContent=''; $('eBar').style.width='100%'; $('eBar').className='';
+/* まちがえた器具の使い方 */
+const ordMissText=g=>g.miss.length?'\n📌 '+g.miss.map(t=>`${t.name}:${t.use}`).join('\n📌 '):'';
+
+/* ---------- 通学編(旧第1話):行動「🛵 通学路」。道をふさぐ相手とバトル ----------
+   ふつうの相手19人(foes/01〜19)からまだ勝っていない人がランダムに出る。9人に勝つと校門のDNA先生(ボス)。
+   ボスに勝ったあとはガイコツ先輩(おまけ)、全員に勝ったあとは再戦。
+   バトル:相手のHPは hp×10、江藤くんのやる気は3。4択に正解 → 器具ならべでダメージ(4つ正しいと×1.5)。
+   不正解 → 器具ならべで4つ正しければよける、だめならやる気-1 */
+const ROAD_OP=[['sys','朝8時。看護学校へバイクで向かう江藤くん。'],['eto','今日こそ遅刻しないで着くっす。…なんかイヤな予感するけど。','06']];
+function roadNext(){ const b=G.road.b, reg=FOES.filter(f=>!f.boss&&!f.extra), boss=FOES.find(f=>f.boss), ex=FOES.find(f=>f.extra);
+ const won=reg.filter(f=>b.includes(f.n)).length, left=reg.filter(f=>!b.includes(f.n));
+ if(won>=9&&!b.includes(boss.n)) return boss;
+ if(left.length) return pick(left);
+ if(!b.includes(ex.n)) return ex;
+ return pick(FOES); }
+function roadInfo(){ gx(); const boss=FOES.find(f=>f.boss); return G.road.b.includes(boss.n)?`勝った ${G.road.b.length}/${FOES.length}`:`勝った ${G.road.b.length} ・ 9人でボス`; }
+function actRoad(){ state='act'; gx(); home(false); bg('park'); bgm('event'); addStress(5);
+ const f=roadNext(), first=!G.road.met; G.road.met=1; foe=f; dexSeen(f); album('road');
+ talk((first?ROAD_OP:[['sys','バイクで通学中――']]).concat([['sys',`${f.kind}の ${f.name}が\n道をふさいでいる!(${f.theme})`]],f.pre),()=>battle(f)); }
+let BT=null;
+function battle(f){ BT={f,hp:f.hp*10,max:f.hp*10,me:3,combo:0,miss:0,q:shuffle(f.qs)}; btAsk(); }
+function btRight(){ return `相手HP ${Math.max(0,BT.hp)}/${BT.max} ・ やる気 ${'♥'.repeat(Math.max(0,BT.me))}${'♡'.repeat(3-Math.max(0,BT.me))}`; }
+function btAsk(){ if(!BT.q.length) BT.q=shuffle(BT.f.qs); const q=BT.q.shift(); foe=BT.f; label(`⚔ ${BT.f.name}`,btRight());
+ ask4(q,null,'foe',ok=>{
+  if(ok){ BT.combo++; say('sys',`⭕ 正解!${BT.combo>=2?` 🔥${BT.combo}コンボ!`:''}\n器具の絵を、名前の順にならべろ!4つ正しければクリティカル!`,null,q.ex); label('⭕ 正解!器具をならべろ',btRight());
+    nextBtn(()=>order('atk',g=>{ const m=g.all?1.5:g.n>=2?1:0.7, dmg=Math.max(1,Math.round((10+Math.min(6,(BT.combo-1)*2))*m)); BT.hp-=dmg; popTxt((g.all?'クリティカル!! ':'')+'-'+dmg);
+      say('sys',`🧰 ${g.n} / 4 正しくならべた!`+(g.all?' 💥 クリティカル!':'')+`\n${BT.f.name}に ${dmg}ダメージ!`+ordMissText(g)); label(g.all?'💥 クリティカル':m>=1?'⭕ ダメージ':'△ ならべまちがい…',btRight()); nextBtn(btNext); })); }
+  else { BT.combo=0; BT.miss++; BT.q.push(q); say('sys',`❌ 正解は「${q.a}」。\n${BT.f.name}の こうげき!器具を4つ正しく ならべて よけろ!`,null,q.ex); label('❌ 不正解…器具をならべろ',btRight());
+    nextBtn(()=>order('dodge',g=>{ if(g.all) say('sys','🧰 4つ全部 正しくならべた!\nひらりと よけた!やる気は へらなかった。'); else { BT.me--; say('sys',`🧰 ${g.n} / 4 …よけきれなかった。\nやる気が さがった!`+ordMissText(g)); }
+      label(g.all?'💨 回避成功':'💥 くらった',btRight()); nextBtn(btNext); })); } }); }
+function btNext(){ if(BT.hp<=0) return btWin(); if(BT.me<=0) return btLose(); btAsk(); }
+function btWin(){ const f=BT.f, perfect=BT.miss===0, fresh=!G.road.b.includes(f.n); if(fresh) G.road.b.push(f.n); dexWin(f,perfect); sfx('love'); foe=f;
+ const v=addSt(f.extra?'body':'body',fresh?(f.boss?6:3):1);
+ talk(f.win.concat(f.boss?[['sys','校門を通過!'],['eto','通学だけで、生物の予習おわったっす。','15']]:[]),()=>{ if(f.boss) album('road_boss');
+   home(true); pic(etoCard(2)); say('sys',`${f.name}に勝った!${perfect?' ★ノーミス!':''}\nからだの知識 +${v}\n通学路の図鑑 ${G.road.b.length} / ${FOES.length}`); label('🛵 通学路',roadInfo()); finishAct(); }); }
+function btLose(){ addStress(8); home(true); pic(etoCard(4)); say('eto','…やる気がなくなったっす。バイクもエンストしたっす。\n解説を読んで、出直すっす。(ストレス +8)','17'); label('🛵 負けた…'); finishAct(); }
+
+/* ---------- 教室編(旧第2話):行事「クラスの自己紹介」+ほかのキャラのイベント「クラスメイト」 ----------
+   9人と話して、話が3回合えば友達(友好度 G.mt.h は次の会話に残る)。2回かみ合わないと、その場はおひらき。
+   9人全員と友達になると、ハヤカワ先生の小テスト(5問中4問で合格。友達に1人1回だけ聞ける) */
+function mateChat(m,done){ foe=m; let awk=0, pool=shuffle(m.qs); const h=()=>G.mt.h[m.id]||0;
+ (function one(){ if(!pool.length) pool=shuffle(m.qs); const q=pool.shift(); foe=m;
+   label(`👥 ${m.name}と話す(話題:${m.topic})`,`友好度 ${'♥'.repeat(h())}${'♡'.repeat(3-h())} ・ 気まずさ ${awk}/2`);
+   ask4(q,null,'foe',ok=>{ if(ok){ G.mt.h[m.id]=h()+1; say('sys','⭕ 話が合った!友好度アップ ♥',null,q.ex); } else { awk++; say('sys',`❌ 話がかみ合わなかった…。正解は「${q.a}」。`,null,q.ex); }
+     nextBtn(()=>{ foe=m;
+       if(h()>=3){ G.mt.f.push(m.id); G.friend++; const v=addSt('care',2); sfx('love');
+         return talk(m.win.concat([['sys',`${m.name}と 友達になった!(クラスの友達 ${G.mt.f.length} / ${MATES.length})\n思いやり +${v}`+(G.mt.f.length>=MATES.length?'\nクラス全員と友達になった!ハヤカワ先生の小テストを受けられる。':'')]]),done); }
+       if(awk>=2) return talk([['foe','…ごめん、ちょっと用事を思い出した。また後でね。'],['sys','気まずくなって、会話がおわった。(友好度は残る)']],done);
+       one(); }); }); })(); }
+function mateEvent(done){ gx(); const rest=MATES.filter(x=>!G.mt.f.includes(x.id)), m=rest.find(x=>(G.mt.h[x.id]||0)>0)||pick(rest); foe=m; home(false); bg('school');
+ talk((G.mt.h[m.id]||0)?[['sys',`休み時間。${m.name}が話しかけてきた。`],['foe','あ、江藤くん。この前の続き、話そうか。']]:[['sys',`休み時間。${m.kind}の${m.name}がいる。`]].concat(m.pre),()=>mateChat(m,done)); }
+function teacherTest(done){ foe=TEACHER; home(false); bg('school'); bgm('test'); album('mtest');
+ const tq=shuffle(TEACHER.qs).slice(0,5), helps=shuffle(G.mt.f); let i=0, sc=0;
+ const one=()=>{ foe=TEACHER; if(i>=5) return fin(); const q=tq[i]; label(`📝 小テスト ${i+1}/5`,`正解 ${sc} ・ 聞ける友達 ${helps.length}人`);
+   const go=two=>{ foe=TEACHER; QNOW=q; say('foe',`【第${i+1}問】\n${q.q}`); const opts=two?shuffle([q.a,shuffle(q.w)[0]]):shuffle([q.a,...q.w]);
+     const list=opts.map(t=>({t,f:b=>{ QNOW=null; disableAll(); const ok=t===q.a; [...$('pane').children].forEach(x=>{ if(x.textContent===q.a) x.classList.add('right'); }); if(!ok) b.classList.add('wrong'); sfx(ok?'ok':'ng'); if(ok) sc++; i++;
+       say('sys',ok?'⭕ 正解!':`❌ 正解は「${q.a}」`,null,q.ex); nextBtn(one); }}));
+     if(!two&&helps.length) list.push({t:`👥 友達に聞く(のこり${helps.length}人)`,wide:true,f:()=>{ QNOW=null; const m=MATES.find(x=>x.id===helps.pop()); foe=m; say('foe','たぶん、この2つのどっちかだと思う!'); label('👥 友達に聞いた','選択肢が2つに減った!'); nextBtn(()=>go(true)); }});
+     buttons(list,2); };
+   go(false); };
+ const fin=()=>{ foe=TEACHER;
+   if(sc>=4){ G.mt.test=1; const v=addSt('body',6); sfx('love'); return talk(TEACHER.win.concat([['sys',`5問中 ${sc}問 正解。小テスト合格!\nからだの知識 +${v}`]]),done); }
+   addStress(5); talk([['foe',`5問中 ${sc}問 正解。合格は4問です。また今度、受けなおしましょう。`],['eto','…出直すっす。','17']],done); };
+ talk(TEACHER.pre.concat([['sys','小テスト開始!全5問。4問正解で合格。\n友達には、1人1回だけ聞ける。']]),one); }
+
+/* ---------- 購買編(旧第3話):行事「購買のやきそばパン」(10月:消化と吸収) ----------
+   やきそばパンは残り8個。前に9人(10人からランダム)。前の人の問題に正解すると順番をゆずってもらえる。
+   1回答えるごとに先頭の人が1個買う。1問25秒。先頭でヤエさんの3問(まちがえるとパン-1) */
+const BREAD0=8;
+function shopEvent(){ state='talk'; home(false); bg('hall'); bgm('event'); album('fx_shop');
+ const Z3={}; LINE3.forEach(p=>{ Z3[p.z]=p; p.rq=shuffle(p.qs); p.met=0; }); BOSS3.rq=shuffle(BOSS3.qs);
+ const L={line:shuffle(LINE3.map(p=>p.z)).slice(0,9).concat('eto'),bread:BREAD0,hit:0,miss:0,c:0,met:0};
+ const ahead=()=>L.line.indexOf('eto'), right=()=>`🥖 ${L.bread}個 ・ 前に ${ahead()}人`;
+ const front=()=>{ const i=ahead(); if(i===0) return counter(); const p=Z3[L.line[i-1]]; foe=p; label(`🥖 ${p.kind}に話しかけた`,right());
+   talk(p.met?[['foe','…もう1問だけ聞くよ。']]:p.pre,()=>{ p.met=1; q1(p); }); };
+ const q1=p=>{ foe=p; const q=p.rq.shift(); label(`🥖 ${p.name}の問題(話題:${p.topic})`,right());
+   ask4(q,null,'foe',(ok,out)=>{ if(ok){ const i=ahead(); [L.line[i-1],L.line[i]]=[L.line[i],L.line[i-1]]; L.hit++; say('sys',`⭕ 正解!${p.name}に 順番をゆずってもらった!`,null,q.ex); }
+     else { L.miss++; p.rq.push(q); say('sys',`${out?'⏱ 時間切れ…。':'❌ '}正解は「${q.a}」。\nゆずってもらえなかった。`,null,q.ex); }
+     label(ok?'⭕ 1人抜かした':'❌ ゆずってもらえなかった',right()); nextBtn(()=>{ foe=p; ok?talk(p.win,after):after(); }); },{sec:25,right}); };
+ const after=()=>{ const i=ahead(); if(i===0) return counter(); const f=Z3[L.line.shift()]; L.bread--; foe=null; pic(null);
+   say('sys',`先頭の${f.name}が、やきそばパンを買っていった。\n🥖 のこり ${L.bread}個 ・ 前に ${i-1}人`); label('🥖 パンが1個売れた',right());
+   if(L.bread<=0) return nextBtn(sold); nextBtn(i-1===0?counter:front); };
+ const counter=()=>{ foe=BOSS3; label('🥖 先頭に着いた!',right()); if(!L.met){ L.met=1; return talk(BOSS3.pre,cq); } cq(); };
+ const cq=()=>{ foe=BOSS3; const q=BOSS3.rq.shift(); label(`🥖 ヤエさんの問題 ${L.c+1}/3`,right());
+   ask4(q,`【${L.c+1}問目 / 3】`,'foe',(ok,out)=>{ if(ok){ L.c++; L.hit++; say('sys',`⭕ 正解!(${L.c} / 3)`,null,q.ex); }
+     else { L.miss++; L.bread--; BOSS3.rq.push(q); say('sys',`${out?'⏱ 時間切れ…。':'❌ '}正解は「${q.a}」。\nおばちゃんは、うしろの人に先にパンを売った!(🥖 のこり ${L.bread}個)`,null,q.ex); }
+     nextBtn(()=>{ if(L.c>=3) return win(); if(L.bread<=0) return sold(); cq(); }); },{sec:25,right}); };
+ const win=()=>{ foe=BOSS3; L.bread--; sfx('love'); const rank=L.miss===0?'★★★ ノーミス!':L.miss<=2?'★★':'★', v=addSt('body',4+Math.min(6,L.hit)); addStress(-10); const k=G.her;
+   talk(BOSS3.win.concat([['sys',`やきそばパンを手に入れた!評価 ${rank}\n正解 ${L.hit}問 ・ まちがい ${L.miss}問\nからだの知識 +${v}、ストレス -10`],
+     [k,k==='saki'?'…それ、最後の1個?…半分、くれてもいいわよ。消化の話、聞いてたから。':'わあ、やきそばパン!江藤くん、問題ぜんぶ答えてたね。すごい!',2]]),()=>{ addLove(k,4); fixEnd(); }); };
+ const sold=()=>{ addStress(8); foe=null; talk([['sys','「やきそばパン、売り切れでーす!」'],['eto','…マジっすか。残ってるの、具なしのコッペパンだけっす。','16'],['eto','消化と吸収、ちゃんと復習しとくっす。(ストレス +8)','17']],fixEnd); };
+ talk([['sys','10月。4時間目終了。昼休みの購買には、名物やきそばパンを求めて長い列ができていた。'],['eto','やきそばパン、残り8個っす。前に9人。…ふつうに並んでたら、ギリギリっす。','08'],
+   ['sys','前の人の問題(消化と吸収)に正解すると、順番をゆずってもらえる。\n1回答えるごとに、先頭の人がパンを1個買っていく。1問25秒。']],front); }
+
+/* ---------- 体育編(旧第4話):行事「体育の持久走」(6月:心臓と循環+救命処置) ----------
+   ミズキ(立ちくらみ)→ キザワ(さぼりの言い訳を知識でつっこむ)→ タナベさんが倒れて心肺蘇生とAED。
+   手順をまちがえると解説が出てやり直し。まちがいの数で★(0回=3、1〜2回=2、3回以上=1)。助けた人名鑑に記録
+   ※救命処置は JRC 蘇生ガイドライン2020(市民向け)にそって書いた。作り手の確認が必要 */
+let S4=null, F4miss=0;
+function step4(title,q,opts,onOk,opt){ opt=opt||{}; S4={opts,picked:[]}; tmStop(); say('sys',q); label(title,opt.timer?'':`まちがい ${F4miss}`);
+ const pk=(o,b)=>{ tmStop(); disableAll(); S4=null;
+   if(o.ok){ sfx('ok'); b.classList.add('right'); say('sys','⭕ '+o.r); label('⭕ 正解'); nextBtn(onOk); }
+   else { F4miss++; sfx('ng'); b.classList.add('wrong'); say('sys','❌ '+o.r); label('❌ もう一度'); nextBtn(()=>step4(title,q,opts,onOk,opt)); } };
+ buttons(shuffle(opts).map(o=>({t:o.t,f:b=>pk(o,b)})),1);
+ if(opt.timer) tmStart(opt.timer,s=>label(title,`⏱ ${s}秒`),()=>{ disableAll(); S4=null; F4miss++; sfx('ng'); say('sys','❌ '+opt.out); label('⏱ 時間切れ'); nextBtn(onOk); }); }
+function step4pick(title,q,opts,need,onOk,after){ S4={opts,picked:[]}; tmStop(); say('sys',q); label(title,`あと ${need}つ`);
  buttons(shuffle(opts).map(o=>({t:o.t,f:b=>{ b.disabled=true;
    if(o.ok){ S4.picked.push(o.t); sfx('ok'); b.classList.add('right'); const left=need-S4.picked.length;
-     if(left<=0){ disableAll(); say(null,'⭕ '+o.r+(after?'\n'+after:'')); label('⭕ 正解'); nextBtn(onOk); } else { say(null,'⭕ '+o.r+`\nあと ${left}つ`); label(title,`あと ${left}つ`); } }
-   else { F4.miss++; missBar(); sfx('ng'); b.classList.add('wrong'); say(null,'❌ '+o.r); } }})),1);
-}
-/* 胸骨圧迫のリズム:100〜120回/分(1回0.5〜0.6秒)に入った割合で判定 */
-function compress4(title,n,onDone){
- state='battle'; S4={opts:[],picked:[]}; t4Stop(); const ts=[]; label(title,'目標 100〜120回/分');
- const ivs=()=>ts.slice(1).map((t,i)=>t-ts[i]);
+     if(left<=0){ disableAll(); S4=null; say('sys','⭕ '+o.r+(after?'\n'+after:'')); label('⭕ 正解'); nextBtn(onOk); } else { say('sys','⭕ '+o.r+`\nあと ${left}つ`); label(title,`あと ${left}つ`); } }
+   else { F4miss++; sfx('ng'); b.classList.add('wrong'); say('sys','❌ '+o.r); } }})),1); }
+/* 胸骨圧迫のリズム:100〜120回/分(1回0.5〜0.6秒)に入った割合で判定。onDone(ちょうどいい割合%) */
+function compress4(title,n,onDone){ S4=null; tmStop(); const ts=[]; const ivs=()=>ts.slice(1).map((t,i)=>t-ts[i]);
  const show=()=>{ const last=ivs().slice(-4), bpm=last.length?Math.round(60000/(last.reduce((a,c)=>a+c,0)/last.length)):0;
-   const j=!bpm?'':bpm<100?'🐢 おそい!':bpm>120?'🐇 はやい!':'👍 ちょうどいい'; say(null,`胸の真ん中を、ひじをのばして真上から押す!\nテンポ ${bpm||'-'}回/分 ${j}`,'1分間に100〜120回。1秒に2回より少し速いくらい');
-   $('eLv').textContent=`${ts.length} / ${n}回`; $('eBar').style.width=(ts.length/n*100)+'%'; $('eBar').className=''; };
+   const j=!bpm?'':bpm<100?'🐢 おそい!':bpm>120?'🐇 はやい!':'👍 ちょうどいい'; say('sys',`胸の真ん中を、ひじをのばして真上から押す!\nテンポ ${bpm||'-'}回/分 ${j}`,null,'1分間に100〜120回。1秒に2回より少し速いくらい'); label(title,`${ts.length} / ${n}回`); };
  const finish=()=>{ const iv=ivs(), good=iv.filter(x=>x>=500&&x<=600).length, pct=iv.length?Math.round(good/iv.length*100):0, avg=iv.length?Math.round(60000/(iv.reduce((a,c)=>a+c,0)/iv.length)):0;
    disableAll();
-   if(pct>=50){ sfx('ok'); say(null,`⭕ 平均 ${avg}回/分(ちょうどいいテンポ ${pct}%)`,'深さは約5cm(6cmをこえない)。押したら毎回、胸をもとの高さまで戻す。疲れたら交代して、中断はできるだけ短く'); label('⭕ いいテンポ'); }
-   else { F4.miss++; missBar(); sfx('ng'); say(null,`△ 平均 ${avg}回/分(ちょうどいいテンポ ${pct}%)`,'テンポは1分間に100〜120回。速すぎると胸が戻りきらず、おそすぎると血液が十分に流れない'); label('△ テンポがずれた'); }
-   nextBtn(onDone); };
- buttons([{t:'👐 押す!',cls:'main',f:()=>{ if(ts.length>=n) return; ts.push(performance.now()); sfx('step'); anim($('me'),'atk'); show(); if(ts.length>=n) finish(); }}]); show();
+   if(pct>=50){ sfx('ok'); say('sys',`⭕ 平均 ${avg}回/分(ちょうどいいテンポ ${pct}%)`,null,'深さは約5cm(6cmをこえない)。押したら毎回、胸をもとの高さまで戻す。疲れたら交代して、中断はできるだけ短く'); label('⭕ いいテンポ'); }
+   else { F4miss++; sfx('ng'); say('sys',`△ 平均 ${avg}回/分(ちょうどいいテンポ ${pct}%)`,null,'テンポは1分間に100〜120回。速すぎると胸が戻りきらず、おそすぎると血液が十分に流れない'); label('△ テンポがずれた'); }
+   nextBtn(()=>onDone(pct)); };
+ buttons([{t:'👐 押す!',cls:'main',f:()=>{ if(ts.length>=n) return; ts.push(performance.now()); show(); if(ts.length>=n) finish(); }}]); show(); }
+function helpCase(p,done){ foe=p; F4miss=0; label(p.kind);
+ talk(p.pre,()=>p.run(()=>{ tmStop(); const st=F4miss===0?3:F4miss<=2?2:1; HELP[p.id]=Math.max(HELP[p.id]||0,st); G.p4[p.id]=st; recSave(); sfx('love'); foe=p;
+   talk(p.win,()=>{ say('sys',`📒 ${p.name}を「助けた人名鑑」に記録した!\n評価 ${'★'.repeat(st)}${'☆'.repeat(3-st)}(まちがい ${F4miss})`); label('📒 名鑑に記録'); nextBtn(()=>done(st)); }); })); }
+function peEvent(){ state='talk'; gx(); home(false); bg('park'); bgm('event'); album('fx_pe'); const k=G.her, ps=['p_fura','p_sabo','p_bls'].map(id=>PEOPLE.find(p=>p.id===id)); let stars=0, i=0;
+ const go=()=>{ if(i>=ps.length) return fin(); const p=ps[i++]; helpCase(p,st=>{ stars+=st; go(); }); };
+ const fin=()=>{ foe=null; const a=addSt('skill',2+stars), c=addSt('care',stars); addLove(k,5,stars>=7?8:3);
+   talk([['sys','キーンコーンカーンコーン…体育、終了。'],['eto','走るより、人を助けるほうがずっと疲れたっす。…でも、やってよかったっす。','15'],
+     [k,k==='saki'?'…さっきの胸骨圧迫、見てたわ。手順、ひとつもまちがえなかったわね。…すごかった。':'江藤くん、タナベさんを助けたんだね。…かっこよかったよ。',3],
+     ['sys',`看護技術 +${a}、思いやり +${c}\n※これはゲームでの練習。いざというときのために、消防署などの救命講習で実際に身につけよう。`]],fixEnd); };
+ talk(OP4,go); }
+
+/* ---------- 記録:助けた人名鑑・通学路の図鑑・クラスの友達(タイトルとメニューから) ---------- */
+function openRec(tab,back){ state='note'; $('title').style.display='none'; $('msg').style.display='none'; gx();
+ const card=(img,name,sub,body,seen)=>`<div class="mkc ${seen?'':'un'}"><img src="${cutSrc(img)}" onerror="this.onerror=null;this.src='${img}'" alt=""><div><b>${seen?name:'???'}</b> ${sub}${body}</div></div>`;
+ let h='';
+ if(tab==='help'||tab==='f'){ const list=PEOPLE.filter(p=>tab==='help'||p.sex==='f');
+   h=`<h2>📒 助けた人名鑑</h2><p class="by">${tab==='help'?'感謝の名鑑:助けたすべての人':'美女名鑑:助けた女性たち'} ・ 助けた ${list.filter(p=>HELP[p.id]).length}/${list.length}人 ・ ★は「まちがえずに助けた」ほど多い</p>`+
+    list.map(p=>{ const s=HELP[p.id]; return card(p.img,p.name,s?`<span class="st">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span><br><i>${p.kind}</i>`:'<br><i>6月の体育で出会えるかも</i>',s?`<p>😟 ${p.trouble}</p><p>💡 ${p.know}</p><p>💬「${p.thanks}」</p>`:'',s); }).join(''); }
+ if(tab==='road'){ const won=FOES.filter(f=>DEX[f.n]&&DEX[f.n].w).length;
+   h=`<h2>🛵 通学路の図鑑 ${won}/${FOES.length}</h2><p class="by">行動「🛵 通学路」で出会う相手。★はノーミスで勝った相手</p>`+
+    FOES.map(f=>{ const d=DEX[f.n]; return card(f.img,f.name,d?`${d.p?'<span class="st">★</span>':''}<br><i>${f.kind}・${f.theme}${d.w?'':'(まだ勝っていない)'}</i>`:'',d?`<p>💬「${f.win[0][1]}」</p>`:'',!!d); }).join(''); }
+ if(tab==='mate'){ const f=G?G.mt.f:[];
+   h=`<h2>👥 クラスの友達 ${f.length}/${MATES.length}</h2><p class="by">${G?'休み時間に話しかけてくる。9人と友達になると、ハヤカワ先生の小テスト':'ゲームを始めると記録される(1年ごと)'}</p>`+
+    MATES.map(m=>{ const fr=f.includes(m.id), hh=G?(G.mt.h[m.id]||0):0; return card(m.img,m.name,fr?'<span class="st">💛</span>':hh?`<span class="st">${'♥'.repeat(hh)}</span>`:'',`<br><i>${fr?m.prof:hh?'友好度 '+hh+' / 3':'まだ話していない'}</i>`,fr||hh); }).join(''); }
+ $('note').innerHTML=h; $('note').style.display='block'; $('note').scrollTop=0; label('記録',{help:'感謝の名鑑',f:'美女名鑑',road:'通学路の図鑑',mate:'クラスの友達'}[tab]);
+ const tb=(t,k)=>({t,cls:tab===k?'main':'',f:()=>openRec(k,back)});
+ buttons([tb('📒 感謝の名鑑','help'),tb('🌸 美女名鑑','f'),tb('🛵 通学路の図鑑','road'),tb('👥 クラスの友達','mate'),{t:'とじる',wide:true,f:()=>{ $('note').style.display='none'; back(); }}],2); }
+
+/* ---------- 修了式とエンディング ---------- */
+const ENDINGS=[
+ {id:'saki_best',name:'サキ 最高のエンド(恋も試験も)'},{id:'saki_lover',name:'サキ 恋人エンド'},{id:'saki_friend',name:'サキ 友達エンド'},
+ {id:'yui_best',name:'ユイ 最高のエンド(恋も試験も)'},{id:'yui_lover',name:'ユイ 恋人エンド'},{id:'yui_friend',name:'ユイ 友達エンド'},
+ {id:'white',name:'白衣の誓いエンド'},{id:'ryunen',name:'留年エンド'},{id:'karui',name:'親友エンド'},{id:'gai',name:'ガイコツ先輩エンド(隠し)'}
+];
+function finalDay(){ G.t=Math.min(G.t,TURNS-1); state='talk'; home(false); hud();
+ const after=()=>{ const pass=(G.exam2||0)>=6, k=G.her;
+  let id; if(G.lover) id=pass?`${k}_best`:`${k}_lover`; else if(!pass) id='ryunen'; else if(G.gai>=6) id='gai'; else if(G.friend>=8) id='karui'; else if(G.st.body+G.st.med>=90||G.declined) id='white'; else id=`${k}_friend`;
+  ending(id); };
+ if(G.lover) return chance(CHANCES[4],after);
+ talk([['sys','3月。修了式の日。'],['eto','1年、あっという間だったっす。','12']],()=>chance(CHANCES[4],after));
 }
-/* ---- 画面 ---- */
-function load4(){ try{ return JSON.parse(localStorage.getItem('eto_ep4')||'null')||{}; }catch(e){ return {}; } }
-function save4(){ try{ localStorage.setItem('eto_ep4',JSON.stringify({done:F4.done,c:F4.c})); }catch(e){} }
-const P4=()=>PEOPLE.filter(p=>p.ep===4);
-function menu4(){
- const sv=load4(); if(!(sv.done&&Object.keys(sv.done).length)) return start4(true);
- label('第4話 体育編'); buttons([{t:`▶ つづきから(助けた ${Object.keys(sv.done).length}人)`,cls:'main',f:()=>start4(false)},{t:'はじめから(名鑑の記録は残る)',f:()=>start4(true)},{t:'もどる',f:title}]);
+const END_TEXT={
+ saki_best:[['saki','進級試験、2人とも合格ね。…約束、守れたわ。',2],['saki','これからも、隣で勉強して。…ううん、ずっと隣にいて。',3],['eto','もちろんっす!2年生も、その先も、ずっとっす!','20']],
+ saki_lover:[['saki','…試験、ぎりぎりだったわね。来年は私がみっちり教えるから。',4],['saki','でも…あなたが恋人で、よかった。',3],['eto','がんばるっす!サキ先生!','15']],
+ saki_friend:[['saki','1年間、ありがとう。あなたのおかげで、少しだけ肩の力がぬけた。',1],['saki','…2年生になっても、勉強仲間でいてくれる?',2],['eto','もちろんっす。','06']],
+ yui_best:[['yui','2人とも合格!…10年ぶりの勉強、江藤くんがいたからがんばれた。',2],['yui','来年も、そのまた先も…一緒にいてくれる?',3],['eto','ずっと一緒っす!','20']],
+ yui_lover:[['yui','試験はぎりぎりだったけど…来年は私が教える番だね。',2],['yui','大好きだよ、江藤くん。',3],['eto','オレもっす!来年こそ、ちゃんと合格するっす!','15']],
+ yui_friend:[['yui','1年間ありがとう。江藤くんの言葉、何回も助けられたよ。',1],['yui','2年生も、よろしくね。',2],['eto','こちらこそっす!','06']],
+ white:[['eto','恋もいいけど…まずは、一人前の看護師になるっす。','12'],['sys','学年トップクラスの成績で進級した江藤くん。その目は、入学式の日よりずっとまっすぐだった。']],
+ ryunen:[['sys','進級試験の結果は…不合格。'],['eto','…マジっすか。もう1年、1年生っすか。','16'],['karui','江藤っち…オレも留年だぜ!'],['eto','なんでうれしそうなんすか!…来年こそ、がんばるっす!','17']],
+ karui:[['karui','江藤っち!修了式のあとはラーメンだろ!今日はオレのおごり!…半分だけ!'],['eto','半分って何すか。…でも、カルイがいたから楽しかったっす。','02'],['karui','2年生も、よろしくな、親友!']],
+ gai:[['gai','カタカタ…江藤よ。1年間、よくワシの問題に答えてくれたのう。'],['gai','おぬしこそ、ワシの骨…いや、ワシの心の友じゃ!'],['eto','ガイコツ先輩…!オレ、骨の名前、ぜんぶ覚えたっす!','20'],['sys','こうして、江藤くんとガイコツ先輩の奇妙な友情は、伝説になった。']]
+};
+function ending(id){ const e=ENDINGS.find(x=>x.id===id); ENDS[id]=1; try{ localStorage.setItem('tk_ends2',JSON.stringify(ENDS)); localStorage.removeItem('tk_save2'); }catch(e2){} state='ending'; album('end_'+id);
+ bg(id.endsWith('_best')||id.endsWith('_lover')?'pink':'hall'); bgm(id==='ryunen'?'event':'date');
+ talk(END_TEXT[id],()=>{ sfx('love'); pic(null); say('sys',`🎬 ${e.name}\n\n見たエンディング ${Object.keys(ENDS).length} / ${ENDINGS.length}\n思い出アルバム ${Object.keys(ALBUM).length}枚`); label('🎬 エンディング');
+  buttons([{t:'タイトルへもどる',cls:'main',f:title},{t:'🎞 エンディング一覧',f:openEnds}],1); });
 }
-function start4(fresh){
- EP=4; padStop(); tStop(); t4Stop(); const sv=fresh?{}:load4(); F4={done:sv.done||{},miss:0,c:!!sv.c}; if(fresh) save4();
- $('title').style.display='none'; $('battle').style.display='none'; foe=null;
- if(fresh){ state='talk'; hud4(); talk(OP4,toField); } else toField();
-}
-function hud4(){ $('hudL').textContent='🏃 3時間目のグラウンド'; $('hudR').textContent=`助けた ${Object.keys(F4.done).length} / ${P4().length}`; }
-function lastOpen(){ return P4().filter(p=>!p.last).every(p=>F4.done[p.id]); }
-function toField(){
- padStop(); t4Stop(); state='map'; bgm('ride'); foe=null; $('msg').style.display='none'; $('battle').style.display='none'; $('battle').classList.remove('room','shop','field'); hud4();
- label('困っている人をえらぼう','単元:心臓と循環・救命処置');
- const list=P4().filter(p=>!p.last||lastOpen()).map(p=>({t:`${F4.done[p.id]?'✅':p.last?'🚨':'🆘'} ${p.name}(${p.kind})${F4.done[p.id]?' '+'★'.repeat(F4.done[p.id]):''}`,wide:true,cls:F4.done[p.id]?'':'main',f:()=>startCase(p)}));
- if(!lastOpen()) list.push({t:'🔒 ほかの人を助けると、何かが起こる…',wide:true,dis:true,f:()=>{}});
- list.push({t:'🎒 カバン',f:openBag},{t:'📒 名鑑',f:()=>openMeikan('all',toField)});
- buttons(list,2);
-}
-function scene4(p){ const b=$('battle'); b.style.display='block'; b.classList.remove('room','shop'); b.classList.add('field'); $('foe').className=''; $('me').className='';
- $('foe').innerHTML=foeArt(p); $('me').innerHTML=etoSVG(p.last?'12':'01'); $('eName').textContent=p.name; $('eLv').textContent=''; missBar(); }
-function startCase(p){
- padStop(); t4Stop(); state='talk'; foe=p; F4.miss=0; $('pane').innerHTML=''; scene4(p); bgm(p.last?'test':'class'); label(`${p.kind}`);
- talk(p.pre,()=>p.run(()=>finishCase(p)));
-}
-function finishCase(p){
- t4Stop(); const st=F4.miss===0?3:F4.miss<=2?2:1; F4.done[p.id]=Math.max(F4.done[p.id]||0,st); HELP[p.id]=Math.max(HELP[p.id]||0,st); save4(); helpSave();
- stopBgm(); sfx('win'); $('me').innerHTML=etoSVG('02'); state='talk';
- talk(p.win,()=>{ say(null,`📒 ${p.name}を「助けた人名鑑」に記録した!\n評価 ${'★'.repeat(st)}${'☆'.repeat(3-st)}(まちがい ${F4.miss})`); label('📒 名鑑に記録');
-   next(()=>{ if(P4().every(q=>F4.done[q.id])&&!F4.c) return clear4(); toField(); }); });
-}
-function clear4(){
- F4.c=true; save4(); $('battle').style.display='none'; state='talk'; foe=null; jingle(); label('🎉 第4話クリア');
- talk([[null,'キーンコーンカーンコーン…3時間目、終了。'],['eto','走るより、人を助けるほうがずっと疲れたっす。…でも、やってよかったっす。','15'],
-   [null,'第4話クリア!\n※これはゲームでの練習。いざというときのために、消防署などの救命講習で実際に身につけよう。']],
-  ()=>buttons([{t:'タイトルへもどる',cls:'main',f:title},{t:'📒 名鑑を見る',f:()=>openMeikan('all',title)}]));
-}
-function drawField(){
- const top=34, H=vh-top; ctx.fillStyle='#7ccf6b'; ctx.fillRect(0,0,vw,vh);
- ctx.save(); ctx.beginPath(); ctx.ellipse(vw/2,top+H*0.52,vw*0.42,H*0.38,0,0,7); ctx.lineWidth=Math.min(34,vw*0.08); ctx.strokeStyle='#d9774a'; ctx.stroke();
- ctx.lineWidth=1.5; ctx.strokeStyle='#fff'; ctx.setLineDash([6,6]); ctx.beginPath(); ctx.ellipse(vw/2,top+H*0.52,vw*0.42,H*0.38,0,0,7); ctx.stroke(); ctx.restore();
- ctx.textAlign='center'; ctx.textBaseline='middle'; const r=Math.min(vw*0.1,H*0.11);
- P4().forEach(p=>{ if(p.last&&!lastOpen()) return; const x=vw*p.pos[0], y=top+H*p.pos[1], d=F4.done[p.id];
-   faceAt(p.im,x,y,r,d?'#ffcf33':p.last?'#d7263d':'#0d1b2a');
-   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x+r*0.8,y-r*0.8,r*0.34,0,7); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle='#0d1b2a'; ctx.stroke();
-   ctx.fillStyle=d?'#1f8a48':'#d7263d'; ctx.font='900 '+r*0.45+'px sans-serif'; ctx.fillText(d?'✓':'!',x+r*0.8,y-r*0.78);
-   ctx.fillStyle='#0d1b2a'; ctx.font='800 '+Math.max(11,r*0.32)+'px sans-serif'; ctx.fillText(p.name,x,y+r+12); });
- faceAt(etoIm,vw*0.5,top+H*0.38,r*0.8,'#ffe14d',true);
-}
-/* ---- 助けた人名鑑:感謝の名鑑(全員)と美女名鑑(女性だけ) ---- */
-function meikanStat(){ const n=PEOPLE.filter(p=>HELP[p.id]).length, s=PEOPLE.reduce((a,p)=>a+(HELP[p.id]||0),0); return {n,s,rate:Math.round(s/(PEOPLE.length*3)*100)}; }
-function openMeikan(tab,back){
- padStop(); t4Stop(); state='dex'; $('title').style.display='none';
- const list=PEOPLE.filter(p=>tab==='all'||p.sex==='f'), st=meikanStat();
- $('note').innerHTML=`<h2>📒 助けた人名鑑 やり込み度 ${st.rate}%</h2><p class="by">${tab==='all'?'感謝の名鑑:助けたすべての人':'美女名鑑:助けた女性たち'} ・ 助けた ${list.filter(p=>HELP[p.id]).length}/${list.length}人 ・ ★は「まちがえずに助けた」ほど多い</p>`+
-  list.map(p=>{ const h=HELP[p.id]; return `<div class="mkc ${h?'':'un'}"><img src="${p.img}" alt=""><div><b>${h?p.name:'???'}</b> <span class="st">${h?'★'.repeat(h)+'☆'.repeat(3-h):''}</span><br><i>${h?p.kind:'第'+p.ep+'話で出会えるかも'}</i>${h?`<p>😟 ${p.trouble}</p><p>💡 ${p.know}</p><p>💬「${p.thanks}」</p>`:''}</div></div>`; }).join('');
- $('note').style.display='block'; $('note').scrollTop=0; label('助けた人名鑑',tab==='all'?'感謝の名鑑':'美女名鑑');
- buttons([{t:'📒 感謝の名鑑',cls:tab==='all'?'main':'',f:()=>openMeikan('all',back)},{t:'🌸 美女名鑑',cls:tab==='f'?'main':'',f:()=>openMeikan('f',back)},{t:'とじる',wide:true,f:()=>{ $('note').style.display='none'; back(); }}],2);
+function openEnds(){ state='note'; $('title').style.display='none';
+ $('note').innerHTML=`<h2>🎞 エンディング一覧 ${Object.keys(ENDS).length}/${ENDINGS.length}</h2><ul>${ENDINGS.map(e=>`<li>${ENDS[e.id]?'✅ '+e.name:'??? (まだ見ていない)'}</li>`).join('')}</ul><p class="by">思い出アルバム ${Object.keys(ALBUM).length}枚。ヒント:告白されるには💗と🤝の両方と、ヒロインが大事にする能力(サキ=からだの知識、ユイ=思いやり)。恋人になっても、進級試験に受かってこそ最高のエンド!</p>`;
+ $('note').style.display='block'; label('エンディング一覧'); buttons([{t:'とじる',cls:'main',f:()=>{ $('note').style.display='none'; title(); }}]);
 }
 
-/* ===== ゴール ===== */
-function ending(){
- padStop(); state='talk'; foe=null; label('🚩 学校に到着!'); stopBgm(); jingle();
- CLEARS++; dexSave(); try{ localStorage.removeItem('eto_battle3'); }catch(e){}
- const st=dexStat();
- talk(ED.concat([[null,`通学編クリア!(${CLEARS}回目)\n図鑑のやり込み度 ${st.rate}%。次の通学では、また別の相手が待っている。`]]),()=>{ buttons([{t:'📖 図鑑を見る',f:()=>openDex(title)},{t:'タイトルへもどる',cls:'main',f:title}]); });
-}
-
-resize(); draw(); title();
+title();
 </script>
 </body>
 </html>
