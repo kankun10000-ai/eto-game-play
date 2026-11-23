@@ -92,6 +92,10 @@ button.ordpic{min-height:0;padding:4px;display:flex;align-items:center;justify-c
 button.ordpic.used{opacity:.25}
 button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:contain}
 .ord-e{font-size:32px}
+/* バイクの縦スクロール(交通事故の行事) */
+#cv{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:1}
+#pane.ride{grid-template-rows:2fr 1fr}
+#pane.ride button.pad{font-size:34px;background:#ffd43b;box-shadow:0 4px 0 #b08900}
 /* 記録(名鑑・図鑑・友達) */
 #note .mkc{display:flex;gap:10px;margin-top:10px;padding:8px;background:#fff;border:3px solid #2a1a2e;border-radius:12px;font-size:13px;line-height:1.45}
 #note .mkc img{width:64px;height:84px;object-fit:contain;object-position:center bottom;border:2px solid #2a1a2e;border-radius:8px;background:linear-gradient(#fafafb,#d9dbe0 55%,#a9adb6);flex:none}
@@ -105,7 +109,7 @@ button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:c
 <body>
 <div id="app">
  <div id="top">
-  <div id="bg"></div><div id="pic"><img alt=""></div><div id="side"></div><div id="mono"><span id="monoT"></span></div>
+  <div id="bg"></div><canvas id="cv"></canvas><div id="pic"><img alt=""></div><div id="side"></div><div id="mono"><span id="monoT"></span></div>
   <div id="hud"><span id="hudL"></span><span id="hudR"></span></div>
   <div id="note"></div>
   <button id="snd" onclick="sndToggle()">🔊</button>
@@ -124,7 +128,7 @@ button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:c
    ・旧『ガンバレ！江藤くん』の4話は、この1年の中の行動・行事・イベントとして入っている(下の「旧『ガンバレ！江藤くん』の物語」)
    ・人物は切り取らない元の構図で、黒枠つきのカードに出す
    ===================================================================== */
-const VERSION='1.0';
+const VERSION='1.1';
 const $=id=>document.getElementById(id);
 const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -490,6 +494,7 @@ fix(1,0,'クラスの自己紹介',()=>{ state='talk'; gx(); home(false); bg('sc
  talk([['sys','4月第2週。1時間目の生物は「細胞」。'],['eto','そういえば、クラスの人とまだちゃんと話してないっす。とりあえず、全員に自己紹介してくるっす。','06'],['sys',`まずは、${m.kind}の${m.name}に話しかけてみよう。\n話が3回合えば、友達になれる。`]],()=>{ foe=m;
   talk(m.pre,()=>mateChat(m,()=>talk([['sys',`クラスには、まだ話していない人がいる。休み時間に話しかけてくるかも。\n9人全員と友達になると、ハヤカワ先生の小テストを受けられる。(メニューの「📒 記録」で見られる)`]],fixEnd))); }); });
 fix(10,0,'体育の持久走',()=>peEvent());
+fix(12,0,'通学路の交通事故',()=>accidentEvent());
 fix(25,0,'購買のやきそばパン',()=>shopEvent());
 fix(14,0,'前期試験',()=>exam(6,'前期試験','exam1'));
 fix(18,1,'夏祭り',()=>chance(CHANCES[0],fixEnd));
@@ -1235,13 +1240,130 @@ function peEvent(){ state='talk'; gx(); home(false); bg('park'); bgm('event'); a
      ['sys',`看護技術 +${a}、思いやり +${c}\n※これはゲームでの練習。いざというときのために、消防署などの救命講習で実際に身につけよう。`]],fixEnd); };
  talk(OP4,go); }
 
+/* ---------- バイクの縦スクロール(旧第1話から移植。2026-11-23 作り手の指定で、交通事故の行事で使う) ----------
+   道が上から流れてくる。◀▶で車線変更、▲▼で速さ。🚧にぶつかると hits+1、🍙で hits-1。
+   goal まで走ると、道の先に mark(絵文字)が近づいてきて、rideStart の onEnd(hits) が呼ばれる */
+const RIDE={lane:1,lx:1,speed:1,dist:0,goal:10,obs:[],pops:[],spawn:1,inv:0,crash:0,hits:0,scroll:0,last:0,on:false,hard:0,mark:'🚩',markY:null,end:null};
+const RV=0.42; // 道が流れる速さ(画面の高さに対する割合/秒、速さ1のとき)
+let RIM=null, etoIm=null, cv=null, ctx=null, vw=0, vh=0;
+function rideInit(){ if(RIM) return; RIM=[0,1,2,3].map(i=>{ const im=new Image(); im.src='ride/'+i+'.png'; return im; }); etoIm=new Image(); etoIm.src='faces/01.jpg';
+ cv=$('cv'); ctx=cv&&cv.getContext?cv.getContext('2d'):null; try{ window.addEventListener('resize',rideResize); }catch(e){} }
+function rideResize(){ if(!ctx) return; const r=$('top').getBoundingClientRect(), d=window.devicePixelRatio||1; vw=r.width; vh=r.height; cv.width=vw*d; cv.height=vh*d; ctx.setTransform(d,0,0,d,0,0); }
+function rideStart(o,onEnd){ rideInit();
+ Object.assign(RIDE,{lane:1,lx:1,speed:1,dist:0,goal:o.goal,obs:[],pops:[],spawn:1.2,inv:0,crash:0,hits:0,scroll:0,last:0,on:true,hard:o.hard||0,mark:o.mark||'🚩',markY:null,end:onEnd});
+ state='ride'; home(false); pic(null); $('msg').style.display='none'; if(cv&&cv.style){ cv.style.display='block'; rideResize(); }
+ label(o.label||'🛵 ◀▶ 車線 ・ ▲▼ 速さ',o.right||''); bgm('date');
+ buttons([{t:'◀',cls:'pad',f:()=>rideMove('l')},{t:'▶',cls:'pad',f:()=>rideMove('r')},{t:'▼ ゆっくり',f:()=>rideMove('d')},{t:'▲ はやく',f:()=>rideMove('u')}],2,'ride');
+ requestAnimationFrame(rideLoop); }
+function rideLoop(){ if(!RIDE.on) return; const now=performance.now(), dt=Math.min(0.05,(now-(RIDE.last||now))/1000); RIDE.last=now;
+ if(!document.hidden) rideTick(dt); if(RIDE.on){ drawRide(); requestAnimationFrame(rideLoop); } }
+function rideMove(d){ if(state!=='ride') return;
+ if(d==='l') RIDE.lane=Math.max(0,RIDE.lane-1); else if(d==='r') RIDE.lane=Math.min(2,RIDE.lane+1);
+ else if(d==='u') RIDE.speed=Math.min(1.8,+(RIDE.speed+0.4).toFixed(1)); else if(d==='d') RIDE.speed=Math.max(0.6,+(RIDE.speed-0.4).toFixed(1)); }
+document.addEventListener('keydown',e=>{ const k={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r'}[e.key]; if(k) rideMove(k); });
+function ridePop(t,lane,y,c){ RIDE.pops.push({t,lane,y,c,life:0.9}); }
+function rideTick(dt){
+ const R1=RIDE, v=RV*R1.speed*dt; if(!R1.on) return;
+ R1.dist+=R1.speed*dt; R1.scroll+=v; R1.inv-=dt; R1.crash-=dt; R1.lx+=(R1.lane-R1.lx)*Math.min(1,dt*12); R1.spawn-=dt*R1.speed;
+ if(R1.spawn<=0&&R1.markY===null&&R1.dist<R1.goal-1.2){ const hard=R1.hard; R1.spawn=Math.max(0.55,1.25-hard*0.06)+Math.random()*0.5;
+   const l=Math.floor(Math.random()*3); R1.obs.push({lane:l,y:-0.08,k:Math.random()<0.16?'🍙':'🚧'});
+   if(hard>=3&&Math.random()<0.25+hard*0.04){ const l2=(l+1+Math.floor(Math.random()*2))%3; R1.obs.push({lane:l2,y:-0.08,k:'🚧'}); } }
+ R1.obs.forEach(o=>{ o.y+=v;
+   if(!o.done&&o.lane===R1.lane&&Math.abs(o.y-0.8)<0.05){ o.done=true;
+     if(o.k==='🍙'){ o.gone=true; if(R1.hits>0){ R1.hits--; ridePop('落ちついた!',o.lane,0.72,'#2b8a3e'); } else ridePop('おいしい!',o.lane,0.72,'#2b8a3e'); sfx('ok'); }
+     else if(R1.inv<=0){ R1.hits++; R1.inv=1.2; R1.crash=0.6; o.gone=true; ridePop('いてっ!',o.lane,0.7,'#c92a2a'); sfx('ng'); } } });
+ R1.obs=R1.obs.filter(o=>o.y<1.15&&!o.gone);
+ R1.pops.forEach(p=>{ p.life-=dt; p.y-=dt*0.12; }); R1.pops=R1.pops.filter(p=>p.life>0);
+ if(R1.dist>=R1.goal&&R1.markY===null){ R1.markY=-0.15; sfx('bell'); }
+ if(R1.markY!==null){ R1.markY+=v*0.8; if(R1.markY>=0.58) rideEnd(); } }
+function rideEnd(){ RIDE.on=false; if(cv&&cv.style) cv.style.display='none'; const cb=RIDE.end; RIDE.end=null; state='talk'; if(cb) cb(RIDE.hits); }
+function faceAt(im,cx,cy,r,ring){ ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.clip(); ctx.fillStyle='#fff'; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+ if(im.complete&&im.naturalWidth){ const w=im.naturalWidth,h=im.naturalHeight; ctx.drawImage(im,(w-h)/2,0,h,h,cx-r,cy-r,r*2,r*2); }
+ ctx.restore(); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.lineWidth=3; ctx.strokeStyle=ring; ctx.stroke(); }
+function drawRide(){ if(!ctx||!vw) return;
+ const top=34, H=vh-top, rw=Math.min(vw*0.72,320), x0=(vw-rw)/2, lw=rw/3, sy=y=>top+y*H, sc=RIDE.scroll*H;
+ ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#7ccf6b'; ctx.fillRect(0,0,vw,vh);
+ const step=70, base=Math.floor(sc/step);
+ for(let i=-1;i<H/step+2;i++){ const k=base-i, y=top+i*step+(sc%step); [[x0/2,1],[vw-x0/2,2]].forEach(([x,s])=>{ const h=Math.abs((k*7+s*13+k*s*5)%9); const d=h<3?'🌳':h===3?'🏠':h===4?'🌼':h===5?'🏢':h===6?'🌳':''; if(d){ ctx.font=Math.min(40,x0*0.7)+'px serif'; ctx.fillText(d,x,y); } }); }
+ ctx.fillStyle='#8d99a6'; ctx.fillRect(x0,top,rw,H); ctx.fillStyle='#f2f2f2'; ctx.fillRect(x0,top,4,H); ctx.fillRect(x0+rw-4,top,4,H);
+ for(let j=1;j<3;j++) for(let y=-40+(sc%40);y<H;y+=40) ctx.fillRect(x0+lw*j-2,top+y,4,20);
+ RIDE.obs.forEach(o=>{ ctx.font=lw*0.55+'px serif'; ctx.fillText(o.k,x0+lw*(o.lane+0.5),sy(o.y)); });
+ if(RIDE.markY!==null){ const y=sy(RIDE.markY); ctx.fillStyle='rgba(201,42,42,.25)'; ctx.fillRect(x0,y-lw*0.3,rw,lw*0.6); ctx.font=lw*0.9+'px serif'; ctx.fillText(RIDE.mark,vw/2,y); }
+ const ex=x0+lw*(RIDE.lx+0.5), ey=sy(0.8), s=lw*1.4, lean=RIDE.lane-RIDE.lx;
+ if(!(RIDE.inv>0&&Math.floor(RIDE.inv*10)%2)){ const im=RIM[RIDE.crash>0?3:lean<-0.08?1:lean>0.08?2:0];
+   if(im.complete&&im.naturalWidth) ctx.drawImage(im,ex-s/2,ey-s/2,s,s);
+   else { ctx.save(); ctx.translate(ex,ey); ctx.rotate(RIDE.crash>0?0.5:lean*0.35); ctx.font=s*0.62+'px serif'; ctx.fillText('🛵',0,s*0.12); ctx.restore(); faceAt(etoIm,ex,ey-s*0.28,s*0.2,'#ffd43b'); } }
+ RIDE.pops.forEach(p=>{ ctx.globalAlpha=Math.min(1,p.life*2); ctx.fillStyle=p.c; ctx.font='900 '+Math.max(13,lw*0.18)+'px sans-serif'; ctx.fillText(p.t,x0+lw*(p.lane+0.5),sy(p.y)); }); ctx.globalAlpha=1;
+ ctx.fillStyle='rgba(42,26,46,.5)'; ctx.fillRect(0,top,vw,6); ctx.fillStyle='#ffd43b'; ctx.fillRect(0,top,vw*Math.min(1,RIDE.dist/RIDE.goal),6);
+ ctx.textAlign='left'; ctx.fillStyle='#2a1a2e'; ctx.font='900 13px sans-serif'; ctx.fillText('速さ '+'▶'.repeat(Math.round((RIDE.speed-0.2)/0.4))+'   🚧 '+RIDE.hits,8,vh-14); ctx.textAlign='center'; }
+
+/* ---------- 行事「通学路の交通事故」(7月第1週。2026-11-23 作り手の指定) ----------
+   バイク通学(縦スクロール)→ 道で泣いている新入生ナミダに止められる → 急いで現場へ(縦スクロール、🚧が多い)
+   → バイク便の赤血球ライダーが転倒している。二次事故の防止・通報・首を動かさない・直接圧迫止血・保温・引き継ぎ。
+   途中で夜勤明けの看護師ヤキン先輩が通りかかる。まちがいの数で★、助けた人名鑑に記録。
+   ※応急手当ての内容は、日本赤十字社・JRC(市民向け)の考え方にそって書いた。作り手の確認が必要 */
+const NAMIDA={name:'ナミダ',kind:'すぐ泣く新入生',img:'zako/Z29.jpg'}, YAKIN={name:'ヤキン先輩',kind:'夜勤明けの看護師(卒業生)',img:'zako/Z30.jpg'};
+PEOPLE.push({id:'p_jiko',z:'F04',name:'赤血球ライダー',sex:'m',where:'7月の通学路で出会うかも',kind:'バイク便の配達員',img:'foes/04.jpg',
+ trouble:'通学路の交差点で、バイクごと転倒して動けなくなっていた(足から出血)',
+ know:'まず二次事故を防ぎ、119番をたのむ。首や背中のけがが疑われるときは、むやみに動かさない。出血は清潔な布で強く押さえる(直接圧迫止血)。反応がなく普段どおりの呼吸がなければ、心肺蘇生とAED',
+ thanks:'あのときの金髪くん…!君が止血してくれたおかげで、またバイクに乗れるよ。今度は安全運転でお届けするね。'});
+function accidentEvent(){ state='talk'; gx(); home(false); bg('park'); bgm('event'); album('fx_jiko'); const k=G.her, P=PEOPLE.find(p=>p.id==='p_jiko'), met=G.road.b.includes('04');
+ let hits=0;
+ const scene=()=>{ foe=P; F4miss=0; bgm('test'); label('🚨 交通事故の現場');
+   talk([['sys','交差点の手前。バイクが横だおしになり、配達員が道路に倒れている。後ろから車が近づいてくる!'],
+     ['foe','う…うぅ…足が…。'],['eto',met?'…あんた、通学路で勝負した赤血球ライダーっすか!?':'大丈夫っすか!…じゃなくて、まず落ちつくっす。','13'],
+     ['sys',`手順をまちがえないように、助けよう。${hits>=3?'\n(🚧に何度もぶつかって、到着が少しおくれた…)':''}`]],()=>steps()); };
+ const steps=()=>{ const S=[
+   n=>step4('① まず何をする?','倒れている配達員のそばを、車が走りぬけていく。まず何をする?',[
+     OK('自分のバイクを安全な所に止め、ハザードをつけて、後ろの車に手で合図する','いちばん大事なのは二次事故を防ぐこと。自分の安全を確かめ、周りの車に事故を知らせてから近づく'),
+     NG('道路の真ん中に走って飛び出し、すぐに抱きおこす','車にひかれるおそれがある。まず周りの安全。首や背中のけがも考えて、むやみに起こさない'),
+     NG('スマホで現場の写真をとる','写真より先に、安全の確保と通報と手当て'),
+     NG('自分にはむりなので、そのまま学校へ向かう','そばにいる人の行動が命をつなぐ。安全を確かめて、助けを呼ぶ')],n),
+   n=>{ foe=NAMIDA; pic(NAMIDA.img); step4('② 助けを呼ぶ','ナミダ「うぇぇん…ど、どうしよう…」\n泣いているナミダに、何をたのむ?',[
+     OK('「ナミダさん、119番に電話して!『救急です、交通事故です』って伝えて!」','人を指名して、具体的にたのむ。119番では「救急」と場所・ようすを伝える(警察には119番から連絡してもらえることもある)'),
+     NG('「だれか、なんとかしてー!」と叫ぶ','「だれか」だと、みんなが「ほかの人がやるだろう」と思って動けないことがある。指名してたのむ'),
+     NG('「泣いてないで、帰っていいっすよ」','人手は多いほどいい。落ちついて、できることをたのむ'),
+     NG('通報はあとにして、まず全部自分でやる','手当てと同時に、通報を人にたのむ。救急車は早く呼ぶほどいい')],()=>{ foe=P; pic(P.img); n(); }); },
+   n=>step4('③ 声をかける','「大丈夫ですか!」と声をかけると、うめき声で返事をした。首が痛いと言っている。どうする?',[
+     OK('首や体をむやみに動かさないようにして、声をかけつづける','首や背中のけががあるかもしれない。危ない場所でなければ、そのままの姿勢で動かさない'),
+     NG('すぐに起こして、歩道まで歩かせる','首や背中のけがが悪化するおそれ。危険が迫っていなければ動かさない'),
+     NG('ヘルメットを急いで引っぱって外す','首を動かしてしまうおそれ。呼吸の確認や心肺蘇生に必要なとき以外は、むりに外さない'),
+     NG('水を飲ませる','けがの具合がわからないうちは、飲食させない')],n),
+   n=>{ foe=YAKIN; talk([['sys','そこへ、通勤帰りらしい男性が走ってきた。'],['foe','…夜勤明けの看護師だ。手伝う。…きみ、いい判断だ。首は動かすな。'],['eto','ヤキン先輩!?(卒業生の…)たすかるっす!','06']],()=>{ foe=P; pic(P.img); n(); }); },
+   n=>step4('④ 出血','ズボンのひざから下が、血でぬれている。どう止血する?',[
+     OK('清潔なガーゼやハンカチを当て、ビニール袋などで手を覆って、強く押さえる','直接圧迫止血。血液に直接さわらないよう、手袋やビニール袋を使う。血がにじんできたら、布を重ねて押さえつづける'),
+     NG('傷口に何も当てず、素手でそのまま押さえる','感染予防のため、ビニール袋などで手を覆う。清潔な布を当てて押さえる'),
+     NG('細いひもで、足のつけねを強くしばる','まずは傷口を直接押さえて止血する(直接圧迫止血)'),
+     NG('血を洗い流すため、水をかけつづける','流しつづけても止血にならない。清潔な布で強く押さえる')],n),
+   n=>step4('⑤ 救急車を待つあいだ','止血しながら、救急車を待っている。ほかにすることは?',[
+     OK('上着などで体をおおって保温し、声をかけて意識や呼吸のようすを見守る','体が冷えると状態が悪くなる。保温し、声をかけて変化を見る。反応がなくなり、普段どおりの呼吸がなければ心肺蘇生'),
+     NG('寝ないように、体を強くゆさぶる','首や体を動かしてしまう。声をかけて見守る'),
+     NG('痛み止めの薬を飲ませる','飲食や薬はあたえない。救急隊にまかせる'),
+     NG('もう大丈夫そうなので、その場を離れる','救急隊に引き継ぐまで、そばで見守る')],n),
+   n=>step4('⑥ 救急隊が到着','サイレンが聞こえ、救急隊が到着した。どうする?',[
+     OK('見たこととしたこと(倒れていた様子・意識・出血と止血・首の痛み)を伝える','救急隊は、そばにいた人の情報で手当てを決める。いつ・どうなっていて・何をしたかを短く伝える'),
+     NG('何も言わずに、だまって学校へ行く','見たことを伝えるのも大事な手当てのひとつ'),
+     NG('「たぶん骨折です」と自分の考えだけを伝える','見たこと・したことを、そのまま伝える'),
+     NG('救急隊の前で、止血をやめて手を離す','引き継ぎの合図があるまで、押さえつづける')],n)
+  ]; let i=0; (function go(){ if(i>=S.length) return fin(); S[i++](go); })(); };
+ const fin=()=>{ tmStop(); const st=F4miss===0?3:F4miss<=2?2:1; HELP[P.id]=Math.max(HELP[P.id]||0,st); G.p4[P.id]=st; recSave(); sfx('love');
+   const a=addSt('skill',3+st), c=addSt('care',2+st); if(hits>=3) addStress(5); foe=YAKIN;
+   talk([['sys','赤血球ライダーは、救急車で病院へ運ばれた。'],['foe','…落ちついていたな。看護学生か。いい看護師になれ。じゃあ、オレは寝る。'],['eto','先輩、立ったまま寝てるっす…。','08'],
+     [null,`📒 赤血球ライダーを「助けた人名鑑」に記録した!\n評価 ${'★'.repeat(st)}${'☆'.repeat(3-st)}(まちがい ${F4miss})\n看護技術 +${a}、思いやり +${c}`],
+     [k,k==='saki'?'…聞いたわよ、今朝の事故。止血して、救急隊に引き継いだって。…ちょっと、見直した。':'今朝、事故の人を助けたんだって?…江藤くん、えらかったね。けがはない?',k==='saki'?3:2],
+     ['sys','※これはゲームでの練習。実際の応急手当ては、消防署や日本赤十字社の講習で身につけよう。']],()=>{ addLove(k,6,st>=2?6:2); fixEnd(); }); };
+ talk([['sys','7月。夏休み前の朝。今日は久しぶりにバイクで通学だ。'],['eto','安全運転でいくっす。','06'],['sys','◀▶で車線を変えて🚧をよけよう。▲▼で速さを変えられる。🍙を取ると落ちつく。']],()=>
+  rideStart({goal:8,hard:1,mark:'🙋',label:'🛵 バイク通学(◀▶ 車線/▲▼ 速さ)'},h1=>{ hits+=h1; foe=NAMIDA; home(false);
+   talk([['sys','道のわきで、学生が手をふっている。'],['foe','うぇぇん…!そ、その先の交差点で、バイクの人が転んで…動かないんですぅ…!'],['eto','マジっすか!すぐ行くっす!ナミダさんも来てほしいっす!','13']],()=>
+    rideStart({goal:7,hard:4,mark:'🚨',label:'🚨 事故の現場へ急げ!(🚧に注意)'},h2=>{ hits+=h2; scene(); })); })); }
+
 /* ---------- 記録:助けた人名鑑・通学路の図鑑・クラスの友達(タイトルとメニューから) ---------- */
 function openRec(tab,back){ state='note'; $('title').style.display='none'; $('msg').style.display='none'; gx();
  const card=(img,name,sub,body,seen)=>`<div class="mkc ${seen?'':'un'}"><img src="${cutSrc(img)}" onerror="this.onerror=null;this.src='${img}'" alt=""><div><b>${seen?name:'???'}</b> ${sub}${body}</div></div>`;
  let h='';
  if(tab==='help'||tab==='f'){ const list=PEOPLE.filter(p=>tab==='help'||p.sex==='f');
    h=`<h2>📒 助けた人名鑑</h2><p class="by">${tab==='help'?'感謝の名鑑:助けたすべての人':'美女名鑑:助けた女性たち'} ・ 助けた ${list.filter(p=>HELP[p.id]).length}/${list.length}人 ・ ★は「まちがえずに助けた」ほど多い</p>`+
-    list.map(p=>{ const s=HELP[p.id]; return card(p.img,p.name,s?`<span class="st">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span><br><i>${p.kind}</i>`:'<br><i>6月の体育で出会えるかも</i>',s?`<p>😟 ${p.trouble}</p><p>💡 ${p.know}</p><p>💬「${p.thanks}」</p>`:'',s); }).join(''); }
+    list.map(p=>{ const s=HELP[p.id]; return card(p.img,p.name,s?`<span class="st">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span><br><i>${p.kind}</i>`:`<br><i>${p.where||'6月の体育で出会えるかも'}</i>`,s?`<p>😟 ${p.trouble}</p><p>💡 ${p.know}</p><p>💬「${p.thanks}」</p>`:'',s); }).join(''); }
  if(tab==='road'){ const won=FOES.filter(f=>DEX[f.n]&&DEX[f.n].w).length;
    h=`<h2>🛵 通学路の図鑑 ${won}/${FOES.length}</h2><p class="by">行動「🛵 通学路」で出会う相手。★はノーミスで勝った相手</p>`+
     FOES.map(f=>{ const d=DEX[f.n]; return card(f.img,f.name,d?`${d.p?'<span class="st">★</span>':''}<br><i>${f.kind}・${f.theme}${d.w?'':'(まだ勝っていない)'}</i>`:'',d?`<p>💬「${f.win[0][1]}」</p>`:'',!!d); }).join(''); }
