@@ -95,16 +95,19 @@ button.wrong{background:#f87171;box-shadow:0 4px 0 #a53030}
 .sideBtn{width:78px;height:60px;font-size:13px;line-height:1.2;background:#ffe14d;box-shadow:0 4px 0 #b99a00}
 button{white-space:pre-line}
 #battle.room{background:linear-gradient(#2f5d50 0 26%,#7a4a21 26% 29%,#e8dcc0 29% 100%)}
-/* 医療器具の神経衰弱 */
-#pane.mem{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:6px;overflow:hidden}
-button.memc{min-height:0;padding:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;
- background:repeating-linear-gradient(45deg,#2b6cb0 0 8px,#2c5282 8px 16px);box-shadow:0 4px 0 #1a365d;border:3px solid #fff}
-button.memc.open{background:#fff;box-shadow:0 4px 0 #6b7f95;border-color:#ffe14d}
-button.memc.done{border-color:#4ade80;background:#f0fff4;box-shadow:0 2px 0 #1f8a48;opacity:.75}
-button.memc img{max-width:100%;max-height:100%;object-fit:contain}
-.mem-q{font-size:30px;color:#fff;-webkit-text-stroke:1px #0d1b2a}
-.mem-n{font-size:14px;line-height:1.2;word-break:keep-all;overflow-wrap:anywhere}
-.mem-e{font-size:34px}
+/* 医療器具ならべ:上段=名前つきの枠4つ、下段=絵4枚 */
+#pane.ord{grid-template-columns:repeat(4,1fr);grid-template-rows:1.25fr 1fr;gap:6px;overflow:hidden}
+button.ordslot{min-height:0;padding:3px;display:flex;flex-direction:column;align-items:stretch;gap:3px;overflow:hidden;background:#33506b;box-shadow:0 3px 0 #1a2a3a;color:#fff}
+button.ordslot:active,button.ordpic:active{transform:none}
+.ord-n{font-size:12px;line-height:1.15;min-height:2.3em;display:flex;align-items:center;justify-content:center;word-break:keep-all;overflow-wrap:anywhere}
+.ord-box{flex:1;min-height:0;border:2px dashed #9fb3c8;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;overflow:hidden}
+button.ordslot.put .ord-box{border-style:solid;border-color:#ffe14d;background:#fff}
+button.ordslot.ok{background:#1f8a48}button.ordslot.ok .ord-box{border-color:#4ade80}
+button.ordslot.ng{background:#a53030}button.ordslot.ng .ord-box{border-color:#f87171}
+button.ordpic{min-height:0;padding:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #ffe14d}
+button.ordpic.used{opacity:.25}
+button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:contain}
+.ord-e{font-size:32px}
 .dmg.weak{color:#cbd5e1;font-size:22px}
 button.main.ep{font-size:15px;line-height:1.25;padding:4px}
 .dmg{position:absolute;right:8%;top:20%;z-index:4;font-size:26px;font-weight:900;color:#fff;-webkit-text-stroke:1.5px #0d1b2a;text-shadow:0 3px 0 #0d1b2a;animation:dmg 1s forwards;pointer-events:none}
@@ -151,7 +154,7 @@ button.main.ep{font-size:15px;line-height:1.25;padding:4px}
 </div>
 <script>
 /* バージョン:更新のたびに上げる(決まりは CLAUDE.md の「バージョン」)。タブの題名にも自動で入る */
-const VERSION='1.4.7';
+const VERSION='1.4.8';
 /* ================================================================
    キャラデータ(デザインが届いたら img に画像を入れると差し替わります)
    ================================================================ */
@@ -734,13 +737,13 @@ function setBars(){
 }
 function startBattle(f){
  const hurt=RIDE.hurt; RIDE.hurt=0;
- bgm(f.boss?'boss':'battle'); state='battle'; eMax=f.hp*10; eHP=eMax; pHP=Math.max(1,P_MAX-hurt); combo=0; bMiss=0; queue=shuffle(f.qs); MEM=null;
+ bgm(f.boss?'boss':'battle'); state='battle'; eMax=f.hp*10; eHP=eMax; pHP=Math.max(1,P_MAX-hurt); combo=0; bMiss=0; queue=shuffle(f.qs);
  const b=$('battle'); b.style.display='block'; b.classList.remove('room'); anim(b,'flash');
  $('foe').className=''; $('me').className='';
  $('foe').innerHTML=foeArt(f); $('me').innerHTML=etoSVG(f.boss?'12':'05');
  $('eName').textContent=f.name; $('eLv').textContent='Lv.'+f.lv; setBars();
  $('hudL').textContent=(f.boss?'👑 ボス戦:':'⚔️ バトル:')+f.theme;
- say(null,`${f.kind}の ${f.name}が\n勝負をしかけてきた!`+(hurt?`\n(ぶつかったせいで、やる気が ${hurt} へっている)`:''),'速く答えるほど、ダメージアップ。答えたあとは医療器具の神経衰弱。「絵」と「名前」のカードを1枚ずつめくり、そろえば正解ならクリティカル、不正解なら攻撃をよけられる');
+ say(null,`${f.kind}の ${f.name}が\n勝負をしかけてきた!`+(hurt?`\n(ぶつかったせいで、やる気が ${hurt} へっている)`:''),'速く答えるほど、ダメージアップ。答えたあとは、器具の絵4枚を名前の順にならべる。4つ正しければ、正解ならクリティカル、不正解なら攻撃をよけられる');
  label('バトル開始'); next(ask);
 }
 function useBento(q){
@@ -755,11 +758,11 @@ function ask(q0){
  if(bento>0&&pHP<P_MAX) list.push({t:'🍱 弁当を食べる(やる気 全回復)',wide:true,f:()=>useBento(q)});
  buttons(list,2); qT=performance.now();
 }
-/* 医療器具の神経衰弱(2026-11-23 に注射器のタイミングゲージから変更)
-   1回のバトルのあいだ、6種類の器具の「絵」と「名前」のカード12枚を伏せて並べておく(MEM)。
-   答えるたびに2枚めくる。絵と名前がそろえば、正解のとき→クリティカル(×1.5)、不正解のとき→攻撃をよける。
-   そろったカードは表のまま残る。全部そろったら、新しい6種類で並べなおす。
-   memory(kind,cb):kind='atk'|'dodge'。cb({hit:そろったか, tool:そろった器具}) */
+/* 医療器具ならべ(2026-11-23 作り手の指定で、注射器のタイミングゲージ → 神経衰弱 → これに変更)
+   答えるたびに、器具の名前が4つ並ぶ。下の絵4枚を、名前の順にタップして並べる(並べた絵をタップすると外せる)。
+   4つ全部正しいと、正解のとき→クリティカル(×1.5)、不正解のとき→攻撃をよける。
+   正解のときは 2〜3個で×1.0、0〜1個で×0.7。
+   order(kind,cb):kind='atk'|'dodge'。cb({n:正しく並べた数, all:4つ全部か, miss:まちがえた器具の配列}) */
 const TOOLS=[
  {id:'T01',e:'🩺',name:'聴診器',use:'心臓の音・呼吸の音・おなかの音(腸の動き)を聞く。血圧を測るときにも使う'},
  {id:'T02',e:'🌡️',name:'電子体温計',use:'体温を測る。わきの下では、先をくぼみの奥に当て、少し斜め下からはさむ'},
@@ -771,29 +774,32 @@ const TOOLS=[
  {id:'T08',e:'🥢',name:'鑷子(せっし)',use:'いわゆるピンセット。消毒したガーゼや綿球を、手でさわらずにつまむ'},
  {id:'T09',e:'🫘',name:'膿盆(のうぼん)',use:'そら豆の形の皿。使ったガーゼや器具を一時的に置く。うがいの水を受けることも'},
  {id:'T10',e:'🔨',name:'打腱器',use:'ひざなどの腱をたたいて、反射(しつがい腱反射など)を調べる'}];
-let MEM=null;
-function memDeal(){ const ts=shuffle(TOOLS.slice()).slice(0,6);
- MEM={cards:shuffle(ts.flatMap(t=>[{t,k:'pic'},{t,k:'name'}])),open:[],done:[]}; }
 /* 絵は tools/T01.webp → 無ければ .jpg → それも無ければ絵文字 */
-function memImgErr(img){ const id=img.dataset.id; if(!img.dataset.jpg){ img.dataset.jpg=1; img.src='tools/'+id+'.jpg'; return; }
- const t=TOOLS.find(x=>x.id===id); img.outerHTML='<b class="mem-e">'+(t?t.e:'❓')+'</b>'; }
-function memFace(c){ return c.k==='pic'
- ? `<img src="tools/${c.t.id}.webp" data-id="${c.t.id}" alt="" onerror="memImgErr(this)">`
- : `<span class="mem-n">${c.t.name}</span>`; }
-function memory(kind,cb){
- if(!MEM||MEM.done.length>=MEM.cards.length) memDeal();
- const p=$('pane'); p.className='mem'; p.innerHTML=''; p.scrollTop=0; let picks=[], live=true;
- const els=MEM.cards.map((c,i)=>{ const b=document.createElement('button'); b.className='memc'+(MEM.done.includes(i)?' open done':'');
-   b.innerHTML=MEM.done.includes(i)?memFace(c):'<span class="mem-q">?</span>'; b.dataset.i=i;
-   b.onclick=()=>{ if(!live||MEM.done.includes(i)||picks.includes(i)) return; sfx('click'); picks.push(i); b.className='memc open'; b.innerHTML=memFace(c);
-     if(picks.length<2) return; live=false;
-     const [a,z]=picks, ca=MEM.cards[a], cz=MEM.cards[z], hit=ca.t===cz.t&&ca.k!==cz.k;
-     setTimeout(()=>{ if(hit){ MEM.done.push(a,z); els[a].className=els[z].className='memc open done'; }
-       else { [a,z].forEach(j=>{ els[j].className='memc'; els[j].innerHTML='<span class="mem-q">?</span>'; }); }
-       cb({hit,tool:hit?ca.t:null}); },hit?350:800); };
+function toolImgErr(img){ const id=img.dataset.id; if(!img.dataset.jpg){ img.dataset.jpg=1; img.src='tools/'+id+'.jpg'; return; }
+ const t=TOOLS.find(x=>x.id===id); img.outerHTML='<b class="ord-e">'+(t?t.e:'❓')+'</b>'; }
+const toolImg=t=>`<img src="tools/${t.id}.webp" data-id="${t.id}" alt="" onerror="toolImgErr(this)">`;
+let ORD=null; // いまの問題 {ans:[器具4つ(名前の順)], put:[スロットに置いた器具 or null]}
+function order(kind,cb){
+ const ans=shuffle(TOOLS.slice()).slice(0,4); ORD={ans,put:[null,null,null,null]}; let live=true;
+ const p=$('pane'); p.className='ord'; p.innerHTML=''; p.scrollTop=0;
+ const slots=ans.map((t,i)=>{ const b=document.createElement('button'); b.className='ordslot'; b.dataset.i=i;
+   b.onclick=()=>{ if(!live||!ORD.put[i]) return; sfx('click'); ORD.put[i]=null; draw(); }; p.appendChild(b); return b; });
+ const pics=shuffle(ans.slice()).map(t=>{ const b=document.createElement('button'); b.className='ordpic'; b.dataset.id=t.id; b.innerHTML=toolImg(t);
+   b.onclick=()=>{ if(!live||ORD.put.includes(t)) return; const i=ORD.put.indexOf(null); if(i<0) return; sfx('click'); ORD.put[i]=t; draw(); if(!ORD.put.includes(null)) finish(); };
    p.appendChild(b); return b; });
-}function popDmg(text,cls){ const d=document.createElement('div'); d.className='dmg '+(cls||''); d.textContent=text; $('battle').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1000); }
-function afterAnswer(){ setBars(); setTimeout(()=>{ const pn=$('pane'); if(pn.className==='mem'){ pn.className='c1'; pn.innerHTML=''; } [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
+ function draw(){
+   slots.forEach((b,i)=>{ const t=ORD.put[i]; b.className='ordslot'+(t?' put':'');
+     b.innerHTML=`<span class="ord-n">${i+1}. ${ans[i].name}</span><span class="ord-box">${t?toolImg(t):''}</span>`; });
+   pics.forEach(b=>{ const used=ORD.put.some(t=>t&&t.id===b.dataset.id); b.className='ordpic'+(used?' used':''); b.disabled=used; });
+ }
+ function finish(){ live=false; const ok=ans.map((t,i)=>ORD.put[i]===t), n=ok.filter(Boolean).length;
+   slots.forEach((b,i)=>{ b.className='ordslot put '+(ok[i]?'ok':'ng'); });
+   setTimeout(()=>cb({n,all:n===4,miss:ans.filter((t,i)=>!ok[i])}),900); }
+ draw();
+}
+/* まちがえた器具の使い方を、セリフ枠の下に出す */
+const ordMissText=g=>g.miss.length?'\n\n📌 '+g.miss.map(t=>`${t.name}:${t.use}`).join('\n📌 '):'';function popDmg(text,cls){ const d=document.createElement('div'); d.className='dmg '+(cls||''); d.textContent=text; $('battle').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1000); }
+function afterAnswer(){ setBars(); setTimeout(()=>{ const pn=$('pane'); if(pn.className==='ord'){ pn.className='c1'; pn.innerHTML=''; } [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
    b.onclick=()=>{ if(b.disabled) return; b.disabled=true; if(eHP<=0) winBattle(); else if(pHP<=0) loseBattle(); else ask(); };
    $('pane').appendChild(b); },400); }
 function answer(t,btn,q){
@@ -801,18 +807,18 @@ function answer(t,btn,q){
  [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); });
  if(ok){
    combo++; const fast=sec<4; let dmg=10+(fast?3:0)+Math.min(6,(combo-1)*2); sfx('ok'); $('me').innerHTML=etoSVG('11');
-   say(null,`正解!${fast?' ⚡はやい!':''}${combo>=2?` 🔥${combo}コンボ!`:''}\n器具の「絵」と「名前」を1枚ずつめくれ!そろえばクリティカル!`); label('⭕ 正解!カードを2枚めくれ',MEM?`そろった ${MEM.done.length/2} / 6`:'');
-   setTimeout(()=>memory('atk',g=>{ const m=g.hit?1.5:1; dmg=Math.max(1,Math.round(dmg*m)); eHP-=dmg;
-     sfx('hit'); anim($('me'),'atk'); setTimeout(()=>anim($('foe'),'hit'),200); popDmg((g.hit?'クリティカル!! ':'')+'-'+dmg,g.hit?'crit':''); $('me').innerHTML=etoSVG(eHP<=0?(foe.boss?'20':'02'):g.hit?'11':'01');
-     say(null,(g.hit?`🧰 そろった!「${g.tool.name}」\n${g.tool.use}\n💥 クリティカル!\n`:'🧰 そろわなかった…。\n')+`${foe.name}に ${dmg}ダメージ!`,q.ex); label(g.hit?'💥 クリティカル':'⭕ ダメージ',eHP>0?'相手の残り '+eHP:'');
+   say(null,`正解!${fast?' ⚡はやい!':''}${combo>=2?` 🔥${combo}コンボ!`:''}\n器具の絵を、名前の順にならべろ!4つ正しければクリティカル!`); label('⭕ 正解!器具をならべろ');
+   setTimeout(()=>order('atk',g=>{ const m=g.all?1.5:g.n>=2?1:0.7; dmg=Math.max(1,Math.round(dmg*m)); eHP-=dmg;
+     sfx('hit'); anim($('me'),'atk'); setTimeout(()=>anim($('foe'),'hit'),200); popDmg((g.all?'クリティカル!! ':'')+'-'+dmg,g.all?'crit':m<1?'weak':''); $('me').innerHTML=etoSVG(eHP<=0?(foe.boss?'20':'02'):m>=1?'11':'08');
+     say(null,`🧰 ${g.n} / 4 正しくならべた!`+(g.all?'\n💥 クリティカル!':'')+`\n${foe.name}に ${dmg}ダメージ!`+ordMissText(g),q.ex); label(g.all?'💥 クリティカル':m>=1?'⭕ ダメージ':'△ ならべまちがい…',eHP>0?'相手の残り '+eHP:'');
      afterAnswer(); }),350);
  }else{
    btn.classList.add('wrong'); combo=0; bMiss++; addMiss(q); sfx('ng'); queue.push(q); $('me').innerHTML=etoSVG('13');
-   say(null,`不正解…。正解は「${q.a}」。\n${foe.name}の こうげき!カードをそろえて よけろ!`); label('❌ 不正解…カードを2枚めくれ',MEM?`そろった ${MEM.done.length/2} / 6`:'');
-   setTimeout(()=>memory('dodge',g=>{ const dodged=g.hit;
+   say(null,`不正解…。正解は「${q.a}」。\n${foe.name}の こうげき!器具を4つ正しく ならべて よけろ!`); label('❌ 不正解…器具をならべろ');
+   setTimeout(()=>order('dodge',g=>{ const dodged=g.all;
      anim($('foe'),'atk2');
-     if(dodged){ sfx('step'); popDmg('ミス!','miss'); $('me').innerHTML=etoSVG('18'); say(null,`🧰 そろった!「${g.tool.name}」\n${g.tool.use}\n\nひらりと よけた!やる気は へらなかった。`,q.ex); label('💨 回避成功'); }
-     else { pHP--; sfx('hit'); setTimeout(()=>anim($('me'),'hit'),200); $('me').innerHTML=etoSVG('sad'); say(null,'よけきれなかった…。\n江藤くんの やる気が さがった!',q.ex); label('💥 くらった'); }
+     if(dodged){ sfx('step'); popDmg('ミス!','miss'); $('me').innerHTML=etoSVG('18'); say(null,'🧰 4つ全部 正しくならべた!\nひらりと よけた!やる気は へらなかった。',q.ex); label('💨 回避成功'); }
+     else { pHP--; sfx('hit'); setTimeout(()=>anim($('me'),'hit'),200); $('me').innerHTML=etoSVG('sad'); say(null,`🧰 ${g.n} / 4 …よけきれなかった。\n江藤くんの やる気が さがった!`+ordMissText(g),q.ex); label('💥 くらった'); }
      afterAnswer(); }),350);
  }
  setBars();
