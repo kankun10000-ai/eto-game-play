@@ -95,16 +95,17 @@ button.wrong{background:#f87171;box-shadow:0 4px 0 #a53030}
 .sideBtn{width:78px;height:60px;font-size:13px;line-height:1.2;background:#ffe14d;box-shadow:0 4px 0 #b99a00}
 button{white-space:pre-line}
 #battle.room{background:linear-gradient(#2f5d50 0 26%,#7a4a21 26% 29%,#e8dcc0 29% 100%)}
-.gauge{position:relative;height:124px;align-self:center}
-.gauge .arm{position:absolute;left:0;right:0;top:76px;height:42px;border-radius:20px 26px 26px 20px;background:linear-gradient(#f6d2ad,#e3a978 70%,#c98a5a);border:3px solid #7a4a21;overflow:hidden}
-.gauge .arm::before{content:'';position:absolute;left:0;right:0;top:17px;height:5px;background:rgba(70,110,200,.45)}
-.gauge .okz{position:absolute;top:0;bottom:0;background:rgba(74,222,128,.55)}
-.gauge.dodge .okz{background:rgba(96,165,250,.6)}
-.gauge .vein{position:absolute;top:0;bottom:0;background:rgba(37,99,235,.75);box-shadow:0 0 0 2px #fff inset}
-.gauge .syr{position:absolute;top:0;width:42px;height:84px;margin-left:-21px;transition:transform .15s;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
-.gauge .syr.poke{transform:translateY(10px)}
+/* 医療器具の神経衰弱 */
+#pane.mem{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:6px;overflow:hidden}
+button.memc{min-height:0;padding:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+ background:repeating-linear-gradient(45deg,#2b6cb0 0 8px,#2c5282 8px 16px);box-shadow:0 4px 0 #1a365d;border:3px solid #fff}
+button.memc.open{background:#fff;box-shadow:0 4px 0 #6b7f95;border-color:#ffe14d}
+button.memc.done{border-color:#4ade80;background:#f0fff4;box-shadow:0 2px 0 #1f8a48;opacity:.75}
+button.memc img{max-width:100%;max-height:100%;object-fit:contain}
+.mem-q{font-size:30px;color:#fff;-webkit-text-stroke:1px #0d1b2a}
+.mem-n{font-size:14px;line-height:1.2;word-break:keep-all;overflow-wrap:anywhere}
+.mem-e{font-size:34px}
 .dmg.weak{color:#cbd5e1;font-size:22px}
-button.gbtn{font-size:20px}
 button.main.ep{font-size:15px;line-height:1.25;padding:4px}
 .dmg{position:absolute;right:8%;top:20%;z-index:4;font-size:26px;font-weight:900;color:#fff;-webkit-text-stroke:1.5px #0d1b2a;text-shadow:0 3px 0 #0d1b2a;animation:dmg 1s forwards;pointer-events:none}
 .dmg.crit{color:#ffe14d;font-size:30px}
@@ -150,7 +151,7 @@ button.main.ep{font-size:15px;line-height:1.25;padding:4px}
 </div>
 <script>
 /* バージョン:更新のたびに上げる(決まりは CLAUDE.md の「バージョン」)。タブの題名にも自動で入る */
-const VERSION='1.4.6';
+const VERSION='1.4.7';
 /* ================================================================
    キャラデータ(デザインが届いたら img に画像を入れると差し替わります)
    ================================================================ */
@@ -733,13 +734,13 @@ function setBars(){
 }
 function startBattle(f){
  const hurt=RIDE.hurt; RIDE.hurt=0;
- bgm(f.boss?'boss':'battle'); state='battle'; eMax=f.hp*10; eHP=eMax; pHP=Math.max(1,P_MAX-hurt); combo=0; bMiss=0; queue=shuffle(f.qs);
+ bgm(f.boss?'boss':'battle'); state='battle'; eMax=f.hp*10; eHP=eMax; pHP=Math.max(1,P_MAX-hurt); combo=0; bMiss=0; queue=shuffle(f.qs); MEM=null;
  const b=$('battle'); b.style.display='block'; b.classList.remove('room'); anim(b,'flash');
  $('foe').className=''; $('me').className='';
  $('foe').innerHTML=foeArt(f); $('me').innerHTML=etoSVG(f.boss?'12':'05');
  $('eName').textContent=f.name; $('eLv').textContent='Lv.'+f.lv; setBars();
  $('hudL').textContent=(f.boss?'👑 ボス戦:':'⚔️ バトル:')+f.theme;
- say(null,`${f.kind}の ${f.name}が\n勝負をしかけてきた!`+(hurt?`\n(ぶつかったせいで、やる気が ${hurt} へっている)`:''),'速く答えるほど、ダメージアップ。正解のあとは注射器を血管(まん中)の上で止めよう。ずれるほどダメージが小さくなる');
+ say(null,`${f.kind}の ${f.name}が\n勝負をしかけてきた!`+(hurt?`\n(ぶつかったせいで、やる気が ${hurt} へっている)`:''),'速く答えるほど、ダメージアップ。答えたあとは医療器具の神経衰弱。「絵」と「名前」のカードを1枚ずつめくり、そろえば正解ならクリティカル、不正解なら攻撃をよけられる');
  label('バトル開始'); next(ask);
 }
 function useBento(q){
@@ -754,26 +755,45 @@ function ask(q0){
  if(bento>0&&pHP<P_MAX) list.push({t:'🍱 弁当を食べる(やる気 全回復)',wide:true,f:()=>useBento(q)});
  buttons(list,2); qT=performance.now();
 }
-/* タイミングゲージ(注射器):うでの上を左右に動く注射器を、血管(まん中)の上で止める。
-   kind='atk'(攻撃):ずれが小さいほどダメージ倍率が高い。cb({m:倍率,t:判定,c:表示用class})
-   kind='dodge'(回避):まん中で止めれば成功。cb(成功か) */
-const GRADES=[[0.05,1.5,'クリティカル!!','crit'],[0.13,1.0,'ナイス!',''],[0.25,0.7,'ちょいズレ…','weak'],[1,0.5,'大ハズレ…','weak']];
-const SYRINGE='<svg viewBox="0 0 30 60" width="42" height="84"><rect x="5" y="0" width="20" height="4" rx="2" fill="#33506b"/><rect x="13" y="4" width="4" height="10" fill="#9aa8b5"/><rect x="3" y="13" width="24" height="3" rx="1.5" fill="#33506b"/><rect x="7" y="16" width="16" height="26" rx="3" fill="#e8f6ff" stroke="#0d1b2a" stroke-width="2"/><rect x="9" y="27" width="12" height="13" fill="#ff6b8a"/><path d="M9 21h5M9 25h5M9 29h5M9 33h5" stroke="#0d1b2a" stroke-width="1"/><rect x="13" y="42" width="4" height="4" fill="#9aa8b5"/><line x1="15" y1="46" x2="15" y2="60" stroke="#6b7f95" stroke-width="1.8"/></svg>';
-function gauge(kind,cb){
- const atk=kind==='atk', per=atk?1300:900, t0=performance.now(); let live=true;
- const pos=()=>{ const u=((performance.now()-t0)%per)/per; return u<0.5?u*2:2-u*2; };
- const okW=atk?0.26:0.22, crW=atk?0.10:0;
- const p=$('pane'); p.className='c1';
- p.innerHTML=`<div class="gauge ${kind}"><div class="arm"><div class="okz" style="left:${(0.5-okW/2)*100}%;width:${okW*100}%"></div>${crW?`<div class="vein" style="left:${(0.5-crW/2)*100}%;width:${crW*100}%"></div>`:''}</div><div class="syr" id="gmk">${SYRINGE}</div></div>`;
- const b=document.createElement('button'); b.className='main gbtn'; b.textContent=atk?'💉 ちゅうしゃ!(血管の上でタップ)':'💨 よける!(まん中でタップ)';
- const grade=d=>{ const g=GRADES.find(x=>d<=x[0]); return {m:g[1],t:g[2],c:g[3]}; };
- const end=d=>{ if(!live) return; live=false; b.disabled=true; b.style.display='none'; const m=$('gmk'); if(m&&m.classList) m.classList.add('poke');
-   if(atk) cb(d===null?{m:0.5,t:'時間切れ…',c:'weak'}:grade(d)); else cb(d!==null&&d<=okW/2); };
- b.onclick=()=>{ sfx('click'); end(Math.abs(pos()-0.5)); }; p.appendChild(b);
- (function loop(){ if(!live) return; const m=$('gmk'); if(m&&m.style) m.style.left=(pos()*100)+'%'; requestAnimationFrame(loop); })();
- setTimeout(()=>end(null),atk?3000:2000);
+/* 医療器具の神経衰弱(2026-11-23 に注射器のタイミングゲージから変更)
+   1回のバトルのあいだ、6種類の器具の「絵」と「名前」のカード12枚を伏せて並べておく(MEM)。
+   答えるたびに2枚めくる。絵と名前がそろえば、正解のとき→クリティカル(×1.5)、不正解のとき→攻撃をよける。
+   そろったカードは表のまま残る。全部そろったら、新しい6種類で並べなおす。
+   memory(kind,cb):kind='atk'|'dodge'。cb({hit:そろったか, tool:そろった器具}) */
+const TOOLS=[
+ {id:'T01',e:'🩺',name:'聴診器',use:'心臓の音・呼吸の音・おなかの音(腸の動き)を聞く。血圧を測るときにも使う'},
+ {id:'T02',e:'🌡️',name:'電子体温計',use:'体温を測る。わきの下では、先をくぼみの奥に当て、少し斜め下からはさむ'},
+ {id:'T03',e:'🩸',name:'血圧計',use:'腕帯(マンシェット)を上腕に巻いて血圧を測る。巻く強さは指が1〜2本入るくらい'},
+ {id:'T04',e:'☝️',name:'パルスオキシメーター',use:'指先にはさみ、血液中の酸素の割合(SpO2)と脈拍を測る。ふつうは96〜99%'},
+ {id:'T05',e:'💉',name:'注射器',use:'薬を注射する・採血する。使った針はキャップをせず、そのまま専用の容器へ捨てる'},
+ {id:'T06',e:'🎗️',name:'駆血帯',use:'採血や点滴のとき、腕をしばって静脈を浮き出させる。巻いたままにするのは1分以内が目安'},
+ {id:'T07',e:'💧',name:'点滴セット',use:'輸液(点滴)を静脈に入れる。点滴筒で落ちる速さを見て、クレンメで調節する'},
+ {id:'T08',e:'🥢',name:'鑷子(せっし)',use:'いわゆるピンセット。消毒したガーゼや綿球を、手でさわらずにつまむ'},
+ {id:'T09',e:'🫘',name:'膿盆(のうぼん)',use:'そら豆の形の皿。使ったガーゼや器具を一時的に置く。うがいの水を受けることも'},
+ {id:'T10',e:'🔨',name:'打腱器',use:'ひざなどの腱をたたいて、反射(しつがい腱反射など)を調べる'}];
+let MEM=null;
+function memDeal(){ const ts=shuffle(TOOLS.slice()).slice(0,6);
+ MEM={cards:shuffle(ts.flatMap(t=>[{t,k:'pic'},{t,k:'name'}])),open:[],done:[]}; }
+/* 絵は tools/T01.webp → 無ければ .jpg → それも無ければ絵文字 */
+function memImgErr(img){ const id=img.dataset.id; if(!img.dataset.jpg){ img.dataset.jpg=1; img.src='tools/'+id+'.jpg'; return; }
+ const t=TOOLS.find(x=>x.id===id); img.outerHTML='<b class="mem-e">'+(t?t.e:'❓')+'</b>'; }
+function memFace(c){ return c.k==='pic'
+ ? `<img src="tools/${c.t.id}.webp" data-id="${c.t.id}" alt="" onerror="memImgErr(this)">`
+ : `<span class="mem-n">${c.t.name}</span>`; }
+function memory(kind,cb){
+ if(!MEM||MEM.done.length>=MEM.cards.length) memDeal();
+ const p=$('pane'); p.className='mem'; p.innerHTML=''; p.scrollTop=0; let picks=[], live=true;
+ const els=MEM.cards.map((c,i)=>{ const b=document.createElement('button'); b.className='memc'+(MEM.done.includes(i)?' open done':'');
+   b.innerHTML=MEM.done.includes(i)?memFace(c):'<span class="mem-q">?</span>'; b.dataset.i=i;
+   b.onclick=()=>{ if(!live||MEM.done.includes(i)||picks.includes(i)) return; sfx('click'); picks.push(i); b.className='memc open'; b.innerHTML=memFace(c);
+     if(picks.length<2) return; live=false;
+     const [a,z]=picks, ca=MEM.cards[a], cz=MEM.cards[z], hit=ca.t===cz.t&&ca.k!==cz.k;
+     setTimeout(()=>{ if(hit){ MEM.done.push(a,z); els[a].className=els[z].className='memc open done'; }
+       else { [a,z].forEach(j=>{ els[j].className='memc'; els[j].innerHTML='<span class="mem-q">?</span>'; }); }
+       cb({hit,tool:hit?ca.t:null}); },hit?350:800); };
+   p.appendChild(b); return b; });
 }function popDmg(text,cls){ const d=document.createElement('div'); d.className='dmg '+(cls||''); d.textContent=text; $('battle').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1000); }
-function afterAnswer(){ setBars(); setTimeout(()=>{ [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
+function afterAnswer(){ setBars(); setTimeout(()=>{ const pn=$('pane'); if(pn.className==='mem'){ pn.className='c1'; pn.innerHTML=''; } [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶';
    b.onclick=()=>{ if(b.disabled) return; b.disabled=true; if(eHP<=0) winBattle(); else if(pHP<=0) loseBattle(); else ask(); };
    $('pane').appendChild(b); },400); }
 function answer(t,btn,q){
@@ -781,17 +801,17 @@ function answer(t,btn,q){
  [...$('pane').children].forEach(b=>{ b.disabled=true; if(b.textContent===q.a) b.classList.add('right'); });
  if(ok){
    combo++; const fast=sec<4; let dmg=10+(fast?3:0)+Math.min(6,(combo-1)*2); sfx('ok'); $('me').innerHTML=etoSVG('11');
-   say(null,`正解!${fast?' ⚡はやい!':''}${combo>=2?` 🔥${combo}コンボ!`:''}\n注射器を 血管の上で止めろ!`); label('⭕ 正解!血管をねらえ');
-   setTimeout(()=>gauge('atk',g=>{ dmg=Math.max(1,Math.round(dmg*g.m)); eHP-=dmg;
-     sfx('hit'); anim($('me'),'atk'); setTimeout(()=>anim($('foe'),'hit'),200); popDmg(g.t+' -'+dmg,g.c); $('me').innerHTML=etoSVG(eHP<=0?(foe.boss?'20':'02'):g.m>=1?'11':'08');
-     say(null,`💉 ${g.t}(ダメージ×${g.m})\n${foe.name}に ${dmg}ダメージ!`,q.ex); label(g.m>=1.5?'💥 クリティカル':g.m>=1?'⭕ ナイス':'△ ずれた…',eHP>0?'相手の残り '+eHP:'');
+   say(null,`正解!${fast?' ⚡はやい!':''}${combo>=2?` 🔥${combo}コンボ!`:''}\n器具の「絵」と「名前」を1枚ずつめくれ!そろえばクリティカル!`); label('⭕ 正解!カードを2枚めくれ',MEM?`そろった ${MEM.done.length/2} / 6`:'');
+   setTimeout(()=>memory('atk',g=>{ const m=g.hit?1.5:1; dmg=Math.max(1,Math.round(dmg*m)); eHP-=dmg;
+     sfx('hit'); anim($('me'),'atk'); setTimeout(()=>anim($('foe'),'hit'),200); popDmg((g.hit?'クリティカル!! ':'')+'-'+dmg,g.hit?'crit':''); $('me').innerHTML=etoSVG(eHP<=0?(foe.boss?'20':'02'):g.hit?'11':'01');
+     say(null,(g.hit?`🧰 そろった!「${g.tool.name}」\n${g.tool.use}\n💥 クリティカル!\n`:'🧰 そろわなかった…。\n')+`${foe.name}に ${dmg}ダメージ!`,q.ex); label(g.hit?'💥 クリティカル':'⭕ ダメージ',eHP>0?'相手の残り '+eHP:'');
      afterAnswer(); }),350);
  }else{
    btn.classList.add('wrong'); combo=0; bMiss++; addMiss(q); sfx('ng'); queue.push(q); $('me').innerHTML=etoSVG('13');
-   say(null,`不正解…。正解は「${q.a}」。\n${foe.name}の こうげき!タイミングよく よけろ!`); label('❌ 不正解…よけろ!');
-   setTimeout(()=>gauge('dodge',dodged=>{
+   say(null,`不正解…。正解は「${q.a}」。\n${foe.name}の こうげき!カードをそろえて よけろ!`); label('❌ 不正解…カードを2枚めくれ',MEM?`そろった ${MEM.done.length/2} / 6`:'');
+   setTimeout(()=>memory('dodge',g=>{ const dodged=g.hit;
      anim($('foe'),'atk2');
-     if(dodged){ sfx('step'); popDmg('ミス!','miss'); $('me').innerHTML=etoSVG('18'); say(null,'ひらりと よけた!\nやる気は へらなかった。',q.ex); label('💨 回避成功'); }
+     if(dodged){ sfx('step'); popDmg('ミス!','miss'); $('me').innerHTML=etoSVG('18'); say(null,`🧰 そろった!「${g.tool.name}」\n${g.tool.use}\n\nひらりと よけた!やる気は へらなかった。`,q.ex); label('💨 回避成功'); }
      else { pHP--; sfx('hit'); setTimeout(()=>anim($('me'),'hit'),200); $('me').innerHTML=etoSVG('sad'); say(null,'よけきれなかった…。\n江藤くんの やる気が さがった!',q.ex); label('💥 くらった'); }
      afterAnswer(); }),350);
  }
