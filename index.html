@@ -128,7 +128,7 @@ button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:c
    ・旧『ガンバレ！江藤くん』の4話は、この1年の中の行動・行事・イベントとして入っている(下の「旧『ガンバレ！江藤くん』の物語」)
    ・人物は切り取らない元の構図で、黒枠つきのカードに出す
    ===================================================================== */
-const VERSION='1.6';
+const VERSION='1.7';
 const $=id=>document.getElementById(id);
 const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -196,7 +196,7 @@ function buttons(list,cols,cls){ const p=$('pane'); p.className=(cols===2?'c2':'
 function next(f,t){ buttons([{t:t||'つぎへ ▶',cls:'main',f:b=>{ if(b.disabled) return; b.disabled=true; f(); }}]); }
 function talk(lines,done){ let i=0; (function step(){ if(i>=lines.length) return done(); const [w,t,fc]=lines[i++]; say(w,t,fc); next(step); })(); }
 function disableAll(){ [...$('pane').children].forEach(b=>b.disabled=true); }
-function nextBtn(f){ setTimeout(()=>{ [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶'; b.onclick=()=>{ if(b.disabled) return; b.disabled=true; sfx('click'); f(); }; $('pane').appendChild(b); },300); }
+function nextBtn(f){ setTimeout(()=>{ [...$('pane').children].filter(x=>x.textContent==='つぎへ ▶').forEach(x=>{ try{ x.remove(); }catch(e){} }); const b=document.createElement('button'); b.className='main'; b.style.gridColumn='1 / -1'; b.textContent='つぎへ ▶'; b.onclick=()=>{ if(b.disabled) return; b.disabled=true; sfx('click'); f(); }; const p=$('pane'); p.appendChild(b); p.scrollTop=p.scrollHeight; },300); } // 選択肢が多くても「つぎへ」が画面の外に出ないように
 function clearPane(){ [...$('pane').children].filter(x=>!/\b(right|wrong)\b/.test(x.className||'')).forEach(x=>{ try{ x.remove(); }catch(e){} }); }
 function popTxt(t){ const d=document.createElement('div'); d.className='pop'; d.textContent=t; $('top').appendChild(d); setTimeout(()=>{ try{ d.remove(); }catch(e){} },1200); }
 function hud(){ if(!G) return; $('hudL').textContent=`📅 ${when(G.t)}`; $('hudR').textContent=`のこり ${TURNS-G.t}`; if($('side').style.display==='block') renderSide(); }
@@ -848,7 +848,7 @@ function date(){ G.money-=3000; const k=G.her, h=H(); h.last=G.t; state='talk'; 
  const rounds=DATE_Q[k].map(r=>pick(r)); let sum=0, hit=0, i=0;
  const intro=G.lover?'恋人どうしの休日。':'';
  const ask=()=>{ if(i>=rounds.length) return end(); const r=rounds[i++]; pic(himg(k,1)); say(...r.q); label(`🌸 デート ${i}/${rounds.length}`); DATENOW=r;
-  buttons(shuffle(r.o).map(o=>({t:o[0],f:b=>{ if(!DATENOW) return; DATENOW=null; disableAll(); b.classList.add(o[1]>=7?'right':o[1]>0?'':'wrong'); const before=h.love; addLove(k,o[1]); sum+=h.love-before; if(o[1]>=7) hit++; say(...o[2]); label(o[1]>=7?'💗 大正解!':o[1]>0?'○ まあまあ':'💔 はずれ…'); nextBtn(ask); }})),1); };
+  buttons(shuffle(r.o).map(o=>({t:o[0],f:b=>{ if(!DATENOW) return; DATENOW=null; buttons([{t:o[0],dis:true,cls:o[1]>=7?'right':o[1]>0?'':'wrong'}],1); const before=h.love; addLove(k,o[1]); sum+=h.love-before; if(o[1]>=7) hit++; say(...o[2]); label(o[1]>=7?'💗 大正解!':o[1]>0?'○ まあまあ':'💔 はずれ…'); nextBtn(ask); }})),1); };
  const end=()=>{ addStress(-15); pic(himg(k,hit>=2?2:1));
   const msg=hit===3?`${HN()}は、とても楽しそうだった。`:hit>=1?`${HN()}との距離が、少し縮まった気がする。`:`${HN()}は、少し疲れた顔で帰っていった…。`;
   say('sys',`${msg}\nデートの結果 💗${sum>=0?'+':''}${sum}(大正解 ${hit}/3)`); label('🌸 デート'); finishAct(); };
