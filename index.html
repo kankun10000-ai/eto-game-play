@@ -128,7 +128,7 @@ button.ordslot img,button.ordpic img{max-width:100%;max-height:100%;object-fit:c
    ・旧『ガンバレ！江藤くん』の4話は、この1年の中の行動・行事・イベントとして入っている(下の「旧『ガンバレ！江藤くん』の物語」)
    ・人物は切り取らない元の構図で、黒枠つきのカードに出す
    ===================================================================== */
-const VERSION='1.5';
+const VERSION='1.6';
 const $=id=>document.getElementById(id);
 const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -670,9 +670,8 @@ function actStudy(){ state='act'; addStress(4); const units=learnedUnits(G.t);
  quiz(3,`📖 自習(まちがいノート ${G.miss.length}問)`,(ok,got)=>{ let b=0,m=0; got.forEach(q=>{ if(UNIT_ST[q.u]==='med') m+=2; else b+=2; }); if(b) addSt('body',b); if(m) addSt('med',m);
    home(true); pic(etoCard(1)); say('sys',`自習おわり。${ok}問 正解。まちがいノートは のこり ${G.miss.length}問。`); label('📖 自習'); finishAct(); },null,units,true); }
 function actSkill(){ state='act'; bg('room'); addStress(6); let pts=0, n=0;
- say('sys','実習室で、看護技術の練習。\nまずは器具の名前と形を覚えよう。名前の順に、器具の絵をならべる。3回やる。');
- (function one(){ if(n>=3){ const v=addSt('skill',2+pts); home(true); pic(etoCard(pts>=10?2:1)); say('sys',`練習おわり。正しくならべた器具 ${pts}/12\n看護技術 +${v}`); label('💉 実技練習'); return finishAct(); }
-   n++; label(`🧰 実技練習 ${n}/3`); nextBtn(()=>order('atk',g=>{ pts+=g.n; say('sys',`🧰 ${g.n} / 4 正しくならべた(${n}/3)`+ordMissText(g)); label(`🧰 実技練習 ${n}/3`,`合計 ${pts}`); nextBtn(one); })); })(); }
+ (function one(){ say('sys',n===0?'実習室で、看護技術の練習。\nまずは器具の名前と形を覚えよう。名前の順に、器具の絵をならべる。3回やる。':`${n+1}回目。名前の順に、器具の絵をならべよう。`); if(n>=3){ const v=addSt('skill',2+pts); home(true); pic(etoCard(pts>=10?2:1)); say('sys',`練習おわり。正しくならべた器具 ${pts}/12\n看護技術 +${v}`); label('💉 実技練習'); return finishAct(); }
+   n++; label(`🧰 実技練習 ${n}/3`); order('atk',g=>{ pts+=g.n; say('sys',`🧰 ${g.n} / 4 正しくならべた(${n}/3)`+ordMissText(g)); label(`🧰 実技練習 ${n}/3`,`合計 ${pts}`); nextBtn(one); }); })(); }
 const VOL=[
  {q:'病院のボランティア。入院中のおばあさんが「家に帰りたい…」とつぶやいた。',opts:[['帰れないっすよ。入院中なんで。',-1,'事実だけど、気持ちを受けとめていない…'],['そうですよね、お家が恋しいですよね。',2,'まず気持ちを受けとめる。それだけで安心することがある'],['元気出してください!',1,'はげましも大事。でも、まず気持ちを聞いてから']]},
  {q:'車いすの男性が、自動販売機の前で困っている。',opts:[['だまって押していく。',-1,'急に押すと驚かせる。まず声をかける'],['何かお手伝いしましょうか?',2,'まず声をかけて、相手の希望を聞く'],['大変っすね。がんばってください。',0,'気づいたなら、声をかけて手伝おう']]},
@@ -1427,8 +1426,8 @@ const ordMissText=g=>g.miss.length?'\n📌 '+g.miss.map(t=>`${t.name}:${t.use}`)
 /* ---------- 通学編(旧第1話):行動「🛵 通学路」。道をふさぐ相手とバトル ----------
    ふつうの相手19人(foes/01〜19)からまだ勝っていない人がランダムに出る。9人に勝つと校門のDNA先生(ボス)。
    ボスに勝ったあとはガイコツ先輩(おまけ)、全員に勝ったあとは再戦。
-   バトル:相手のHPは hp×10、江藤くんのやる気は3。4択に正解 → 器具ならべでダメージ(4つ正しいと×1.5)。
-   不正解 → 器具ならべで4つ正しければよける、だめならやる気-1 */
+   バトル:相手のHPは hp×10、江藤くんのやる気は3。4択に正解 → ダメージ(コンボで増える)。
+   不正解 → やる気-1(ver1.6で器具ならべは廃止。器具ならべは実技練習とキビシ主任のテストだけ) */
 const ROAD_OP=[['sys','朝8時。看護学校へバイクで向かう江藤くん。'],['eto','今日こそ遅刻しないで着くっす。…なんかイヤな予感するけど。','06']];
 function roadNext(){ const b=G.road.b, reg=FOES.filter(f=>!f.boss&&!f.extra), boss=FOES.find(f=>f.boss), ex=FOES.find(f=>f.extra);
  const won=reg.filter(f=>b.includes(f.n)).length, left=reg.filter(f=>!b.includes(f.n));
@@ -1445,12 +1444,10 @@ function battle(f){ BT={f,hp:f.hp*10,max:f.hp*10,me:3,combo:0,miss:0,q:shuffle(f
 function btRight(){ return `相手HP ${Math.max(0,BT.hp)}/${BT.max} ・ やる気 ${'♥'.repeat(Math.max(0,BT.me))}${'♡'.repeat(3-Math.max(0,BT.me))}`; }
 function btAsk(){ if(!BT.q.length) BT.q=shuffle(BT.f.qs); const q=BT.q.shift(); foe=BT.f; label(`⚔ ${BT.f.name}`,btRight());
  ask4(q,null,'foe',ok=>{
-  if(ok){ BT.combo++; say('sys',`⭕ 正解!${BT.combo>=2?` 🔥${BT.combo}コンボ!`:''}\n器具の絵を、名前の順にならべろ!4つ正しければクリティカル!`,null,q.ex); label('⭕ 正解!器具をならべろ',btRight());
-    nextBtn(()=>order('atk',g=>{ const m=g.all?1.5:g.n>=2?1:0.7, dmg=Math.max(1,Math.round((10+Math.min(6,(BT.combo-1)*2))*m)); BT.hp-=dmg; popTxt((g.all?'クリティカル!! ':'')+'-'+dmg);
-      say('sys',`🧰 ${g.n} / 4 正しくならべた!`+(g.all?' 💥 クリティカル!':'')+`\n${BT.f.name}に ${dmg}ダメージ!`+ordMissText(g)); label(g.all?'💥 クリティカル':m>=1?'⭕ ダメージ':'△ ならべまちがい…',btRight()); nextBtn(btNext); })); }
-  else { BT.combo=0; BT.miss++; BT.q.push(q); say('sys',`❌ 正解は「${q.a}」。\n${BT.f.name}の こうげき!器具を4つ正しく ならべて よけろ!`,null,q.ex); label('❌ 不正解…器具をならべろ',btRight());
-    nextBtn(()=>order('dodge',g=>{ if(g.all) say('sys','🧰 4つ全部 正しくならべた!\nひらりと よけた!やる気は へらなかった。'); else { BT.me--; say('sys',`🧰 ${g.n} / 4 …よけきれなかった。\nやる気が さがった!`+ordMissText(g)); }
-      label(g.all?'💨 回避成功':'💥 くらった',btRight()); nextBtn(btNext); })); } }); }
+  // ver1.6:問題のあとの器具ならべは廃止。正解ならそのままダメージ、不正解ならやる気が1へる
+  if(ok){ BT.combo++; const dmg=10+Math.min(6,(BT.combo-1)*2); BT.hp-=dmg; popTxt('-'+dmg);
+    say('sys',`⭕ 正解!${BT.combo>=2?` 🔥${BT.combo}コンボ!`:''}\n${BT.f.name}に ${dmg}ダメージ!`,null,q.ex); label('⭕ ダメージ',btRight()); nextBtn(btNext); }
+  else { BT.combo=0; BT.miss++; BT.me--; BT.q.push(q); say('sys',`❌ 正解は「${q.a}」。\n${BT.f.name}の こうげき!やる気が さがった!`,null,q.ex); label('💥 くらった',btRight()); nextBtn(btNext); } }); }
 function btNext(){ if(BT.hp<=0) return btWin(); if(BT.me<=0) return btLose(); btAsk(); }
 function btWin(){ const f=BT.f, perfect=BT.miss===0, fresh=!G.road.b.includes(f.n); if(fresh) G.road.b.push(f.n); dexWin(f,perfect); sfx('love'); foe=f;
  const v=addSt(f.extra?'body':'body',fresh?(f.boss?6:3):1);
